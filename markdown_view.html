@@ -1,0 +1,16 @@
+<html>
+<script type="text/javascript" src="/js/jquery-1.6.1.min.js"></script>
+<script type="text/javascript" src="/js/markdown.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $.get("/resource/markdown_text.html", function(data){
+            $('#content').html(window.markdown.toHTML(data));
+        });
+    });
+</script>
+<body>
+
+<div id="content" />
+
+</body>
+</html>
