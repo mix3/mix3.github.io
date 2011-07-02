@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>20110504_01.md</title>
+    <link href="/css/prettify/prettify.css" rel="stylesheet" type="text/css" media="screen" />
+    <script src="/js/prettify/prettify.js" type="text/javascript"></script>
+    <script src="/js/jquery-1.6.1.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function(){
+            $('pre').filter(function(){
+                console.log($(this).parent());
+                return !$(this).parent().hasClass('gist-highlight');
+            }).addClass('prettyprint linenums');
+            prettyPrint();
+            $('#content').fadeIn(2000);
+        });
+    </script>
+</head>
+<body>
+<div id="content" style="display:none">
+<p>Mojolicious::Liteは一つのファイルの中に全部突っ込んでWebアプリが作れるということなので、今自分が気になってるものを習作の意味を込めて全部詰め込んでCRUDアプリを作ってみました。jQueryも入れたかったけど書いていてカオスになったのでSNBinderの補助とページャ以外は無しにしました。</p>
+
+<p>色々突っ込んでみたものは以下</p>
+
+<ul>
+<li>Teng
+<ul>
+<li>ページャ（プラグイン）</li>
+<li>inflate/deflate</li>
+<li>triggerの代替 Class::Method::Modifiers</li>
+<li>Devel::KYTProf</li>
+</ul></li>
+<li>Xslate
+<ul>
+<li>Mojolicious::Liteで継承</li>
+</ul></li>
+<li>SNBinder
+<ul>
+<li>コンセプト</li>
+</ul></li>
+</ul>
+
+<h2>雑感</h2>
+
+<h3>Teng</h3>
+
+<p>nekokakさん作の軽量ORMであるTeng。</p>
+
+<ul>
+<li>Skinnyの後継</li>
+<li>DBIの薄いラッパー</li>
+</ul>
+
+<p>ということで、シンプルさを残しつつさらっと書きたいことはさらっと書けるように配慮されてて良い感じです。Skinnyと使い方はあまり変わらない事や、そもそもシンプルなのでコードを追いかけやすいということもあって理解はしやすそうです。ただドキュメントはまだまだ少ない感じで【実践Teng — Teng-Doc v0.01 documentation】という非公式のページも出来ているものの未掲載も残っていて、使用例などと合わせてドキュメントの充実が待たれているといった所でしょうか。</p>
+
+<h3>Xslate</h3>
+
+<p>なんだかとてつもなく速いテンプレートエンジン。自分はまだテンプレートエンジンの速度を気にしないといけないような状況には出会っていないので、速さというものの有り難さが分らないのですが速いそうです。また、テンプレートの書き方を選択出来るようでTTの文法で書く事も出来るようです。あと継承が扱えるのが良い感じです。テンプレートエンジンで継承は思いの外対応していないことが多いので。</p>
+
+<h3>SNBinder</h3>
+
+<p>データとテンプレートの組み合わせたものを一つの部品として見て、画面に貼付けて行く事で画面を構築して行くというコンセプトの、jsのテンプレートエンジン。この考え方は自分の大好きなJavaのWebアプリケーションフレームワーク、WicketのViewと似ていて非常に気に入っています。よくあるテンプレートエンジンのテンプレートの中にコードを埋め込んで画面を作る方法よりテンプレートがHTML的にプレーンでシンプルになるのが良いと思います。ただSNBinderはあまりにも機能がミニマムなのであえて使うほどでも無いかなとも思っています。後、データはサーバでViewがクライアントにあるので記述がシームレスに出来ないのもまた障壁のひとつかなと。Wicketだと全てJavaでサーバサイドで書けるので書いていて本当に幸せです。Java使いの方はWicketを使いましょう！</p>
+
+<h2>メモ</h2>
+
+<p>以下今回コードを書いていてのメモ</p>
+
+<h3>triggerの代替 Class::Method::Modifiers</h3>
+
+<p>Skinnyで言うtriggerがTengでは廃止されていて、代替としてClass::Method::Modifiersを使う事を提案されています。今回はTimestampとSoftDeleteの振る舞いを表現するために使ってみました。具体的にはcreated_at,updated_at,deleted_atの３カラムを用意してinsert,update,deleteの操作でそれぞれ自動的に日付が入力されるようにしました。また検索時にSoftDeleteされたものが検索の対象から排除されるようにしました。Class::Method::Modifiersの使い方を理解していないのでこれで良いのかは怪しいですが、それぞれsearchやinsertなどの動作を変更して*_atの値を操作しています。</p>
+
+<pre><code>package Message;
+use parent 'Teng';
+__PACKAGE__-&amp;gt;load_plugin('Pager');
+
+use Class::Method::Modifiers;
+
+around delete =&amp;gt; sub {
+    my ($orig, $self, $table_name, $delete_condition) = @_;
+    my $update_row_data = {
+        deleted_at =&amp;gt; DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo'),
+    };
+    $self-&amp;gt;update($table_name, $update_row_data, $delete_condition);
+};
+
+before update =&amp;gt; sub {
+    my ($self, $table_name, $update_row_data, $update_condition) = @_;
+    if (!$update_row_data-&amp;gt;{deleted_at}) {
+        $update_row_data-&amp;gt;{updated_at} = DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo');
+    }
+};
+
+before insert =&amp;gt; sub {
+    my ($self, $table_name, $row_data) = @_;
+    $row_data-&amp;gt;{created_at} = DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo');
+    $row_data-&amp;gt;{updated_at} = DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo');
+};
+
+before fast_insert =&amp;gt; sub {
+    my ($self, $table_name, $row_data) = @_;
+    $row_data-&amp;gt;{created_at} = DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo');
+    $row_data-&amp;gt;{updated_at} = DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo');
+};
+
+before search =&amp;gt; sub {
+    my ($self, $table_name, $search_condition, $search_attr) = @_;
+    $search_condition-&amp;gt;{deleted_at} = \'IS NULL';
+};
+
+before search_with_pager =&amp;gt; sub {
+    my ($self, $table_name, $where, $opts) = @_;
+    $where-&amp;gt;{deleted_at} = \'IS NULL';
+};
+
+1;
+
+my $result = $model-&amp;gt;single('message', {
+    id =&amp;gt; $self-&amp;gt;param('id')
+});
+
+$model-&amp;gt;fast_insert('message', {
+    message =&amp;gt; $self-&amp;gt;param('message'),
+});
+
+$model-&amp;gt;update('message',
+    {
+        message =&amp;gt; $self-&amp;gt;param('message'),
+    },
+    {
+        id =&amp;gt; $self-&amp;gt;param('id'),
+    }
+);
+
+$model-&amp;gt;delete('message', {
+    id =&amp;gt; $self-&amp;gt;param('id'),
+});
+
+my ($rows, $pager) = $model-&amp;gt;search_with_pager(
+    'message',
+    {
+    },
+    {
+        order_by =&amp;gt; 'id DESC',
+        page =&amp;gt; $page,
+        rows =&amp;gt; 3,
+    }
+);
+</code></pre>
+
+<h3>Mojolicious::LiteでのXslateの継承</h3>
+
+<p>Xslateで継承を使わないというのはありえないと思うのですが、Mojolicious::Liteでのサンプルが見つからなかったのでちょっと悩みました。実際はhogehoge.txで定義してincludeやcascadeなどでそれを指定するだけでした。</p>
+
+<pre><code>@@ base.tx
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+  &lt;head&gt;
+    &lt;meta http-equiv="content-type" content="text/html; charset=utf-8" /&gt;
+    &lt;script src="http://www.google.com/jsapi" type="text/javascript"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript"&gt;//&lt;![CDATA[
+        google.load('jquery', '1.4.4');
+    //]]&gt;&lt;/script&gt;
+    &lt;script src="https://github.com/snakajima/SNBinder/raw/master/snbinder-0.5.3.js" type="text/javascript"&gt;&lt;/script&gt;
+: include main_js
+    &lt;title&gt;Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory)&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+:   block content -&gt; { }
+  &lt;/body&gt;
+&lt;/html&gt;
+
+@@ form.tx
+&lt;form method="post" action="&lt;: $path :&gt;"&gt;
+: if ($id) {
+  &lt;input type="hidden" name="id" value="&lt;: $id :&gt;"&gt;
+: }
+  &lt;p&gt;&lt;textarea name="message" cols="50" rows="10" &gt;&lt;: $message :&gt;&lt;/textarea&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;input type="submit" /&gt;&lt;/p&gt;
+&lt;/form&gt;
+
+@@ index.html.tx
+: cascade base
+: override content -&gt; {
+
+: include form { path =&gt; "/create" }
+
+&lt;div id="main" style="display:none;"&gt;
+  &lt;p&gt;Accessing server ...&lt;/p&gt;
+&lt;/div&gt;
+
+: }
+</code></pre>
+
+<h3>SQLite/OnMemory</h3>
+
+<p>実はSQLiteってオンメモリ（正しくはインメモリかな？）で動作するんですね。知りませんでした。これのおかげで必要なCPANモジュールが入っていれば本当に一つのファイルで動作するアプリになりました。ただしオンメモリなので切断されると当然データが消えます。また、複数プロセスから接続は出来ないようでStarmanなどのHTTPDと組み合わせて動かすと勝手に複数ワーカーが起動して動作するため上手く動きません。オンメモリでもDB名を付けることが出来たり、コネクションプールで接続を維持し続ける方法があったりするんじゃないかとは思うのですが、ちょっと良くわかりません。H2DBではそういうことが出来た覚えがあるのですがさて。</p>
+
+<pre><code>my $model = Message-&gt;new(
+    dbh =&gt; DBI-&gt;connect(
+        'dbi:SQLite:dbname=:memory:', '', '',
+        {
+            RaiseError     =&gt; 1,
+            PrintError     =&gt; 0,
+            AutoCommit     =&gt; 1,
+            sqlite_unicode =&gt; 1,
+        }
+    )
+);
+</code></pre>
+
+<h2>コード</h2>
+
+<p>コードはGistに上げています</p>
+
+<script src="https://gist.github.com/953572.js"> </script>
+
+</div>
+</body>
+</html>
