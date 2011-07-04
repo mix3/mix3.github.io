@@ -74,78 +74,78 @@
 
 <pre><code>package Message;
 use parent 'Teng';
-__PACKAGE__-&amp;gt;load_plugin('Pager');
+__PACKAGE__-&gt;load_plugin('Pager');
 
 use Class::Method::Modifiers;
 
-around delete =&amp;gt; sub {
+around delete =&gt; sub {
     my ($orig, $self, $table_name, $delete_condition) = @_;
     my $update_row_data = {
-        deleted_at =&amp;gt; DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo'),
+        deleted_at =&gt; DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo'),
     };
-    $self-&amp;gt;update($table_name, $update_row_data, $delete_condition);
+    $self-&gt;update($table_name, $update_row_data, $delete_condition);
 };
 
-before update =&amp;gt; sub {
+before update =&gt; sub {
     my ($self, $table_name, $update_row_data, $update_condition) = @_;
-    if (!$update_row_data-&amp;gt;{deleted_at}) {
-        $update_row_data-&amp;gt;{updated_at} = DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo');
+    if (!$update_row_data-&gt;{deleted_at}) {
+        $update_row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo');
     }
 };
 
-before insert =&amp;gt; sub {
+before insert =&gt; sub {
     my ($self, $table_name, $row_data) = @_;
-    $row_data-&amp;gt;{created_at} = DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo');
-    $row_data-&amp;gt;{updated_at} = DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo');
+    $row_data-&gt;{created_at} = DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo');
+    $row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo');
 };
 
-before fast_insert =&amp;gt; sub {
+before fast_insert =&gt; sub {
     my ($self, $table_name, $row_data) = @_;
-    $row_data-&amp;gt;{created_at} = DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo');
-    $row_data-&amp;gt;{updated_at} = DateTime-&amp;gt;now-&amp;gt;set_time_zone('Asia/Tokyo');
+    $row_data-&gt;{created_at} = DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo');
+    $row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo');
 };
 
-before search =&amp;gt; sub {
+before search =&gt; sub {
     my ($self, $table_name, $search_condition, $search_attr) = @_;
-    $search_condition-&amp;gt;{deleted_at} = \'IS NULL';
+    $search_condition-&gt;{deleted_at} = \'IS NULL';
 };
 
-before search_with_pager =&amp;gt; sub {
+before search_with_pager =&gt; sub {
     my ($self, $table_name, $where, $opts) = @_;
-    $where-&amp;gt;{deleted_at} = \'IS NULL';
+    $where-&gt;{deleted_at} = \'IS NULL';
 };
 
 1;
 
-my $result = $model-&amp;gt;single('message', {
-    id =&amp;gt; $self-&amp;gt;param('id')
+my $result = $model-&gt;single('message', {
+    id =&gt; $self-&gt;param('id')
 });
 
-$model-&amp;gt;fast_insert('message', {
-    message =&amp;gt; $self-&amp;gt;param('message'),
+$model-&gt;fast_insert('message', {
+    message =&gt; $self-&gt;param('message'),
 });
 
-$model-&amp;gt;update('message',
+$model-&gt;update('message',
     {
-        message =&amp;gt; $self-&amp;gt;param('message'),
+        message =&gt; $self-&gt;param('message'),
     },
     {
-        id =&amp;gt; $self-&amp;gt;param('id'),
+        id =&gt; $self-&gt;param('id'),
     }
 );
 
-$model-&amp;gt;delete('message', {
-    id =&amp;gt; $self-&amp;gt;param('id'),
+$model-&gt;delete('message', {
+    id =&gt; $self-&gt;param('id'),
 });
 
-my ($rows, $pager) = $model-&amp;gt;search_with_pager(
+my ($rows, $pager) = $model-&gt;search_with_pager(
     'message',
     {
     },
     {
-        order_by =&amp;gt; 'id DESC',
-        page =&amp;gt; $page,
-        rows =&amp;gt; 3,
+        order_by =&gt; 'id DESC',
+        page =&gt; $page,
+        rows =&gt; 3,
     }
 );
 </code></pre>
