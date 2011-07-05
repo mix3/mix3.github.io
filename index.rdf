@@ -9,12 +9,14 @@
 <link>http://mix3.github.com/</link>
 <description>命名:萌えキャラピュタ</description>
 <pubDate>Tue, 05 Jul 2011 10:56:01 +0900</pubDate>
-<lastBuildDate>Tue, 05 Jul 2011 15:58:23 +0900</lastBuildDate>
+<lastBuildDate>Tue, 05 Jul 2011 16:51:41 +0900</lastBuildDate>
 
 <item>
 <title>さくらVPS借りてみた</title>
 <link>http://mix3.github.com/article/d0eaf97b5d1fa525640b284666ed63c7.html</link>
-<description><![CDATA[# さくらVPS借りてみた
+<description>
+<![CDATA[
+# さくらVPS借りてみた
 
 ### さくらVPS借りてみた
 
@@ -49,13 +51,16 @@
 他にもデーモンを止める話とかもあるので以下とか参考にしつつ最適化していきたいです。
 
 [さくらVPSを使うときに最初にやっておきたいこと(CentOS編)](http://sakura.off-soft.net/blog/sakura_vps_centos_first_setup.html)
-]]></description>
+]]>
+</description>
 <pubDate>Tue, 05 Jul 2011 10:56:01 +0900</pubDate>
 </item>
 <item>
 <title>Markdownブログ</title>
 <link>http://mix3.github.com/article/2e06a95d629f75805f2bfdd404f9c6fa.html</link>
-<description><![CDATA[# Markdownブログ
+<description>
+<![CDATA[
+# Markdownブログ
 
 ### Markdownブログ
 
@@ -81,13 +86,16 @@ pixivブログでjsを使ってごにょごにょしようとしてみたがム�
 などなど。
 
 ということでpixivブログで割と満足している現状全く使いどころが無いMarkdownブログだけどまあいっか。
-]]></description>
+]]>
+</description>
 <pubDate>Sun, 03 Jul 2011 00:00:00 +0900</pubDate>
 </item>
 <item>
 <title>MobaSiFを弄ってみた</title>
 <link>http://mix3.github.com/article/6da22b3e8148ef357d95a79d44b8d254.html</link>
-<description><![CDATA[# MobaSiFを弄ってみた
+<description>
+<![CDATA[
+# MobaSiFを弄ってみた
 
 MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。
 
@@ -99,7 +107,7 @@ MobaSiFは機能がミニマムなので、コントローラに相当すると�
 #### conf/pages.conf
 
     our %PAGE = (
-        'test' => [0,0,0, 'Page::Sample', 'pageMain'],
+        &#39;test&#39; =&gt; [0,0,0, &#39;Page::Sample&#39;, &#39;pageMain&#39;],
     );
 
 #### pm/Page/Sample.pm
@@ -108,19 +116,19 @@ MobaSiFは機能がミニマムなので、コントローラに相当すると�
     sub pageMain {
         my $func = shift;
         # レスポンスの生成
-        my $html = HTMLTemplate::insert('sample/index', $rhData);
+        my $html = HTMLTemplate::insert(&#39;sample/index&#39;, $rhData);
         # レスポンスヘッダに値をセット
         Response::output(¥$html);
     }
 
 #### template/_system/sample/index.html
 
-    <html>
-    <head><title>$CON:title$</title></head>
-    <body>
+    &lt;html&gt;
+    &lt;head&gt;&lt;title&gt;$CON:title$&lt;/title&gt;&lt;/head&gt;
+    &lt;body&gt;
         test
-    </body>
-    </html>
+    &lt;/body&gt;
+    &lt;/html&gt;
 
 普段触るフレームワークだと「レスポンスの生成」も「レスポンスヘッダへの値のセット」も自分ですることはまず無くて。テンプレートに渡す値をハッシュで用意して、テンプレート自体はクエリパスなどから自動で判断するかもしくは明示的に指定するかする場合が多い。
 
@@ -128,11 +136,11 @@ MobaSiFは機能がミニマムなので、コントローラに相当すると�
 
 #### pm/Context.pm
 
-<script src="https://gist.github.com/1038137.js?file=Context.pm"></script>
+&lt;script src=&quot;https://gist.github.com/1038137.js?file=Context.pm&quot;&gt;&lt;/script&gt;
 
 #### pm/Page/Main.pm
 
-<script src="https://gist.github.com/1038137.js?file=Main.pm"></script>
+&lt;script src=&quot;https://gist.github.com/1038137.js?file=Main.pm&quot;&gt;&lt;/script&gt;
 
 #### conf/pages.conf
 
@@ -140,29 +148,32 @@ MobaSiFは機能がミニマムなので、コントローラに相当すると�
             .
             .
             .
-        'test'  => [0,0,0, 'Page::Sample', 'test'],
-        'test1' => [0,0,0, 'Page::Sample', 'test1'],
-        'test2' => [0,0,0, 'Page::Sample', 'test2'],
+        &#39;test&#39;  =&gt; [0,0,0, &#39;Page::Sample&#39;, &#39;test&#39;],
+        &#39;test1&#39; =&gt; [0,0,0, &#39;Page::Sample&#39;, &#39;test1&#39;],
+        &#39;test2&#39; =&gt; [0,0,0, &#39;Page::Sample&#39;, &#39;test2&#39;],
     );
 
 #### pm/Page/Sample.pm
 
-<script src="https://gist.github.com/1038137.js?file=Sample.pm"></script>
+&lt;script src=&quot;https://gist.github.com/1038137.js?file=Sample.pm&quot;&gt;&lt;/script&gt;
 
 #### template/_system/sample/test.html
 
-<script src="https://gist.github.com/1038137.js?file=test.html"></script>
+&lt;script src=&quot;https://gist.github.com/1038137.js?file=test.html&quot;&gt;&lt;/script&gt;
 
 ### 次回はDB周りを触ってみる
 
 commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。
-]]></description>
+]]>
+</description>
 <pubDate>Wed, 22 Jun 2011 00:00:00 +0900</pubDate>
 </item>
 <item>
 <title>MobaSiFを触ってみた</title>
 <link>http://mix3.github.com/article/72498178ebb89e2e4d3c18efd6c1918b.html</link>
-<description><![CDATA[# MobaSiFを触ってみた
+<description>
+<![CDATA[
+# MobaSiFを触ってみた
 
 ### インストール
 
@@ -189,7 +200,7 @@ commit,transactionなどをラップしているものの、サンプルコー�
 * MobaSiF
  * mod_fastcgiとmod_fcgidがあるがMobaSiFはmod_fastcgi
  * yumで入れたApacheのバージョンが2.2だったが、mod_fastcgiは2.0までしか対応していない。
- * パッチを当てれば2.2にmod_fastcgiを入れるられる⇒'Apache2.2＋fastcgiで Ruby on Rails'
+ * パッチを当てれば2.2にmod_fastcgiを入れるられる⇒&#39;Apache2.2＋fastcgiで Ruby on Rails&#39;
 * perl
  * FastCGIがシステム標準のperlを使うのでperlbrewを使うと混乱する。
  * 素直にシステム標準のperlを使うのが楽
@@ -214,7 +225,7 @@ MobaSiFでのページとURLの対応は以下のようになる
             .
             .
             .
-        'sample' => [0,    package Page::Sample;
+        &#39;sample&#39; =&gt; [0,    package Page::Sample;
     
     use strict;
     use HTMLTemplate;
@@ -224,11 +235,11 @@ MobaSiFでのページとURLの対応は以下のようになる
         my $func = shift;
         my $rhData = {};
     
-        my $html = HTMLTemplate::insert("sample/top", $rhData);
+        my $html = HTMLTemplate::insert(&quot;sample/top&quot;, $rhData);
         Response::output(\$html);
     }
     
-    1;0,0, 'Page::Sample', 'pageMain'],
+    1;0,0, &#39;Page::Sample&#39;, &#39;pageMain&#39;],
         # http://[domain]/_sample にアクセスすると Page::SampleモジュールのpageMainの処理が走る
     };
 
@@ -244,7 +255,7 @@ MobaSiFでのページとURLの対応は以下のようになる
         my $func = shift;
         my $rhData = {};
     
-        my $html = HTMLTemplate::insert("sample/top", $rhData);
+        my $html = HTMLTemplate::insert(&quot;sample/top&quot;, $rhData);
         Response::output(\$html);
     }
     
@@ -258,7 +269,7 @@ MobaSiFでは速度を出すためにアプリで機種毎に出し分けなど�
 
 #### conf/pages.confの数字の意味
 
-    'ページ名' => [ UID_ST, USER_ST, SERV_ST, モジュール, サブルーチン ]
+    &#39;ページ名&#39; =&gt; [ UID_ST, USER_ST, SERV_ST, モジュール, サブルーチン ]
 
 * UID_ST
  * 0:情報なし
@@ -290,13 +301,16 @@ MobaSiFでは速度を出すためにアプリで機種毎に出し分けなど�
 以下で説明されている通りモダンじゃないのは確かかもしれませんね。 
 
 [第42回PHP勉強会 MobaSiF 発表資料](http://www.slideshare.net/bobpp/42php-mobasif-1351953)
-]]></description>
+]]>
+</description>
 <pubDate>Tue, 21 Jun 2011 00:00:00 +0900</pubDate>
 </item>
 <item>
 <title>jquery-presentationを弄ってみた</title>
 <link>http://mix3.github.com/article/1f582291f61c7e0bda7e728647b42609.html</link>
-<description><![CDATA[# jquery-presentationを弄ってみた
+<description>
+<![CDATA[
+# jquery-presentationを弄ってみた
 
 最近自分の進むべき道の事について考えたり考えなかったりしているmix3です。
 
@@ -318,7 +332,7 @@ jquery-presentationは実はページ送り（戻り）しか出来ない超絶�
 
 [デモはこちら](http://dl.dropbox.com/u/5299588/jquery-presentation/index.html)
 
-<script src="https://gist.github.com/1019885.js"> </script>
+&lt;script src=&quot;https://gist.github.com/1019885.js&quot;&gt; &lt;/script&gt;
 
 表示する順序や、visibility:hidden/display:noneの使い分けまでやりたいなと思いつつ片手間に弄ったので隠して表示が出来る程度にしています。やりすぎると「他のツール使え」ということになりますしね。
 
@@ -326,13 +340,16 @@ jquery-presentationは実はページ送り（戻り）しか出来ない超絶�
 ちなみに
 
 HTMLベースのパワポの弱点としてスライドシェアに上げにくい（PDFにしにくい）というものがあります。スライドシェアに上げる前提の場合はHTMLベースは避けた方が良いでしょう。
-]]></description>
+]]>
+</description>
 <pubDate>Sun, 12 Jun 2011 00:00:00 +0900</pubDate>
 </item>
 <item>
 <title>Qudoでログ回収</title>
 <link>http://mix3.github.com/article/7343925d5b5db5964a28dff94b1e9334.html</link>
-<description><![CDATA[# Qudoでログ回収
+<description>
+<![CDATA[
+# Qudoでログ回収
 
 * SCPやrsyncやらで各アプリケーションサーバから回収
  * 自由が利く
@@ -350,7 +367,7 @@ Hadoopが扱うファイルシステムはHDFSという前提で前回構築し�
 
 まず最初にシェルスクリプトで書いてみました。「これだと回収先のアプリが100万個ある場合は100万個同時にダウンロードしちゃうってことだよね？」というもっともな指摘で没になりました。まったくもってその通りだと思います。
 
-<script src="https://gist.github.com/954830.js"> </script>
+&lt;script src=&quot;https://gist.github.com/954830.js&quot;&gt; &lt;/script&gt;
 
 ### Qudoで並列回収
 
@@ -362,16 +379,19 @@ Hadoopが扱うファイルシステムはHDFSという前提で前回構築し�
 
 以上の要件で最初はTheSchwartz＆Parallel::Preforkで考えていましたが何やらGearmanでもDBを使って動作させられるという話があったりQudoを見つけてみたりで、でもやりたいことって別にそんなに複雑な事でもないので結局何使っても良いかなと思ってQudoを選びました。後々機能を増やしたい時にフックポイントが色々用意されているので悪くないかなと。
 
-<script src="https://gist.github.com/951476.js"> </script>
+&lt;script src=&quot;https://gist.github.com/951476.js&quot;&gt; &lt;/script&gt;
 
 どうでも良いですがnekokakさん曰くQudoは「駆動」らしいですが「弓道」の方が良いと思います＾＾
-]]></description>
+]]>
+</description>
 <pubDate>Wed, 04 May 2011 00:00:01 +0900</pubDate>
 </item>
 <item>
 <title>Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory) でCRUDアプリを作ってみた</title>
 <link>http://mix3.github.com/article/31f556362690556d70162368934b2d08.html</link>
-<description><![CDATA[# Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory) でCRUDアプリを作ってみた
+<description>
+<![CDATA[
+# Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory) でCRUDアプリを作ってみた
 
 Mojolicious::Liteは一つのファイルの中に全部突っ込んでWebアプリが作れるということなので、今自分が気になってるものを習作の意味を込めて全部詰め込んでCRUDアプリを作ってみました。jQueryも入れたかったけど書いていてカオスになったのでSNBinderの補助とページャ以外は無しにしました。
 
@@ -415,79 +435,79 @@ nekokakさん作の軽量ORMであるTeng。
 Skinnyで言うtriggerがTengでは廃止されていて、代替としてClass::Method::Modifiersを使う事を提案されています。今回はTimestampとSoftDeleteの振る舞いを表現するために使ってみました。具体的にはcreated_at,updated_at,deleted_atの３カラムを用意してinsert,update,deleteの操作でそれぞれ自動的に日付が入力されるようにしました。また検索時にSoftDeleteされたものが検索の対象から排除されるようにしました。Class::Method::Modifiersの使い方を理解していないのでこれで良いのかは怪しいですが、それぞれsearchやinsertなどの動作を変更して*_atの値を操作しています。
 
     package Message;
-    use parent 'Teng';
-    __PACKAGE__->load_plugin('Pager');
+    use parent &#39;Teng&#39;;
+    __PACKAGE__-&gt;load_plugin(&#39;Pager&#39;);
     
     use Class::Method::Modifiers;
     
-    around delete => sub {
+    around delete =&gt; sub {
         my ($orig, $self, $table_name, $delete_condition) = @_;
         my $update_row_data = {
-            deleted_at => DateTime->now->set_time_zone('Asia/Tokyo'),
+            deleted_at =&gt; DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;),
         };
-        $self->update($table_name, $update_row_data, $delete_condition);
+        $self-&gt;update($table_name, $update_row_data, $delete_condition);
     };
     
-    before update => sub {
+    before update =&gt; sub {
         my ($self, $table_name, $update_row_data, $update_condition) = @_;
-        if (!$update_row_data->{deleted_at}) {
-            $update_row_data->{updated_at} = DateTime->now->set_time_zone('Asia/Tokyo');
+        if (!$update_row_data-&gt;{deleted_at}) {
+            $update_row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;);
         }
     };
     
-    before insert => sub {
+    before insert =&gt; sub {
         my ($self, $table_name, $row_data) = @_;
-        $row_data->{created_at} = DateTime->now->set_time_zone('Asia/Tokyo');
-        $row_data->{updated_at} = DateTime->now->set_time_zone('Asia/Tokyo');
+        $row_data-&gt;{created_at} = DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;);
+        $row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;);
     };
     
-    before fast_insert => sub {
+    before fast_insert =&gt; sub {
         my ($self, $table_name, $row_data) = @_;
-        $row_data->{created_at} = DateTime->now->set_time_zone('Asia/Tokyo');
-        $row_data->{updated_at} = DateTime->now->set_time_zone('Asia/Tokyo');
+        $row_data-&gt;{created_at} = DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;);
+        $row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;);
     };
     
-    before search => sub {
+    before search =&gt; sub {
         my ($self, $table_name, $search_condition, $search_attr) = @_;
-        $search_condition->{deleted_at} = \'IS NULL';
+        $search_condition-&gt;{deleted_at} = \&#39;IS NULL&#39;;
     };
     
-    before search_with_pager => sub {
+    before search_with_pager =&gt; sub {
         my ($self, $table_name, $where, $opts) = @_;
-        $where->{deleted_at} = \'IS NULL';
+        $where-&gt;{deleted_at} = \&#39;IS NULL&#39;;
     };
     
     1;
     
-    my $result = $model->single('message', {
-        id => $self->param('id')
+    my $result = $model-&gt;single(&#39;message&#39;, {
+        id =&gt; $self-&gt;param(&#39;id&#39;)
     });
     
-    $model->fast_insert('message', {
-        message => $self->param('message'),
+    $model-&gt;fast_insert(&#39;message&#39;, {
+        message =&gt; $self-&gt;param(&#39;message&#39;),
     });
     
-    $model->update('message',
+    $model-&gt;update(&#39;message&#39;,
         {
-            message => $self->param('message'),
+            message =&gt; $self-&gt;param(&#39;message&#39;),
         },
         {
-            id => $self->param('id'),
+            id =&gt; $self-&gt;param(&#39;id&#39;),
         }
     );
     
-    $model->delete('message', {
-        id => $self->param('id'),
+    $model-&gt;delete(&#39;message&#39;, {
+        id =&gt; $self-&gt;param(&#39;id&#39;),
     });
     
-    my ($rows, $pager) = $model->search_with_pager(
-        'message',
+    my ($rows, $pager) = $model-&gt;search_with_pager(
+        &#39;message&#39;,
         {
         },
         {
-            order_by => 'id DESC',
-            page => $page,
-            rows => 3,
+            order_by =&gt; &#39;id DESC&#39;,
+            page =&gt; $page,
+            rows =&gt; 3,
         }
     );
 
@@ -496,41 +516,41 @@ Skinnyで言うtriggerがTengでは廃止されていて、代替としてClass:
 Xslateで継承を使わないというのはありえないと思うのですが、Mojolicious::Liteでのサンプルが見つからなかったのでちょっと悩みました。実際はhogehoge.txで定義してincludeやcascadeなどでそれを指定するだけでした。
 
     @@ base.tx
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-    <html xmlns="http://www.w3.org/1999/xhtml">
-      <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <script src="http://www.google.com/jsapi" type="text/javascript"></script>
-        <script type="text/javascript">//<![CDATA[
-            google.load('jquery', '1.4.4');
-        //]]></script>
-        <script src="https://github.com/snakajima/SNBinder/raw/master/snbinder-0.5.3.js" type="text/javascript"></script>
+    &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;
+    &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+      &lt;head&gt;
+        &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+        &lt;script src=&quot;http://www.google.com/jsapi&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+        &lt;script type=&quot;text/javascript&quot;&gt;//&lt;![CDATA[
+            google.load(&#39;jquery&#39;, &#39;1.4.4&#39;);
+        //]]&gt;&lt;/script&gt;
+        &lt;script src=&quot;https://github.com/snakajima/SNBinder/raw/master/snbinder-0.5.3.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
     : include main_js
-        <title>Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory)</title>
-      </head>
-      <body>
-    :   block content -> { }
-      </body>
-    </html>
+        &lt;title&gt;Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory)&lt;/title&gt;
+      &lt;/head&gt;
+      &lt;body&gt;
+    :   block content -&gt; { }
+      &lt;/body&gt;
+    &lt;/html&gt;
     
     @@ form.tx
-    <form method="post" action="<: $path :>">
+    &lt;form method=&quot;post&quot; action=&quot;&lt;: $path :&gt;&quot;&gt;
     : if ($id) {
-      <input type="hidden" name="id" value="<: $id :>">
+      &lt;input type=&quot;hidden&quot; name=&quot;id&quot; value=&quot;&lt;: $id :&gt;&quot;&gt;
     : }
-      <p><textarea name="message" cols="50" rows="10" ><: $message :></textarea></p>
-      <p><input type="submit" /></p>
-    </form>
+      &lt;p&gt;&lt;textarea name=&quot;message&quot; cols=&quot;50&quot; rows=&quot;10&quot; &gt;&lt;: $message :&gt;&lt;/textarea&gt;&lt;/p&gt;
+      &lt;p&gt;&lt;input type=&quot;submit&quot; /&gt;&lt;/p&gt;
+    &lt;/form&gt;
     
     @@ index.html.tx
     : cascade base
-    : override content -> {
+    : override content -&gt; {
     
-    : include form { path => "/create" }
+    : include form { path =&gt; &quot;/create&quot; }
     
-    <div id="main" style="display:none;">
-      <p>Accessing server ...</p>
-    </div>
+    &lt;div id=&quot;main&quot; style=&quot;display:none;&quot;&gt;
+      &lt;p&gt;Accessing server ...&lt;/p&gt;
+    &lt;/div&gt;
     
     : }
 
@@ -538,14 +558,14 @@ Xslateで継承を使わないというのはありえないと思うのです�
 
 実はSQLiteってオンメモリ（正しくはインメモリかな？）で動作するんですね。知りませんでした。これのおかげで必要なCPANモジュールが入っていれば本当に一つのファイルで動作するアプリになりました。ただしオンメモリなので切断されると当然データが消えます。また、複数プロセスから接続は出来ないようでStarmanなどのHTTPDと組み合わせて動かすと勝手に複数ワーカーが起動して動作するため上手く動きません。オンメモリでもDB名を付けることが出来たり、コネクションプールで接続を維持し続ける方法があったりするんじゃないかとは思うのですが、ちょっと良くわかりません。H2DBではそういうことが出来た覚えがあるのですがさて。
 
-    my $model = Message->new(
-        dbh => DBI->connect(
-            'dbi:SQLite:dbname=:memory:', '', '',
+    my $model = Message-&gt;new(
+        dbh =&gt; DBI-&gt;connect(
+            &#39;dbi:SQLite:dbname=:memory:&#39;, &#39;&#39;, &#39;&#39;,
             {
-                RaiseError     => 1,
-                PrintError     => 0,
-                AutoCommit     => 1,
-                sqlite_unicode => 1,
+                RaiseError     =&gt; 1,
+                PrintError     =&gt; 0,
+                AutoCommit     =&gt; 1,
+                sqlite_unicode =&gt; 1,
             }
         )
     );
@@ -554,22 +574,26 @@ Xslateで継承を使わないというのはありえないと思うのです�
 
 コードはGistに上げています
 
-<script src="https://gist.github.com/953572.js"> </script>
-]]></description>
+&lt;script src=&quot;https://gist.github.com/953572.js&quot;&gt; &lt;/script&gt;
+]]>
+</description>
 <pubDate>Wed, 04 May 2011 00:00:00 +0900</pubDate>
 </item>
 <item>
 <title>Hadoopを触ってみた</title>
 <link>http://mix3.github.com/article/64e7ae8130b74b84e0caa83dd73e5cb0.html</link>
-<description><![CDATA[# Hadoopを触ってみた
+<description>
+<![CDATA[
+# Hadoopを触ってみた
 
 具体的にはgistに書いた。
 
 完全分散モードが結構癖が強い感じなので気をつけたい。
 
-<script src="https://gist.github.com/944255.js"> </script>
-<script src="https://gist.github.com/944342.js"> </script>
-]]></description>
+&lt;script src=&quot;https://gist.github.com/944255.js&quot;&gt; &lt;/script&gt;
+&lt;script src=&quot;https://gist.github.com/944342.js&quot;&gt; &lt;/script&gt;
+]]>
+</description>
 <pubDate>Sat, 30 Apr 2011 00:00:00 +0900</pubDate>
 </item>
 </channel>

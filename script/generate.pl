@@ -110,11 +110,12 @@ my $list = [];
         }
         last if(10 < ++$i);
         my $content = file($FindBin::Bin.'/../resource/'.$_->{resource})->slurp;
+        $content = html_escape($content);
         my $created_at = DateTime::Format::Mail->format_datetime(&mtime2date($_->{created_at}));
         $rss->add_item(
             title => $_->{title},
             link => 'http://mix3.github.com/article/'.$_->{id}.'.html',
-            description => '<![CDATA['.$content.']]>',
+            description => "\n<![CDATA[\n".$content."]]>\n",
             pubDate => $created_at,
         );
     }
@@ -162,6 +163,16 @@ sub sorted_list {
         };
     }
     return sort{ $b->{created_at} <=> $a->{created_at} } @$list;
+}
+
+sub html_escape {
+    my $content = shift;
+    my @escape_from = qw(& > < " ');
+    my @escape_to = ('&amp;', '&gt;', '&lt;', '&quot;', '&#39;');
+    for (my $i = 0; $i <= $#escape_from; $i++) {
+        $content =~ s/$escape_from[$i]/$escape_to[$i]/g;
+    }
+    return $content;
 }
 
 __DATA__
