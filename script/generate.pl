@@ -13,6 +13,8 @@ use Encode;
 use File::Basename;
 use YAML::Tiny;
 use FindBin;
+use XML::RSS;
+use DateTime::Format::Mail;
 
 my $resource_dir = dir($FindBin::Bin.'/../resource');
 
@@ -29,6 +31,7 @@ my $list = [];
         push @$list, $id;
         my ($title) = ($resource->openr->getline =~ /^# (.*?)$/);
         my $param = {
+            resource => $resource->basename,
             title => $title,
             created_at => $resource->stat->[9],
             updated_at => $resource->stat->[9],
@@ -75,18 +78,9 @@ my $list = [];
 }
 
 {
-    my $list = [];
-    for my $id (keys %$metadata) {
-        push @$list, {
-            id         => $id,
-            title      => $metadata->{$id}->{title},
-            created_at => $metadata->{$id}->{created_at}
-        };
-    }
-    my @result = sort{ $b->{created_at} <=> $a->{created_at} } @$list;
-
+    # index
     my $content = '<ol>'."\n";
-    for (@result) {
+    for (&sorted_list($metadata)) {
         $content .= '    <li><a href="/article/'.$_->{id}.'.html">'.$_->{title}.'</a></li>'."\n";
     }
     $content .= '</ol>';
@@ -96,6 +90,37 @@ my $list = [];
     my $fh = $file->openw();
     print $fh $template;
     $fh->close;
+}
+
+{
+    # rss
+    my $rss = new XML::RSS (version => '2.0');
+    my $i = 0;
+    for (&sorted_list($metadata)) {
+        if ($i == 0) {
+            my $created_at = DateTime::Format::Mail->format_datetime(&mtime2date($_->{created_at}));
+            my $builded_at = DateTime::Format::Mail->format_datetime(DateTime->now->set_time_zone('Asia/Tokyo'));
+            $rss->channel(
+                title => encode_utf8('萌えキャラ的にクリスマスはキリスト教的なイベントだから仏教的人種はスルー的な？みたいな？'),
+                link => 'http://mix3.github.com/',
+                description => encode_utf8('命名:萌えキャラピュタ'),
+                pubDate => $created_at,
+                lastBuildDate => $builded_at,
+            );
+        }
+        last if(10 < ++$i);
+        my $content = file($FindBin::Bin.'/../resource/'.$_->{resource})->slurp;
+        $rss->add_item(
+            title => $_->{title},
+            link => 'http://mix3.github.com/article/'.$_->{id}.'.html',
+            description => '<![CDATA['.$content.']]>',
+        );
+    }
+    my $rdf_fh = file($FindBin::Bin.'/../index.rdf')->openw;
+    my $data = $rss->as_string;
+    $data =~ s/&#x([0-9A-Fa-f]{2});/pack("H2", $1)/eg;
+    print $rdf_fh $data;
+    $rdf_fh->close;
 }
 
 my $metadata_fh = $metadata_file->openw;
@@ -123,6 +148,20 @@ sub create_article {
     $fh->close;
 }
 
+sub sorted_list {
+    my $metadata = shift;
+    my $list = [];
+    for my $id (keys %$metadata) {
+        push @$list, {
+            id         => $id,
+            title      => $metadata->{$id}->{title},
+            created_at => $metadata->{$id}->{created_at},
+            resource   => $metadata->{$id}->{resource},
+        };
+    }
+    return sort{ $b->{created_at} <=> $a->{created_at} } @$list;
+}
+
 __DATA__
 
 @@ index.html
@@ -130,8 +169,9 @@ __DATA__
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Markdownブログ</title>
+    <title>萌えキャラ的にクリスマスはキリスト教的なイベントだから仏教的人種はスルー的な？みたいな？</title>
     <script src="/js/jquery-1.6.1.min.js" type="text/javascript"></script>
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="http://mix3.github.com/index.rdf" />
 </head>
 <body>
 #CONTENT#
@@ -144,6 +184,7 @@ __DATA__
 <head>
     <meta charset="utf-8" />
     <title>#TITLE#</title>
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="http://mix3.github.com/index.rdf" />
     <link href="/css/prettify/prettify.css" rel="stylesheet" type="text/css" media="screen" />
     <script src="/js/prettify/prettify.js" type="text/javascript"></script>
     <script src="/js/jquery-1.6.1.min.js" type="text/javascript"></script>
