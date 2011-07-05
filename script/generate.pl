@@ -110,10 +110,12 @@ my $list = [];
         }
         last if(10 < ++$i);
         my $content = file($FindBin::Bin.'/../resource/'.$_->{resource})->slurp;
+        my $created_at = DateTime::Format::Mail->format_datetime(&mtime2date($_->{created_at}));
         $rss->add_item(
             title => $_->{title},
             link => 'http://mix3.github.com/article/'.$_->{id}.'.html',
             description => '<![CDATA['.$content.']]>',
+            pubDate => $created_at,
         );
     }
     my $rdf_fh = file($FindBin::Bin.'/../index.rdf')->openw;

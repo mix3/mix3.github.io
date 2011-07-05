@@ -9,7 +9,7 @@
 <link>http://mix3.github.com/</link>
 <description>命名:萌えキャラピュタ</description>
 <pubDate>Tue, 05 Jul 2011 10:56:01 +0900</pubDate>
-<lastBuildDate>Tue, 05 Jul 2011 15:19:44 +0900</lastBuildDate>
+<lastBuildDate>Tue, 05 Jul 2011 15:31:16 +0900</lastBuildDate>
 
 <item>
 <title>さくらVPS借りてみた</title>
@@ -50,6 +50,7 @@
 
 [さくらVPSを使うときに最初にやっておきたいこと(CentOS編)](http://sakura.off-soft.net/blog/sakura_vps_centos_first_setup.html)
 ]]></description>
+<pubDate>Tue, 05 Jul 2011 10:56:01 +0900</pubDate>
 </item>
 <item>
 <title>Markdownブログ</title>
@@ -81,6 +82,7 @@ pixivブログでjsを使ってごにょごにょしようとしてみたがム�
 
 ということでpixivブログで割と満足している現状全く使いどころが無いMarkdownブログだけどまあいっか。
 ]]></description>
+<pubDate>Sun, 03 Jul 2011 00:00:00 +0900</pubDate>
 </item>
 <item>
 <title>MobaSiFを弄ってみた</title>
@@ -155,6 +157,7 @@ MobaSiFは機能がミニマムなので、コントローラに相当すると�
 
 commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。
 ]]></description>
+<pubDate>Wed, 22 Jun 2011 00:00:00 +0900</pubDate>
 </item>
 <item>
 <title>MobaSiFを触ってみた</title>
@@ -288,6 +291,7 @@ MobaSiFでは速度を出すためにアプリで機種毎に出し分けなど�
 
 [第42回PHP勉強会 MobaSiF 発表資料](http://www.slideshare.net/bobpp/42php-mobasif-1351953)
 ]]></description>
+<pubDate>Tue, 21 Jun 2011 00:00:00 +0900</pubDate>
 </item>
 <item>
 <title>jquery-presentationを弄ってみた</title>
@@ -323,6 +327,7 @@ jquery-presentationは実はページ送り（戻り）しか出来ない超絶�
 
 HTMLベースのパワポの弱点としてスライドシェアに上げにくい（PDFにしにくい）というものがあります。スライドシェアに上げる前提の場合はHTMLベースは避けた方が良いでしょう。
 ]]></description>
+<pubDate>Sun, 12 Jun 2011 00:00:00 +0900</pubDate>
 </item>
 <item>
 <title>Qudoでログ回収</title>
@@ -361,6 +366,7 @@ Hadoopが扱うファイルシステムはHDFSという前提で前回構築し�
 
 どうでも良いですがnekokakさん曰くQudoは「駆動」らしいですが「弓道」の方が良いと思います＾＾
 ]]></description>
+<pubDate>Wed, 04 May 2011 00:00:01 +0900</pubDate>
 </item>
 <item>
 <title>Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory) でCRUDアプリを作ってみた</title>
@@ -550,6 +556,7 @@ Xslateで継承を使わないというのはありえないと思うのです�
 
 <script src="https://gist.github.com/953572.js"> </script>
 ]]></description>
+<pubDate>Wed, 04 May 2011 00:00:00 +0900</pubDate>
 </item>
 <item>
 <title>Hadoopを触ってみた</title>
@@ -563,6 +570,7 @@ Xslateで継承を使わないというのはありえないと思うのです�
 <script src="https://gist.github.com/944255.js"> </script>
 <script src="https://gist.github.com/944342.js"> </script>
 ]]></description>
+<pubDate>Sat, 30 Apr 2011 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>
