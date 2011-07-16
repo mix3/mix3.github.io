@@ -8,9 +8,120 @@
 <title>萌えキャラ的にクリスマスはキリスト教的なイベントだから仏教的人種はスルー的な？みたいな？</title>
 <link>http://mix3.github.com/</link>
 <description>命名:萌えキャラピュタ</description>
-<pubDate>Tue, 05 Jul 2011 10:56:01 +0900</pubDate>
-<lastBuildDate>Tue, 05 Jul 2011 16:51:41 +0900</lastBuildDate>
+<pubDate>Sun, 17 Jul 2011 08:02:28 +0900</pubDate>
+<lastBuildDate>Sun, 17 Jul 2011 08:03:00 +0900</lastBuildDate>
 
+<item>
+<title>さくらVPSをちょこちょこ触ってみる</title>
+<link>http://mix3.github.com/article/4d2ced9323e6b01dc90783c18675d2bd.html</link>
+<description>
+<![CDATA[
+# さくらVPSをちょこちょこ触ってみる
+
+と言っても特に何かしたとかは無かったり。
+
+* sshのポートを変えた
+* iptablesを設定した
+* logwatchを導入した
+* pacoを導入した
+
+### sshのポート変更
+
+セキュリティ的にはsshを公開鍵認証にしておくだけで基本大丈夫だとは思うのですが、アタックされることには変わりなく気持ち悪い物は気持ち悪いので一応変えておきました。
+
+### iptablesの設定
+
+何処でも見かける設定ですが以下のような基準でiptablesを設定するスクリプトを組みました。
+
+* 内から外への通信以外は拒否
+ * ただし内から外への通信の応答は通す
+* SSH用の穴は用意する
+
+#### iptables-init.sh
+
+    #!/bin/sh
+    
+    # ルールクリア
+    iptables -F
+    iptables -X
+    
+    # 内から外への通信以外は破棄
+    iptables -P INPUT   DROP
+    iptables -P OUTPUT  ACCEPT
+    iptables -P FORWARD DROP
+    
+    # ループバックは全て許可
+    iptables -A INPUT  -i lo -j ACCEPT
+    iptables -A OUTPUT -o lo -j ACCEPT
+    
+    # プライベートネットワークなんて無かったんや…
+    iptables -A INPUT -s 10.0.0.0/8     -j DROP
+    iptables -A INPUT -s 127.16.0.0/12  -j DROP
+    iptables -A INPUT -s 192.168.0.0/16 -j DROP
+    
+    # SSH用の穴
+    iptables -A INPUT -p tcp --dport {SSHのポート} -j ACCEPT
+    
+    # 内から外への通信の応答は通す
+    iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+### logwatchの導入
+
+ログも監視しないと意味ないのでlogwatchなるログを定期的に（デフォルトはcron.dailyを利用した毎日）メールで知らせるプログラムを導入してみました。yumで入れるとバージョンが結構古かったりするので[sourceforge](http://sourceforge.net/projects/logwatch/files/)から落としてインストールしました。rpmで入れるとデフォルトの設定ファイルが/usr/share/logwatch/default.conf以下となるようです。/etc/logwatch/conf以下に設定ファイルを置くと設定を上書きするようです。
+
+とりあえずSSHのログとDiskスペースのログを監視するようにしました。デフォルトではService = Allで全部を監視するようにしてその後除外を設定しているのでその設定をコメントアウトしてSSHのログとDiskスペースのログに決め打ちしました。
+
+#### /usr/share/logwatch/default.conf/logwatch.conf
+
+    #Service = All
+    #Service = &quot;-zz-network&quot; 
+    #Service = &quot;-zz-sys&quot; 
+    #Service = &quot;-eximstats&quot;
+
+#### /etc/logwatch/conf/logwatch.conf
+
+    MailTo = 送信先メールアドレス
+    MailFrom = 送信元メールアドレス
+    Service = sshd
+    Service = zz-disk_space
+
+rpmで入れているならばおそらく/etc/cron.daily/0logwatchにlogwatchスクリプトへのシンボリックリンクが貼られているので毎日定期的に実行されメールが届くようになるハズです。ただしデフォルトでは前日のログを送信する設定（Range = yesterday）になっていてログが記録されていなければ送信されません。
+
+### pacoの導入
+
+pacoはmake installしたソフトを管理するものです。yumなどのパッケージ管理ソフトで管理されている以外のものについてもきちっと管理したい場合は導入するととても幸せになれそうです。
+
+* 参考
+ * [paco](http://paco.sourceforge.net/)
+ * [make install&quot;したソフトウェアを管理できる超便利ツール「Paco」](http://d.hatena.ne.jp/rx7/20081011/p2)
+
+pacoのインストール自体はconfigure make make installで出来ます。またpaco自身をpacoで管理するためにmake installの後make logmeを実行します。これ以降make installするときはpaco -D make insatllというふうにすることでそのソフトをpacoの管理下に置いてくれます。
+
+#### 注意
+
+pacoはデフォルトで/usr/local/bin以下にインストールされるのですがsudoで実行するとPATHが引き継がれずpacoが見つからないためmake logmeに失敗してしまいました。./configure prefix=/binなどインストール場所を設定してsudoでも実行出来るようにするか、sudo時の環境変数の引き継ぎをするなどして回避しましょう。
+
+なおsudo時の環境変数の引き継ぎ方法は色々あるようです。
+
+#### bashrcで設定
+
+    alias sudo=&quot;sudo env PATH=$PATH&quot;
+
+#### visudoで設定
+
+    Defaults:{run_user} !env_reset
+        or
+    Defaults env_keep+=&quot;PATH&quot;
+
+#### sudo -s で実行
+
+### 次回は
+
+Nginx+plackでなんか適当に外から見れる環境を作りたいかな。
+]]>
+</description>
+<pubDate>Sun, 17 Jul 2011 08:02:28 +0900</pubDate>
+</item>
 <item>
 <title>さくらVPS借りてみた</title>
 <link>http://mix3.github.com/article/d0eaf97b5d1fa525640b284666ed63c7.html</link>

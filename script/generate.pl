@@ -204,6 +204,7 @@ __DATA__
 
 </head>
 <body>
+<h1><a href="http://mix3.github.com/">萌えキャラ的にクリスマスはキリスト教的なイベントだから仏教的人種はスルー的な？みたいな？</a></h1>
 #CONTENT#
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 </body>
@@ -214,7 +215,7 @@ __DATA__
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>#TITLE#</title>
+    <title>萌えキャラ的にクリスマスはキリスト教的なイベントだから仏教的人種はスルー的な？みたいな？ : #TITLE#</title>
     <link rel="alternate" type="application/rss+xml" title="RSS" href="http://mix3.github.com/index.rdf" />
     <link href="/css/prettify/prettify.css" rel="stylesheet" type="text/css" media="screen" />
     <script src="/js/prettify/prettify.js" type="text/javascript"></script>
@@ -249,6 +250,7 @@ __DATA__
 </head>
 <body>
 <div id="content" style="display:none">
+<h1><a href="http://mix3.github.com/">萌えキャラ的にクリスマスはキリスト教的なイベントだから仏教的人種はスルー的な？みたいな？</a></h1>
 #CONTENT#
 </div>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->

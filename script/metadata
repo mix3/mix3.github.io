@@ -14,6 +14,11 @@
   resource: 20110504_01.md
   title: 'Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory) でCRUDアプリを作ってみた'
   updated_at: 1309806313
+4d2ced9323e6b01dc90783c18675d2bd:
+  created_at: 1310857348
+  resource: 20110717.md
+  title: 'さくらVPSをちょこちょこ触ってみる'
+  updated_at: 1310857348
 64e7ae8130b74b84e0caa83dd73e5cb0:
   created_at: 1304089200
   resource: 20110430.md
@@ -37,5 +42,5 @@
 d0eaf97b5d1fa525640b284666ed63c7:
   created_at: 1309830961
   resource: 20110705.md
-  title: 'さくらVPS借りてみた'
+  title: さくらVPS借りてみた
   updated_at: 1309830961
