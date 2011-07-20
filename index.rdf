@@ -8,9 +8,113 @@
 <title>萌えキャラ的にクリスマスはキリスト教的なイベントだから仏教的人種はスルー的な？みたいな？</title>
 <link>http://mix3.github.com/</link>
 <description>命名:萌えキャラピュタ</description>
-<pubDate>Sun, 17 Jul 2011 08:02:28 +0900</pubDate>
-<lastBuildDate>Sun, 17 Jul 2011 08:03:00 +0900</lastBuildDate>
+<pubDate>Wed, 20 Jul 2011 16:28:25 +0900</pubDate>
+<lastBuildDate>Wed, 20 Jul 2011 16:28:50 +0900</lastBuildDate>
 
+<item>
+<title>MySQLのパーティショニングを触ってみる</title>
+<link>http://mix3.github.com/article/cd1db22b4fd91385020b90987772ef3e.html</link>
+<description>
+<![CDATA[
+# MySQLのパーティショニングを触ってみる
+
+MySQLで大容量のデータを扱うと削除処理が重くて涙目になることがあるので残さないデータを扱うテーブルはパーティショニングしてあげるのが良いようです。ログデータは典型的かもしれませんね。メリットとしては以下のような感じだと思います。
+
+* DROP TABLE のようにパーティションのデータをサクっと消せる
+* 刈り込みが出来る（検索範囲を限定出来る場合が有り、各クエリのパフォーマンスが良くなる可能性がある）
+
+デメリットとしては[漢のコンピュータ道](http://nippondanji.blogspot.com/2009/04/1.html)にてこんな感じに挙げられています。
+
+* インデックスをつけるだけでカバー出来る場合が多い。
+* パーショニングを使わずに、単にテーブルを分けてしまえばいい。
+* テーブルが巨大にならないとあまり効果を実感できない。
+* 使い方を間違えると性能が落ちてしまう。
+
+以下、日別にパーティションを区切っていくサンプルになります。
+
+### テーブル作成
+
+    DROP TABLE IF EXISTS partition;
+    CREATE TABLE partition (
+        id         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        created_at DATETIME            NOT NULL,
+        PRIMARY KEY (id, created_at)
+    ) ENGINE=InnoDB;
+
+### ベースとなるパーティションの作成
+
+    ALTER TABLE partition PARTITION BY RANGE (TO_DAYS(created_at))
+        (PARTITION p20110720 VALUES LESS THAN (TO_DAYS(&#39;2011-07-21 00:00:00&#39;)) COMMENT = &#39;2011-07-21 00:00:00&#39;);
+
+### mysql_partition_cron.sh 
+
+cronで順次パーティションを追加していきます。以下では毎日次の日の１日分を追加していますが１週間毎に纏めて追加とかしても良いでしょう。実際に運用する際はログを取ってメールを投げる等監視しておく方が良いですね。
+
+    #!/bin/bash
+    
+    DAYSTR=`date --date &#39;1 day&#39; +&quot;%Y%m%d&quot;`
+    DAY_2=`date --date &#39;2 day&#39; +&quot;%Y-%m-%d 00:00:00&quot;`
+    
+    QUERY=&quot;ALTER TABLE partition ADD PARTITION (PARTITION p$DAYSTR VALUES LESS THAN (TO_DAYS(&#39;$DAY_2&#39;)) COMMENT = &#39;$DAY_2&#39;)&quot;
+    echo $QUERY
+    echo $QUERY | mysql -u root partition
+
+### 確認
+
+#### INSERT
+
+    mysql&gt; insert into partition value (null, &#39;2011-07-20&#39;);
+    Query OK, 1 row affected (0.00 sec)
+
+    mysql&gt; insert into partition value (null, &#39;2011-07-21&#39;);
+    Query OK, 1 row affected (0.00 sec)
+
+    mysql&gt; insert into partition value (null, &#39;2011-07-22&#39;);
+    ERROR 1526 (HY000): Table has no partition for value 734705
+
+存在しないパーティションへのINSERTはエラーになるので、パーティションの追加忘れ、追加ミスには注意。
+
+    mysql&gt; insert into partition value (null, &#39;2011-07-19&#39;);
+    Query OK, 1 row affected (0.01 sec)
+
+#### パーティション分布
+
+mysql&gt; SELECT table_schema, table_name, partition_name, partition_ordinal_position, table_rows FROM information_schema.partitions WHERE table_name = &#39;partition&#39;;
++--------------+------------+----------------+----------------------------+------------+
+| table_schema | table_name | partition_name | partition_ordinal_position | table_rows |
++--------------+------------+----------------+----------------------------+------------+
+| partition    | partition  | p20110720      |                          1 |          2 |
+| partition    | partition  | p20110721      |                          2 |          1 |
++--------------+------------+----------------+----------------------------+------------+
+2 rows in set (0.00 sec)
+
+#### 刈り込み
+
+mysql&gt; explain partitions select * from partition where created_at &lt; &#39;2011-07-21 00:00:00&#39;;
++----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
+| id | select_type | table     | partitions | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
++----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
+|  1 | SIMPLE      | partition | p20110720  | index | NULL          | PRIMARY | 16      | NULL |    2 | Using where; Using index |
++----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
+1 row in set (0.00 sec)
+
+mysql&gt; explain partitions select * from partition where created_at &lt; &#39;2011-07-22 00:00:00&#39;;
++----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
+| id | select_type | table     | partitions          | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
++----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
+|  1 | SIMPLE      | partition | p20110720,p20110721 | index | NULL          | PRIMARY | 16      | NULL |    3 | Using where; Using index |
++----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
+1 row in set (0.01 sec)
+
+前者だとp20110720からのみの検索になってるので刈り込み出来ているようです。これが大容量のデータに対してだと本来インデックがメモリに乗りきらずスワップしちゃうという状況でも、刈り込みによってメモリに収まる可能性が出て来るので、そうなった場合にパーティショニングの威力が発揮されるというのが想像出来ますね。
+
+### まとめ
+
+削除のコストは思いの外大きくて、レプリケーション環境下でしこしこ古いデータを削除するだけのバッチを走らせたときに削除間隔を大きく取らないと同期ズレがずんどこずんどこ溜まっていく、というのを経験したことがあります。パーティションを使うとそういう苦労はせずに済みそうなので有効活用したいですね。
+]]>
+</description>
+<pubDate>Wed, 20 Jul 2011 16:28:25 +0900</pubDate>
+</item>
 <item>
 <title>さくらVPSをちょこちょこ触ってみる</title>
 <link>http://mix3.github.com/article/4d2ced9323e6b01dc90783c18675d2bd.html</link>

@@ -17,7 +17,7 @@
 4d2ced9323e6b01dc90783c18675d2bd:
   created_at: 1310857348
   resource: 20110717.md
-  title: 'さくらVPSをちょこちょこ触ってみる'
+  title: さくらVPSをちょこちょこ触ってみる
   updated_at: 1310857348
 64e7ae8130b74b84e0caa83dd73e5cb0:
   created_at: 1304089200
@@ -39,6 +39,11 @@
   resource: 20110504_02.md
   title: Qudoでログ回収
   updated_at: 1309803989
+cd1db22b4fd91385020b90987772ef3e:
+  created_at: 1311146905
+  resource: 20110720.md
+  title: MySQLのパーティショニングを触ってみる
+  updated_at: 1311146905
 d0eaf97b5d1fa525640b284666ed63c7:
   created_at: 1309830961
   resource: 20110705.md
