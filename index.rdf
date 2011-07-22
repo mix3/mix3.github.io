@@ -8,9 +8,246 @@
 <title>萌えキャラ的にクリスマスはキリスト教的なイベントだから仏教的人種はスルー的な？みたいな？</title>
 <link>http://mix3.github.com/</link>
 <description>命名:萌えキャラピュタ</description>
-<pubDate>Wed, 20 Jul 2011 16:28:25 +0900</pubDate>
-<lastBuildDate>Wed, 20 Jul 2011 16:42:55 +0900</lastBuildDate>
+<pubDate>Fri, 22 Jul 2011 19:41:35 +0900</pubDate>
+<lastBuildDate>Fri, 22 Jul 2011 19:46:16 +0900</lastBuildDate>
 
+<item>
+<title>blessとMouse</title>
+<link>http://mix3.github.com/article/6433264556550a53b7dc874982e89cb2.html</link>
+<description>
+<![CDATA[
+# blessとMouse
+
+### 健康診断
+
+健康診断へ行って血を取ってきました。前回はチューブ通して採血の容器に取ってたのが今回は針から直結するようになって、それのおかげか何なのかは分りませんが採血スピードが向上して地味に嬉しかったです。痛いのは嫌いなのです…
+
+### blessとMouseの速度比較
+
+すこし気になってblessとMouse、その他の速度比較。いろんなところでやられてるので今更自分でする事でもないでしょうが。なおblessで作るクラスは手を抜いて型制限などの実装はせずアクセサを用意して値を操作するだけにしました。適当適当。
+
+[いまさら聞けない「Moose」超入門](http://blog.livedoor.jp/sasata299/archives/51281496.html)を参考にblessとMouseのコードを書き足しました。以下の処理の速度を比較しています。
+
+1. hoge/fugaのアクセサを持ったクラスをnew
+ * 初期値はfugaに1
+2. hogeに&#39;bbb&#39;を代入
+3. fugaの値を取得
+4. hogeの値を取得
+
+#### cost.pl
+
+    # おまじないしない場合
+    package MooseTest;
+    use Moose;
+     
+    has &#39;hoge&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Str&#39; );
+    has &#39;fuga&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Int&#39; );
+     
+    no Moose;
+    
+    1;
+    
+    # おまじないする場合
+    package MooseTest_mi;
+    use Moose;
+     
+    has &#39;hoge&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Str&#39; );
+    has &#39;fuga&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Int&#39; );
+     
+    __PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
+     
+    no Moose;
+    
+    1;
+    
+    # おまじないしない場合
+    package MouseTest;
+    use Mouse;
+     
+    has &#39;hoge&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Str&#39; );
+    has &#39;fuga&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Int&#39; );
+    
+    no Mouse;
+    
+    1;
+    
+    # おまじないする場合
+    package MouseTest_mi;
+    use Mouse;
+     
+    has &#39;hoge&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Str&#39; );
+    has &#39;fuga&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Int&#39; );
+     
+    __PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
+    
+    no Mouse;
+    
+    1;
+    
+    # Class::Accessor を使った場合
+    package ClassAccessorTest;
+    use strict;
+    use warnings;
+    use base &#39;Class::Accessor&#39;;
+     
+    __PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
+    
+    1;
+    
+    # Class::Accessor::Fast を使った場合
+    package ClassAccessorFastTest;
+    use strict;
+    use warnings;
+    use base &#39;Class::Accessor::Fast&#39;;
+     
+    __PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
+    
+    1;
+    
+    # perl5 OOP の場合
+    package Bless;
+    use strict;
+    use warnings;
+    
+    sub new {
+        my $class = shift;
+        my $self  = shift || {};
+        return bless $self, $class;
+    }
+    
+    sub hoge {
+        my $self = shift;
+        if (@_) {
+            $self-&gt;{hoge} = shift;
+        } else {
+            $self-&gt;{hoge};
+        }
+    }
+    
+    sub fuga {
+        my $self = shift;
+        if (@_) {
+            $self-&gt;{fuga} = shift;
+        } else {
+            $self-&gt;{fuga};
+        }
+    }
+    
+    1;
+    
+    package main;
+    use strict;
+    use warnings;
+    use Benchmark qw(cmpthese timethese);
+     
+    cmpthese timethese(100000, {
+        moose =&gt; sub {
+            my $moose = MooseTest-&gt;new( fuga =&gt; 1 );
+            $moose-&gt;hoge(&#39;bbb&#39;);
+            $moose-&gt;fuga;
+            $moose-&gt;hoge;
+        },
+        moose_mi =&gt; sub {
+            my $moose = MooseTest_mi-&gt;new( fuga =&gt; 1 );
+            $moose-&gt;hoge(&#39;bbb&#39;);
+            $moose-&gt;fuga;
+            $moose-&gt;hoge;
+        },
+        mouse =&gt; sub {
+            my $mouse = MouseTest-&gt;new( fuga =&gt; 1 );
+            $mouse-&gt;hoge(&#39;bbb&#39;);
+            $mouse-&gt;fuga;
+            $mouse-&gt;hoge;
+        },
+        mouse_mi =&gt; sub {
+            my $mouse = MouseTest_mi-&gt;new( fuga =&gt; 1 );
+            $mouse-&gt;hoge(&#39;bbb&#39;);
+            $mouse-&gt;fuga;
+            $mouse-&gt;hoge;
+        },
+        accessor =&gt; sub {
+            my $class = ClassAccessorTest-&gt;new({ fuga =&gt; 1 });
+            $class-&gt;hoge(&#39;bbb&#39;);
+            $class-&gt;fuga;
+            $class-&gt;hoge;
+        },
+        accessor_fast =&gt; sub {
+            my $class = ClassAccessorFastTest-&gt;new({ fuga =&gt; 1 });
+            $class-&gt;hoge(&#39;bbb&#39;);
+            $class-&gt;fuga;
+            $class-&gt;hoge;
+        },
+        bless =&gt; sub {
+            my $class = Bless-&gt;new({ fuga =&gt; 1 });
+            $class-&gt;hoge(&#39;bbb&#39;);
+            $class-&gt;fuga;
+            $class-&gt;hoge;
+        },
+    });
+
+結果はこんな感じになりました。何回か実行するとばらつくので３つほど結果を書き出しています。
+
+    Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
+      accessor:  2 wallclock secs ( 1.19 usr +  0.00 sys =  1.19 CPU) @ 84033.61/s (n=100000)
+    accessor_fast:  0 wallclock secs ( 0.58 usr +  0.00 sys =  0.58 CPU) @ 172413.79/s (n=100000)
+         bless:  1 wallclock secs ( 0.41 usr +  0.00 sys =  0.41 CPU) @ 243902.44/s (n=100000)
+         moose: 21 wallclock secs (21.26 usr +  0.02 sys = 21.28 CPU) @ 4699.25/s (n=100000)
+      moose_mi:  2 wallclock secs ( 1.67 usr +  0.00 sys =  1.67 CPU) @ 59880.24/s (n=100000)
+         mouse:  0 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
+      mouse_mi: -1 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
+                      Rate moose moose_mi accessor accessor_fast mouse_mi mouse bless
+    moose           4699/s    --     -92%     -94%          -97%     -98%  -98%  -98%
+    moose_mi       59880/s 1174%       --     -29%          -65%     -69%  -69%  -75%
+    accessor       84034/s 1688%      40%       --          -51%     -57%  -57%  -66%
+    accessor_fast 172414/s 3569%     188%     105%            --     -12%  -12%  -29%
+    mouse_mi      196078/s 4073%     227%     133%           14%       --    0%  -20%
+    mouse         196078/s 4073%     227%     133%           14%       0%    --  -20%
+    bless         243902/s 5090%     307%     190%           41%      24%   24%    --
+
+    Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
+      accessor:  1 wallclock secs ( 0.87 usr +  0.00 sys =  0.87 CPU) @ 114942.53/s (n=100000)
+    accessor_fast:  0 wallclock secs ( 0.56 usr +  0.00 sys =  0.56 CPU) @ 178571.43/s (n=100000)
+         bless:  1 wallclock secs ( 0.43 usr +  0.00 sys =  0.43 CPU) @ 232558.14/s (n=100000)
+         moose: 18 wallclock secs (18.30 usr +  0.00 sys = 18.30 CPU) @ 5464.48/s (n=100000)
+      moose_mi:  2 wallclock secs ( 1.57 usr +  0.00 sys =  1.57 CPU) @ 63694.27/s (n=100000)
+         mouse:  0 wallclock secs ( 0.55 usr +  0.00 sys =  0.55 CPU) @ 181818.18/s (n=100000)
+      mouse_mi:  1 wallclock secs ( 0.65 usr +  0.00 sys =  0.65 CPU) @ 153846.15/s (n=100000)
+                      Rate moose moose_mi accessor mouse_mi accessor_fast mouse bless
+    moose           5464/s    --     -91%     -95%     -96%          -97%  -97%  -98%
+    moose_mi       63694/s 1066%       --     -45%     -59%          -64%  -65%  -73%
+    accessor      114943/s 2003%      80%       --     -25%          -36%  -37%  -51%
+    mouse_mi      153846/s 2715%     142%      34%       --          -14%  -15%  -34%
+    accessor_fast 178571/s 3168%     180%      55%      16%            --   -2%  -23%
+    mouse         181818/s 3227%     185%      58%      18%            2%    --  -22%
+    bless         232558/s 4156%     265%     102%      51%           30%   28%    --
+
+    Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
+      accessor:  1 wallclock secs ( 0.90 usr +  0.00 sys =  0.90 CPU) @ 111111.11/s (n=100000)
+    accessor_fast:  0 wallclock secs ( 0.75 usr +  0.00 sys =  0.75 CPU) @ 133333.33/s (n=100000)
+         bless:  1 wallclock secs ( 0.47 usr +  0.00 sys =  0.47 CPU) @ 212765.96/s (n=100000)
+         moose: 22 wallclock secs (21.62 usr +  0.01 sys = 21.63 CPU) @ 4623.21/s (n=100000)
+      moose_mi:  1 wallclock secs ( 1.61 usr +  0.00 sys =  1.61 CPU) @ 62111.80/s (n=100000)
+         mouse:  1 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
+      mouse_mi:  0 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
+                      Rate moose moose_mi accessor accessor_fast bless mouse_mi mouse
+    moose           4623/s    --     -93%     -96%          -97%  -98%     -98%  -98%
+    moose_mi       62112/s 1243%       --     -44%          -53%  -71%     -72%  -72%
+    accessor      111111/s 2303%      79%       --          -17%  -48%     -50%  -50%
+    accessor_fast 133333/s 2784%     115%      20%            --  -37%     -40%  -40%
+    bless         212766/s 4502%     243%      91%           60%    --      -4%   -4%
+    mouse_mi      222222/s 4707%     258%     100%           67%    4%       --    0%
+    mouse         222222/s 4707%     258%     100%           67%    4%       0%    --
+
+Mouseが爆速でblessより速いこともあるようです。にわかに信じられないのですが。何か最適化されているものでもあるのでしょうか？ちゃんと中身を見ないといけませんね。
+
+
+### 思う事
+
+速度というのは最近気にしているテーマで、Webアプリの１リクエストのレスポンスタイムが10msと100msとあったとして、それの時間差が90msと何となく微々たる物のように思う物でも分間10リクエストとして合計100msと1000msになり差が900msとどんどん大きくなっていくのが恐ろしいなぁと思ったりしています。もしもこれが分間じゃなくて秒間だったら？10リクエストじゃなくて100リクエストだったら？1000リクエストだったら？…まだ実感の伴わない話なのでアレですが今後直面する問題だろうなと感じています。モダンだ流行だと色々なものに飛びつくのも勉強になって良いですが、ただ実際それが実用に堪えうるのかどうかちゃんと検証することも覚えないといけないなと。そんなことを考えています。
+]]>
+</description>
+<pubDate>Fri, 22 Jul 2011 19:41:35 +0900</pubDate>
+</item>
 <item>
 <title>MySQLのパーティショニングを触ってみる</title>
 <link>http://mix3.github.com/article/cd1db22b4fd91385020b90987772ef3e.html</link>
@@ -792,23 +1029,6 @@ Xslateで継承を使わないというのはありえないと思うのです�
 ]]>
 </description>
 <pubDate>Wed, 04 May 2011 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>Hadoopを触ってみた</title>
-<link>http://mix3.github.com/article/64e7ae8130b74b84e0caa83dd73e5cb0.html</link>
-<description>
-<![CDATA[
-# Hadoopを触ってみた
-
-具体的にはgistに書いた。
-
-完全分散モードが結構癖が強い感じなので気をつけたい。
-
-&lt;script src=&quot;https://gist.github.com/944255.js&quot;&gt; &lt;/script&gt;
-&lt;script src=&quot;https://gist.github.com/944342.js&quot;&gt; &lt;/script&gt;
-]]>
-</description>
-<pubDate>Sat, 30 Apr 2011 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>
