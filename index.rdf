@@ -8,9 +8,364 @@
 <title>萌えキャラ的にクリスマスはキリスト教的なイベントだから仏教的人種はスルー的な？みたいな？</title>
 <link>http://mix3.github.com/</link>
 <description>命名:萌えキャラピュタ</description>
-<pubDate>Fri, 22 Jul 2011 19:41:35 +0900</pubDate>
-<lastBuildDate>Fri, 22 Jul 2011 19:46:16 +0900</lastBuildDate>
+<pubDate>Sun, 24 Jul 2011 04:00:10 +0900</pubDate>
+<lastBuildDate>Sun, 24 Jul 2011 04:02:05 +0900</lastBuildDate>
 
+<item>
+<title>Play framework + Scala に入門してみる</title>
+<link>http://mix3.github.com/article/66ec82f09e80065707e987404091fd5c.html</link>
+<description>
+<![CDATA[
+# Play framework + Scala に入門してみる
+
+### Scalaクラスタの怒りが聞こえる…
+
+Scalaクラスタの怒りに満ちたTLが見えて当該セッションのUstを見れなかったのが悔しいです。何があったかはTogetterからある程度察する事が出来ます。
+
+参考：[2011/07/22_Advanced_Tech_Night No.2 「ジャバラーが知っておくべき最近の開発言語のこと」(#atn2011 )](http://togetter.com/li/164689) 
+
+### Play framework + Scala に入門してみる
+
+そんな流れがあったのでScalaを触りたい気持ちが強くなりPlay frameworkの勉強と一緒にScalaをやってみようかと思い立ちました。Play frameworkというのははJava版Ruby on Railsといった感じでJavaだけれど非常に効率に良い開発が出来るフレームワークです（らしいです）Wicketとはまた違う爽快感のあるフレームワークのようです。
+
+### インストール
+
+インストールは非常に簡単です。zipを落として適当に配置してPATHを通すだけ。ただしplayのコマンドはpythonで書かれているのでpythonが必要になるかもしれません。[play]とだけ打つとセットアップが出来ていれば以下のように結果が返ってくるでしょう。
+
+#### $ play
+
+    ~        _            _ 
+    ~  _ __ | | __ _ _  _| |
+    ~ | &#39;_ \| |/ _&#39; | || |_|
+    ~ |  __/|_|\____|\__ (_)
+    ~ |_|            |__/   
+    ~
+    ~ play! 1.2.2, http://www.playframework.org
+    ~
+    ~ Usage: play cmd [app_path] [--options]
+    ~ 
+    ~ with,  new      Create a new application
+    ~        run      Run the application in the current shell
+    ~        help     Show play help
+    ~
+
+セットアップの確認が出来ればさっそく動作確認してみましょう。
+
+### プロジェクトの作成、アプリケーションの実行
+
+以下のように打つとプロジェクトが作成出来ます。作成途中アプリケーションの名前を聞かれます。基本デフォルトのままで良いでしょう。スケルトンが作成されます。
+
+#### $ play new [project_name] --with scala
+
+    ~        _            _ 
+    ~  _ __ | | __ _ _  _| |
+    ~ | &#39;_ \| |/ _&#39; | || |_|
+    ~ |  __/|_|\____|\__ (_)
+    ~ |_|            |__/   
+    ~
+    ~ play! 1.2.2, http://www.playframework.org
+    ~
+    ~ The new application will be created in /path/to/[project_name]
+    ~ What is the application name? [project_name] 
+    ~
+    ~ OK, the application is created.
+    ~ Start it with : play run project_name
+    ~ Have fun!
+    ~
+
+以下のようにして作成されたアプリケーションを起動する事が出来ます。9000番ポートで待っているようなので[http://localhost:9000/](http://localhost:9000/)にアクセスしましょう。いかにもな導入ページが返って来たらOKです。
+
+#### $ play run [project_name]
+
+    ~        _            _ 
+    ~  _ __ | | __ _ _  _| |
+    ~ | &#39;_ \| |/ _&#39; | || |_|
+    ~ |  __/|_|\____|\__ (_)
+    ~ |_|            |__/   
+    ~
+    ~ play! 1.2.2, http://www.playframework.org
+    ~
+    ~ Ctrl+C to stop
+    ~ 
+    Listening for transport dt_socket at address: 8000
+    01:35:10,384 INFO  ~ Starting /path/to/[project_name]
+    01:35:11,399 WARN  ~ You&#39;re running Play! in DEV mode
+    01:35:11,609 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+    01:43:01,925 INFO  ~ Application &#39;[project_name]&#39; is now started !
+
+### Scalaで動作するプロジェクトを作成してみる。
+
+今度はScalaのプロジェクトを作成してみます。ちなみに以下のように conf/dependencies.yml にScalaに依存することを追記して $ play dependencies [project_name] とすることでScala対応のプロジェクトにすることも出来ますが、スケルトンコードがJavaのままなので作り直したいと思います。
+
+#### $ diff -u [project_name]/conf/dependencies.yml.orig [project_name]/conf/dependencies.yml
+    --- project_name/conf/dependencies.yml.orig 2011-07-24 02:04:56.000000000 +0900
+    +++ project_name/conf/dependencies.yml  2011-07-24 02:04:46.000000000 +0900
+    @@ -2,3 +2,4 @@
+     
+     require:
+         - play
+    +    - play -&gt; scala 0.9.1
+
+#### $ play dependencies [project_name]
+
+    ~            _            _ 
+    ~  _ __ | | __ _ _  _| |
+    ~ | &#39;_ \| |/ _&#39; | || |_|
+    ~ |  __/|_|\____|\__ (_)
+    ~ |_|            |__/   
+    ~
+    ~ play! 1.2.2, http://www.playframework.org
+    ~
+    ~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
+    ~
+    ~   play-&gt;scala 0.9.1 (from playLocalModules)
+    ~
+    ~ Installing resolved dependencies,
+    ~
+    ~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
+    ~
+    ~ Done!
+    ~
+
+### Scala対応のプロジェクトを作成して動作確認する
+
+Scala対応のプロジェクトを作成するにはまず以下のようにしてScalaモジュールをインストールする必要があります。
+
+#### $ play install scala
+
+    ~        _            _ 
+    ~  _ __ | | __ _ _  _| |
+    ~ | &#39;_ \| |/ _&#39; | || |_|
+    ~ |  __/|_|\____|\__ (_)
+    ~ |_|            |__/   
+    ~
+    ~ play! 1.2.2, http://www.playframework.org
+    ~
+    ~ Will install scala-0.9.1
+    ~ This module is compatible with: 1.2.2
+    ~ Do you want to install this version (y/n)? y
+    ~ Installing module scala-0.9.1...
+    ~
+    ~ Fetching http://www.playframework.org/modules/scala-0.9.1.zip
+    ~ [--------------------------100%-------------------------] 60034.6 KiB/s    
+    ~ Unzipping...
+    ~
+    ~ Module scala-0.9.1 is installed!
+    ~ You can now use it by adding it to the dependencies.yml file:
+    ~
+    ~ require:
+    ~     play -&gt; scala 0.9.1
+    ~
+
+インストールが済んだら実際にScala対応のプロジェクトを作成してみましょう。
+
+#### $ play new [project_name] --with scala
+
+    ~        _            _ 
+    ~  _ __ | | __ _ _  _| |
+    ~ | &#39;_ \| |/ _&#39; | || |_|
+    ~ |  __/|_|\____|\__ (_)
+    ~ |_|            |__/   
+    ~
+    ~ play! 1.2.2, http://www.playframework.org
+    ~
+    ~ The new application will be created in /path/to/[project_name]
+    ~ What is the application name? [project_name] 
+    ~
+    ~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
+    ~
+    ~   play-&gt;scala 0.9.1 (from playLocalModules)
+    ~
+    ~ Installing resolved dependencies,
+    ~
+    ~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
+    ~
+    ~ Done!
+    ~
+    ~ OK, the application is created.
+    ~ Start it with : play run project_name
+    ~ Have fun!
+    ~
+
+動作確認はJavaの時と同様に $ play run [project_name] で出来ます。
+
+#### $ play run project_name/
+    ~        _                _ 
+    ~  _ __ | | __ _ _  _| |
+    ~ | &#39;_ \| |/ _&#39; | || |_|
+    ~ |  __/|_|\____|\__ (_)
+    ~ |_|            |__/   
+    ~
+    ~ play! 1.2.2, http://www.playframework.org
+    ~
+    ~ Ctrl+C to stop
+    ~ 
+    Listening for transport dt_socket at address: 8000
+    02:15:51,036 INFO  ~ Starting /path/to/[project_name]
+    02:15:51,067 INFO  ~ Module scala is available (/path/to/[play]/modules/scala-0.9.1)
+    02:15:54,598 INFO  ~ Scala support is active
+    02:15:54,598 WARN  ~ You&#39;re running Play! in DEV mode
+    02:15:54,734 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+    Compiling:
+        /path/to/[project_name]/app/controllers.scala
+        /path/to/[play]/modules/docviewer/app/controllers/PlayDocumentation.java
+        /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
+        /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
+        /path/to/[play]/modules/docviewer/app/DocViewerPlugin.java
+        /path/to/[project_name]/tmp/generated/views.html.main.scala
+        /path/to/[play]/modules/docviewer/app/helpers/CheatSheetHelper.java
+    Traversing /path/to/[project_name]/app/controllers.scala
+    Traversing /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
+    Traversing /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
+    Traversing /path/to/[project_name]/tmp/generated/views.html.main.scala
+    API phase took : 0.503 s
+    02:16:21,114 INFO  ~ Application &#39;[project_name]&#39; is now started !
+
+### プロジェクト構成
+
+Playのプロジェクトは以下のような構成となっています。アプリケーションを構築して行く際は主にapp以下を弄って行く事になるでしょう。
+
+* app
+ * コントローラ、モデル、ビューなど。
+* conf
+ * アプリケーションの設定。ルーティングの設定もここ。
+* lib
+ * jarファイルなどのlib関係。
+* modules
+ * プロジェクトが依存しているものがこの下に書き出されるのかな？
+* public
+ * 静的ファイルなど。
+* test
+ * テスト関係など。
+* tmp
+ * 生成されたclassファイルの配置やキャッシュなど。
+
+### とりあえず中身を眺めてみる
+
+生成されるスケルトンは以下のようになっています。ルーティングとコントローラ/アクションの対応は直感的で分かりやすいですね。Controllerを継承したApplicationがコントローラ、その中で定義したメソッドがアクションのようです。
+
+ただアクションで何を返すかが非常に分りづらいですね（もちろん基本はテンプレートですが）テンプレートそのものも@が出て来て関数定義っぽいし非常に分りづらいです。Webデザイナー殺しですね&lt;s&gt;死ねば良いと思います＾＾&lt;/s&gt;
+
+#### $ cat [project_name]/conf/routes
+
+    # Routes
+    # This file defines all application routes (Higher priority routes first)
+    # ~~~~
+    
+    # Home page
+    GET     /                                       Application.index
+    
+    # Ignore favicon requests
+    GET     /favicon.ico                            404
+    
+    # Map static resources from the /app/public folder to the /public path
+    GET     /public/                                staticDir:public
+    
+    # Catch all
+    *       /{controller}/{action}                  {controller}.{action}
+
+#### $ cat [project_name]/app/controllers.scala 
+    package controllers
+    
+    import play._
+    import play.mvc._
+    
+    object Application extends Controller {
+        
+        import views.Application._
+        
+        def index = {
+            html.index(&quot;Your Scala application is ready!&quot;)
+        }
+        
+    }
+
+#### $ cat [project_name]/app/views/Application/index.scala.html
+
+    @(title:String)
+    
+    @main(title) {
+        
+        @views.defaults.html.welcome(title)
+        
+    }
+
+#### $ cat [project_name]/app/views/main.scala.html
+ 
+    @(title:String = &quot;&quot;)(body: =&gt; Html)
+    
+    &lt;!DOCTYPE html&gt;
+    &lt;html&gt;
+        &lt;head&gt;
+            &lt;title&gt;@title&lt;/title&gt;
+            &lt;link rel=&quot;stylesheet&quot; media=&quot;screen&quot; href=&quot;@asset(&quot;public/stylesheets/main.css&quot;)&quot;&gt;
+            &lt;link rel=&quot;shortcut icon&quot; type=&quot;image/png&quot; href=&quot;@asset(&quot;public/images/favicon.png&quot;)&quot;&gt;
+            &lt;script src=&quot;@asset(&quot;public/javascripts/jquery-1.5.2.min.js&quot;)&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+            @body
+        &lt;/body&gt;
+    &lt;/html&gt;
+
+### アクションとビュー
+
+とりあえずスケルトンでは以下のような感じで動いているようです。
+
+* views/[レイアウト].scala.html
+ * レイアウトを定義
+* views/[コントローラ]/[アクション].scala.html
+ * @レイアウト(引数) { HTML }
+ * レイアウトとHTMLをガッチャンコして返す
+
+HTMLの部分が@views.defaults.html.welcome(title)となってこれが何を差しているのかが分りづらくしています。ここを&amp;lt;h1&amp;gt;@title&amp;lt;/h1&amp;gt;とでもすればもう少し見通しが良くなるのではないかと思います。具体的には以下のような感じ。
+
+#### $ diff -u [project_name]/app/views/Application/index.scala.html.orig [project_name]/app/views/Application/index.scala.html
+    --- project_name/app/views/Application/index.scala.html.orig    2011-07-24 03:45:31.000000000 +0900
+    +++ project_name/app/views/Application/index.scala.html 2011-07-24 03:47:38.000000000 +0900
+    @@ -2,6 +2,6 @@
+     
+     @main(title) {
+         
+    -    @views.defaults.html.welcome(title)
+    +    &lt;h1&gt;@title&lt;/h1&gt;
+         
+    -}
+    \ No newline at end of file
+    +}
+
+#### $ diff -u project_name/app/controllers.scala.orig project_name/app/controllers.scala
+    --- project_name/app/controllers.scala.orig 2011-07-24 03:49:42.000000000 +0900
+    +++ project_name/app/controllers.scala  2011-07-24 03:48:58.000000000 +0900
+    @@ -8,7 +8,11 @@
+         import views.Application._
+         
+         def index = {
+    -        html.index(&quot;Your Scala application is ready!&quot;)
+    +        html.index(&quot;index&quot;)
+         }
+         
+    +    def sample = {
+    +        html.index(&quot;sample&quot;)
+    +    }
+    +
+     }
+
+アクションも増やしてみました。これでルーティング設定も確認出来ます。$ play run [project_name] として以下へアクセスするとそれぞれindex、sampleが&amp;lt;h1&amp;gt;で表示されることが確認出来ると思います。
+
+* [http://localhost:9000/](http://localhost:9000/)
+* [http://localhost:9000/Application/sample](http://localhost:9000/Application/sample)
+
+なんとなくではありますがアクションからテンプレートが呼ばれ、引数を使ってレイアウトを解決して表示していることが見えてきた感じがします。
+
+### まとめ
+
+とりあえず一旦ここまで。何をしているか理解出来たらまたコントローラ／アクション／テンプレートの関係を文字に起こしてみたいと思います。
+
+Play frameworkですが面白そうではあるもののやはりテンプレート周りが気に入らないですね。テンプレートの中にコードを埋め込んだり、独自の構文でロジックを埋め込んだりというのはどうしても慣れないです。どんなに簡単な構文でそれが可能だとしてもデザイナーとの連携の時にはやはり困ると思うのです。「ここは動的な情報が入るのでこういう書き方をして下さい」なんて絶対混乱します。テンプレートをHTMLで書くならそのテンプレートはプレーンなHTMLであるべきだと自分は思います。
+]]>
+</description>
+<pubDate>Sun, 24 Jul 2011 04:00:10 +0900</pubDate>
+</item>
 <item>
 <title>blessとMouse</title>
 <link>http://mix3.github.com/article/6433264556550a53b7dc874982e89cb2.html</link>
@@ -836,199 +1191,6 @@ Hadoopが扱うファイルシステムはHDFSという前提で前回構築し�
 ]]>
 </description>
 <pubDate>Wed, 04 May 2011 00:00:01 +0900</pubDate>
-</item>
-<item>
-<title>Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory) でCRUDアプリを作ってみた</title>
-<link>http://mix3.github.com/article/31f556362690556d70162368934b2d08.html</link>
-<description>
-<![CDATA[
-# Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory) でCRUDアプリを作ってみた
-
-Mojolicious::Liteは一つのファイルの中に全部突っ込んでWebアプリが作れるということなので、今自分が気になってるものを習作の意味を込めて全部詰め込んでCRUDアプリを作ってみました。jQueryも入れたかったけど書いていてカオスになったのでSNBinderの補助とページャ以外は無しにしました。
-
-色々突っ込んでみたものは以下
-
-* Teng
- * ページャ（プラグイン）
- * inflate/deflate
- * triggerの代替 Class::Method::Modifiers
- * Devel::KYTProf
-* Xslate
- * Mojolicious::Liteで継承
-* SNBinder
- * コンセプト
-
-## 雑感
-
-### Teng
-
-nekokakさん作の軽量ORMであるTeng。
-
-* Skinnyの後継
-* DBIの薄いラッパー
-
-ということで、シンプルさを残しつつさらっと書きたいことはさらっと書けるように配慮されてて良い感じです。Skinnyと使い方はあまり変わらない事や、そもそもシンプルなのでコードを追いかけやすいということもあって理解はしやすそうです。ただドキュメントはまだまだ少ない感じで【実践Teng — Teng-Doc v0.01 documentation】という非公式のページも出来ているものの未掲載も残っていて、使用例などと合わせてドキュメントの充実が待たれているといった所でしょうか。
-
-### Xslate
-
-なんだかとてつもなく速いテンプレートエンジン。自分はまだテンプレートエンジンの速度を気にしないといけないような状況には出会っていないので、速さというものの有り難さが分らないのですが速いそうです。また、テンプレートの書き方を選択出来るようでTTの文法で書く事も出来るようです。あと継承が扱えるのが良い感じです。テンプレートエンジンで継承は思いの外対応していないことが多いので。
-
-### SNBinder
-
-データとテンプレートの組み合わせたものを一つの部品として見て、画面に貼付けて行く事で画面を構築して行くというコンセプトの、jsのテンプレートエンジン。この考え方は自分の大好きなJavaのWebアプリケーションフレームワーク、WicketのViewと似ていて非常に気に入っています。よくあるテンプレートエンジンのテンプレートの中にコードを埋め込んで画面を作る方法よりテンプレートがHTML的にプレーンでシンプルになるのが良いと思います。ただSNBinderはあまりにも機能がミニマムなのであえて使うほどでも無いかなとも思っています。後、データはサーバでViewがクライアントにあるので記述がシームレスに出来ないのもまた障壁のひとつかなと。Wicketだと全てJavaでサーバサイドで書けるので書いていて本当に幸せです。Java使いの方はWicketを使いましょう！
-
-## メモ
-
-以下今回コードを書いていてのメモ
-
-### triggerの代替 Class::Method::Modifiers
-
-Skinnyで言うtriggerがTengでは廃止されていて、代替としてClass::Method::Modifiersを使う事を提案されています。今回はTimestampとSoftDeleteの振る舞いを表現するために使ってみました。具体的にはcreated_at,updated_at,deleted_atの３カラムを用意してinsert,update,deleteの操作でそれぞれ自動的に日付が入力されるようにしました。また検索時にSoftDeleteされたものが検索の対象から排除されるようにしました。Class::Method::Modifiersの使い方を理解していないのでこれで良いのかは怪しいですが、それぞれsearchやinsertなどの動作を変更して*_atの値を操作しています。
-
-    package Message;
-    use parent &#39;Teng&#39;;
-    __PACKAGE__-&gt;load_plugin(&#39;Pager&#39;);
-    
-    use Class::Method::Modifiers;
-    
-    around delete =&gt; sub {
-        my ($orig, $self, $table_name, $delete_condition) = @_;
-        my $update_row_data = {
-            deleted_at =&gt; DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;),
-        };
-        $self-&gt;update($table_name, $update_row_data, $delete_condition);
-    };
-    
-    before update =&gt; sub {
-        my ($self, $table_name, $update_row_data, $update_condition) = @_;
-        if (!$update_row_data-&gt;{deleted_at}) {
-            $update_row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;);
-        }
-    };
-    
-    before insert =&gt; sub {
-        my ($self, $table_name, $row_data) = @_;
-        $row_data-&gt;{created_at} = DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;);
-        $row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;);
-    };
-    
-    before fast_insert =&gt; sub {
-        my ($self, $table_name, $row_data) = @_;
-        $row_data-&gt;{created_at} = DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;);
-        $row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone(&#39;Asia/Tokyo&#39;);
-    };
-    
-    before search =&gt; sub {
-        my ($self, $table_name, $search_condition, $search_attr) = @_;
-        $search_condition-&gt;{deleted_at} = \&#39;IS NULL&#39;;
-    };
-    
-    before search_with_pager =&gt; sub {
-        my ($self, $table_name, $where, $opts) = @_;
-        $where-&gt;{deleted_at} = \&#39;IS NULL&#39;;
-    };
-    
-    1;
-    
-    my $result = $model-&gt;single(&#39;message&#39;, {
-        id =&gt; $self-&gt;param(&#39;id&#39;)
-    });
-    
-    $model-&gt;fast_insert(&#39;message&#39;, {
-        message =&gt; $self-&gt;param(&#39;message&#39;),
-    });
-    
-    $model-&gt;update(&#39;message&#39;,
-        {
-            message =&gt; $self-&gt;param(&#39;message&#39;),
-        },
-        {
-            id =&gt; $self-&gt;param(&#39;id&#39;),
-        }
-    );
-    
-    $model-&gt;delete(&#39;message&#39;, {
-        id =&gt; $self-&gt;param(&#39;id&#39;),
-    });
-    
-    my ($rows, $pager) = $model-&gt;search_with_pager(
-        &#39;message&#39;,
-        {
-        },
-        {
-            order_by =&gt; &#39;id DESC&#39;,
-            page =&gt; $page,
-            rows =&gt; 3,
-        }
-    );
-
-### Mojolicious::LiteでのXslateの継承
-
-Xslateで継承を使わないというのはありえないと思うのですが、Mojolicious::Liteでのサンプルが見つからなかったのでちょっと悩みました。実際はhogehoge.txで定義してincludeやcascadeなどでそれを指定するだけでした。
-
-    @@ base.tx
-    &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;
-    &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
-      &lt;head&gt;
-        &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
-        &lt;script src=&quot;http://www.google.com/jsapi&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
-        &lt;script type=&quot;text/javascript&quot;&gt;//&lt;![CDATA[
-            google.load(&#39;jquery&#39;, &#39;1.4.4&#39;);
-        //]]&gt;&lt;/script&gt;
-        &lt;script src=&quot;https://github.com/snakajima/SNBinder/raw/master/snbinder-0.5.3.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
-    : include main_js
-        &lt;title&gt;Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory)&lt;/title&gt;
-      &lt;/head&gt;
-      &lt;body&gt;
-    :   block content -&gt; { }
-      &lt;/body&gt;
-    &lt;/html&gt;
-    
-    @@ form.tx
-    &lt;form method=&quot;post&quot; action=&quot;&lt;: $path :&gt;&quot;&gt;
-    : if ($id) {
-      &lt;input type=&quot;hidden&quot; name=&quot;id&quot; value=&quot;&lt;: $id :&gt;&quot;&gt;
-    : }
-      &lt;p&gt;&lt;textarea name=&quot;message&quot; cols=&quot;50&quot; rows=&quot;10&quot; &gt;&lt;: $message :&gt;&lt;/textarea&gt;&lt;/p&gt;
-      &lt;p&gt;&lt;input type=&quot;submit&quot; /&gt;&lt;/p&gt;
-    &lt;/form&gt;
-    
-    @@ index.html.tx
-    : cascade base
-    : override content -&gt; {
-    
-    : include form { path =&gt; &quot;/create&quot; }
-    
-    &lt;div id=&quot;main&quot; style=&quot;display:none;&quot;&gt;
-      &lt;p&gt;Accessing server ...&lt;/p&gt;
-    &lt;/div&gt;
-    
-    : }
-
-### SQLite/OnMemory
-
-実はSQLiteってオンメモリ（正しくはインメモリかな？）で動作するんですね。知りませんでした。これのおかげで必要なCPANモジュールが入っていれば本当に一つのファイルで動作するアプリになりました。ただしオンメモリなので切断されると当然データが消えます。また、複数プロセスから接続は出来ないようでStarmanなどのHTTPDと組み合わせて動かすと勝手に複数ワーカーが起動して動作するため上手く動きません。オンメモリでもDB名を付けることが出来たり、コネクションプールで接続を維持し続ける方法があったりするんじゃないかとは思うのですが、ちょっと良くわかりません。H2DBではそういうことが出来た覚えがあるのですがさて。
-
-    my $model = Message-&gt;new(
-        dbh =&gt; DBI-&gt;connect(
-            &#39;dbi:SQLite:dbname=:memory:&#39;, &#39;&#39;, &#39;&#39;,
-            {
-                RaiseError     =&gt; 1,
-                PrintError     =&gt; 0,
-                AutoCommit     =&gt; 1,
-                sqlite_unicode =&gt; 1,
-            }
-        )
-    );
-
-## コード
-
-コードはGistに上げています
-
-&lt;script src=&quot;https://gist.github.com/953572.js&quot;&gt; &lt;/script&gt;
-]]>
-</description>
-<pubDate>Wed, 04 May 2011 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>
