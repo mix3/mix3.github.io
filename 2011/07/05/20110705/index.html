@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <link href="/css/style.css" rel="stylesheet" type="text/css">
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+  <link href="/css/prettify/prettify.css" rel="stylesheet" type="text/css" media="screen" />
+  <script src="/js/prettify/prettify.js" type="text/javascript"></script>
+  <script type="text/javascript">
+      $(function(){
+          $('pre').filter(function(){
+              console.log($(this).parent());
+              return !$(this).parent().hasClass('gist-highlight');
+          }).addClass('prettyprint linenums');
+          prettyPrint();
+          $('#content').fadeIn(2000);
+      });
+  </script>
+
+  <script type="text/javascript">
+  
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-10744212-4']);
+    _gaq.push(['_setDomainName', 'github.com']);
+    _gaq.push(['_setAllowHash', 'false']);
+    _gaq.push(['_trackPageview']);
+  
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  
+  </script>
+
+  <title>萌えキャラとはなんだったのか - さくらVPS借りてみた
+</title>
+</head>
+<body>
+<div id="wrap">
+  <div id="header">
+    <h1 id="logo-text"><a href="/" title="">萌えキャラとはなんだったのか</a></h1>
+    <p id="slogan">ギークにも絵描きにもなれない者の末路</p>
+    <div id="top-menu">
+      <p><a href="/index.rdf">rss feed</a></p>
+    </div>
+  </div>
+  <div  id="nav">
+    <ul>
+      <li id="current"><a href="/">Home</a></li>
+    </ul>
+  </div>
+  <div id="content">
+    <div id="main">
+<h2><a href="/2011/07/05/20110705/" title="">さくらVPS借りてみた</a></h2>
+<h3>さくらVPS借りてみた</h3>
+
+<p>インフラエンジニアを目指す宣言したは良いものの、自分で管理する外部に晒されている環境すら持ってないのはどうかという話があるのでまずはさくらVPSを借りてみることに請求が来る前に試用出来るようですぐに使えるのは凄いですねぇ。さくら様様です。（ちなみに一応自宅サーバ用のマシンは手元にあるのですが外部ディスプレイ手に入れてからとか考えてたら結局こっち来てから起動することはありませんでした…）</p>
+
+<p>インフラやりたいと言いつつミドルウェアの知識はまったく０に近い状態なので、ミドルウェアの勉強用に使って行きたいかなと思います。</p>
+
+<h3>とりあえず入れて最初にやったこと</h3>
+
+<ul>
+<li>ユーザの設定
+<ul>
+<li>rootのパスを変更する</li>
+<li>一般ユーザを追加する(sudoで管理者の権限を得るためにグループはwheelに入れる)</li>
+<li>一般ユーザのパスを変更する</li>
+<li>visudoでwheelグループがsudoで管理者権限で実行できるように変更</li>
+</ul></li>
+<li>SSHのログインを公開鍵に変更
+<ul>
+<li>/etc/ssh/sshd_config を修正</li>
+<li>キーペアを作成してログイン</li>
+</ul></li>
+<li>system-config-securitylevel-tui でssh以外を閉じる</li>
+<li>git,perlbrew,cpanmを入れる</li>
+</ul>
+
+<p>大体こんな感じ。SSHは以下のような感じで設定。コメントアウト外したりyes,no変えたり。</p>
+
+<pre><code>PermitRootLogin no
+AuthorizedKeysFile      .ssh/authorized_keys
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+</code></pre>
+
+<p>「ChallengeResponseAuthentication no」はデフォルトでnoだけれどこれがyesになってると公開鍵の認証に失敗したらパスワード認証も試すといった挙動をするので、公開鍵に限定する場合はちゃんとnoになってることをチェック。</p>
+
+<p>ファイアーウォールの設定は一旦 system-config-securitylevel-tui 使ってやりましたが、細かく設定する場合は当然 iptables を使って設定しないといけないので、おいおいここは最適化していきたいです。</p>
+
+<p>他にもデーモンを止める話とかもあるので以下とか参考にしつつ最適化していきたいです。</p>
+
+<p><a href="http://sakura.off-soft.net/blog/sakura_vps_centos_first_setup.html">さくらVPSを使うときに最初にやっておきたいこと(CentOS編)</a></p>
+
+<p class="post-footer"><span class="date">2011-07-05</span></p>
+<!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
+    </div>
+    <div id="sidebar">
+<h3>Profile</h3>
+<script src="https://iddy.jp/profile/mix3/linktool/" type="text/javascript" charset="utf-8"></script>
+<h3>Archives</h3>
+<ul class="sidemenu">
+  <li><a href="/archives/2011/11/">2011年11月</a></li>
+  <li><a href="/archives/2011/07/">2011年07月</a></li>
+  <li><a href="/archives/2011/06/">2011年06月</a></li>
+  <li><a href="/archives/2011/05/">2011年05月</a></li>
+  <li><a href="/archives/2011/04/">2011年04月</a></li>
+</ul>
+    </div>
+  </div>
+  <div id="footer">
+    <p>
+      &copy; All your copyright info here  
+  
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+      <a href="http://www.bluewebtemplates.com/" title="Website Templates">website templates</a> by <a href="http://www.styleshout.com/">styleshout</a> |
+      Valid <a href="http://validator.w3.org/check?uri=referer">XHTML</a> | 
+      <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a>
+  
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+      <a href="/">Home</a>&nbsp;|&nbsp;
+      <a href="/">RSS Feed</a>
+    </p>
+  </div>
+</body>
+</html>

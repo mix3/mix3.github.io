@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <link href="/css/style.css" rel="stylesheet" type="text/css">
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+  <link href="/css/prettify/prettify.css" rel="stylesheet" type="text/css" media="screen" />
+  <script src="/js/prettify/prettify.js" type="text/javascript"></script>
+  <script type="text/javascript">
+      $(function(){
+          $('pre').filter(function(){
+              console.log($(this).parent());
+              return !$(this).parent().hasClass('gist-highlight');
+          }).addClass('prettyprint linenums');
+          prettyPrint();
+          $('#content').fadeIn(2000);
+      });
+  </script>
+
+  <script type="text/javascript">
+  
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-10744212-4']);
+    _gaq.push(['_setDomainName', 'github.com']);
+    _gaq.push(['_setAllowHash', 'false']);
+    _gaq.push(['_trackPageview']);
+  
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  
+  </script>
+
+  <title>萌えキャラとはなんだったのか - bonding設定で死んだ
+</title>
+</head>
+<body>
+<div id="wrap">
+  <div id="header">
+    <h1 id="logo-text"><a href="/" title="">萌えキャラとはなんだったのか</a></h1>
+    <p id="slogan">ギークにも絵描きにもなれない者の末路</p>
+    <div id="top-menu">
+      <p><a href="/index.rdf">rss feed</a></p>
+    </div>
+  </div>
+  <div  id="nav">
+    <ul>
+      <li id="current"><a href="/">Home</a></li>
+    </ul>
+  </div>
+  <div id="content">
+    <div id="main">
+<h2><a href="/2011/11/23/2011123/" title="">bonding設定で死んだ</a></h2>
+<h3>bondingとは</h3>
+
+<p>bondingというのはNICを冗長化するもののことのようです。ラウンドロビンで負荷分散したりマスタースレーブ構成にして片方が死んでも大丈夫なように出来るようです。</p>
+
+<p>参考<a href="http://d.hatena.ne.jp/sen-u/20061002/p1">意外と知らない？NICを冗長化するボンディング（bonding）Add Star</a></p>
+
+<h3>ネットワークが遅延？</h3>
+
+<p>ネットワークの知識なんてほぼ０なのでbondingなんて当然知らなかったのですが、でも設定しないといけないということなのでWebを漁ってとりあえずラウンドロビンで設定したのですが、これがいけなかった。</p>
+
+<p>並列(最大100プロセス)でアクセス掛ける負荷試験を行ってると、MySQLの接続でtimeoutが結構出る。</p>
+
+<p>根本的な問題として負荷試験のシナリオにミスがあったりはするのですが、それとは別にネットワークに遅延が発生する模様。</p>
+
+<p>インフラのプロフェッショナル<a href="http://twitter.com/fujiwara">@fujiwara</a>さんや<a href="http://twitter.com/shin1rosei">@shin1rosei</a>さんに調べてもらって自分の設定したbondingの設定がラウンドロビンなのがマズいという事が判明。並列度が上がると、NICの切り替わりで問題が顕在化するみたいです。</p>
+
+<p>正直分った瞬間回線切って首吊って死にたい気分になりました...</p>
+
+<script src="http://togetter.com/js/parts.js"></script>
+
+<script>tgtr.ListWidget({id:'222670',url:'http://togetter.com/',width:'320px',height:'240px'});</script>
+
+<p>自分のした設定にどんな意味があるのか、ちゃんと考える様にします...</p>
+
+<p class="post-footer"><span class="date">2011-11-23</span></p>
+<!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
+    </div>
+    <div id="sidebar">
+<h3>Profile</h3>
+<script src="https://iddy.jp/profile/mix3/linktool/" type="text/javascript" charset="utf-8"></script>
+<h3>Archives</h3>
+<ul class="sidemenu">
+  <li><a href="/archives/2011/11/">2011年11月</a></li>
+  <li><a href="/archives/2011/07/">2011年07月</a></li>
+  <li><a href="/archives/2011/06/">2011年06月</a></li>
+  <li><a href="/archives/2011/05/">2011年05月</a></li>
+  <li><a href="/archives/2011/04/">2011年04月</a></li>
+</ul>
+    </div>
+  </div>
+  <div id="footer">
+    <p>
+      &copy; All your copyright info here  
+  
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+      <a href="http://www.bluewebtemplates.com/" title="Website Templates">website templates</a> by <a href="http://www.styleshout.com/">styleshout</a> |
+      Valid <a href="http://validator.w3.org/check?uri=referer">XHTML</a> | 
+      <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a>
+  
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+      <a href="/">Home</a>&nbsp;|&nbsp;
+      <a href="/">RSS Feed</a>
+    </p>
+  </div>
+</body>
+</html>

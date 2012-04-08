@@ -1,0 +1,94 @@
+package Article;
+
+use strict;
+use warnings;
+use utf8;
+
+use Cwd  qw/realpath/;
+use Carp qw/croak/;
+use File::Basename;
+use FindBin;
+use YAML::Tiny;
+use DateTime;
+use DateTime::Format::MySQL;
+use Text::Markdown;
+use Encode;
+
+sub new {
+	my $proto = shift;
+
+	my $class = ref $proto || $proto;
+	my $self  = ref $_[0] eq 'HASH' ? $_[0] : {@_};
+
+	unless (-f $self->{path}) {
+		croak('article not found: ' . $self->{path});
+	}
+
+	_init($self);
+
+	return bless $self, $class;
+}
+
+sub _init {
+	my $self = shift;
+
+	$self->{name} = basename($self->{path}, '.md');
+
+	open my $fh, $self->{path};
+
+	my $yaml = '';
+	my $separate_num = 0;
+	while (<$fh>) {
+		$separate_num++ if(/^---$/);
+		last if (2 <= $separate_num);
+		$yaml .= $_;
+	}
+
+	if ($separate_num < 2) {
+		croak('require article setting');
+	}
+
+	my $conf = YAML::Tiny->read_string($yaml)->[0];
+	for my $k (keys %{$conf}) {
+		$self->{$k} = $conf->{$k};
+	}
+
+	unless ($self->{date}) {
+		croak('require: date');
+	}
+
+	my $dt = DateTime::Format::MySQL->parse_datetime($self->{date});
+	$dt->set_time_zone('Asia/Tokyo');
+	$self->{date} = $dt;
+
+	unless ($self->{category}) {
+		$self->{category} = [];
+	}
+
+	unless (ref($self->{category})) {
+		$self->{category} = [$self->{category}];
+	}
+
+	unless ($self->{tag}) {
+		$self->{tag} = [];
+	}
+
+	unless (ref($self->{tag})) {
+		$self->{tag} = [$self->{tag}];
+	}
+
+	$self->{content} = do { local $/; <$fh>};
+
+	close $fh;
+}
+
+sub render {
+	my $self = shift;
+	unless ($self->{render}) {
+		my $m = Text::Markdown->new;
+		$self->{render} = $m->markdown(decode_utf8($self->{content}));
+	}
+	return $self->{render};
+}
+
+1;

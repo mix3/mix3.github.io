@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <link href="/css/style.css" rel="stylesheet" type="text/css">
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+  <link href="/css/prettify/prettify.css" rel="stylesheet" type="text/css" media="screen" />
+  <script src="/js/prettify/prettify.js" type="text/javascript"></script>
+  <script type="text/javascript">
+      $(function(){
+          $('pre').filter(function(){
+              console.log($(this).parent());
+              return !$(this).parent().hasClass('gist-highlight');
+          }).addClass('prettyprint linenums');
+          prettyPrint();
+          $('#content').fadeIn(2000);
+      });
+  </script>
+
+  <script type="text/javascript">
+  
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-10744212-4']);
+    _gaq.push(['_setDomainName', 'github.com']);
+    _gaq.push(['_setAllowHash', 'false']);
+    _gaq.push(['_trackPageview']);
+  
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  
+  </script>
+
+  <title>萌えキャラとはなんだったのか - MobaSiFを弄ってみた
+</title>
+</head>
+<body>
+<div id="wrap">
+  <div id="header">
+    <h1 id="logo-text"><a href="/" title="">萌えキャラとはなんだったのか</a></h1>
+    <p id="slogan">ギークにも絵描きにもなれない者の末路</p>
+    <div id="top-menu">
+      <p><a href="/index.rdf">rss feed</a></p>
+    </div>
+  </div>
+  <div  id="nav">
+    <ul>
+      <li id="current"><a href="/">Home</a></li>
+    </ul>
+  </div>
+  <div id="content">
+    <div id="main">
+<h2><a href="/2011/06/22/20110622/" title="">MobaSiFを弄ってみた</a></h2>
+<p>MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。</p>
+
+<ul>
+<li>アプリケーションロジックを記述</li>
+<li>レスポンスの値を生成＆セット</li>
+</ul>
+
+<p>具体的に書くと以下のような感じ。</p>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = (
+    'test' =&gt; [0,0,0, 'Page::Sample', 'pageMain'],
+);
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<pre><code>package Page::Sample;
+sub pageMain {
+    my $func = shift;
+    # レスポンスの生成
+    my $html = HTMLTemplate::insert('sample/index', $rhData);
+    # レスポンスヘッダに値をセット
+    Response::output(¥$html);
+}
+</code></pre>
+
+<h4>template/_system/sample/index.html</h4>
+
+<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;$CON:title$&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    test
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>普段触るフレームワークだと「レスポンスの生成」も「レスポンスヘッダへの値のセット」も自分ですることはまず無くて。テンプレートに渡す値をハッシュで用意して、テンプレート自体はクエリパスなどから自動で判断するかもしくは明示的に指定するかする場合が多い。</p>
+
+<p>ということでこの辺り結構違和感が大きいのでちょっとそれっぽくなるように手を入れてみた。</p>
+
+<h4>pm/Context.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Context.pm"></script>
+
+<h4>pm/Page/Main.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Main.pm"></script>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = (
+        .
+        .
+        .
+    'test'  =&gt; [0,0,0, 'Page::Sample', 'test'],
+    'test1' =&gt; [0,0,0, 'Page::Sample', 'test1'],
+    'test2' =&gt; [0,0,0, 'Page::Sample', 'test2'],
+);
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Sample.pm"></script>
+
+<h4>template/_system/sample/test.html</h4>
+
+<script src="https://gist.github.com/1038137.js?file=test.html"></script>
+
+<h3>次回はDB周りを触ってみる</h3>
+
+<p>commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。</p>
+
+<p class="post-footer"><span class="date">2011-06-22</span></p>
+<!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
+    </div>
+    <div id="sidebar">
+<h3>Profile</h3>
+<script src="https://iddy.jp/profile/mix3/linktool/" type="text/javascript" charset="utf-8"></script>
+<h3>Archives</h3>
+<ul class="sidemenu">
+  <li><a href="/archives/2011/11/">2011年11月</a></li>
+  <li><a href="/archives/2011/07/">2011年07月</a></li>
+  <li><a href="/archives/2011/06/">2011年06月</a></li>
+  <li><a href="/archives/2011/05/">2011年05月</a></li>
+  <li><a href="/archives/2011/04/">2011年04月</a></li>
+</ul>
+    </div>
+  </div>
+  <div id="footer">
+    <p>
+      &copy; All your copyright info here  
+  
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+      <a href="http://www.bluewebtemplates.com/" title="Website Templates">website templates</a> by <a href="http://www.styleshout.com/">styleshout</a> |
+      Valid <a href="http://validator.w3.org/check?uri=referer">XHTML</a> | 
+      <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a>
+  
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+      <a href="/">Home</a>&nbsp;|&nbsp;
+      <a href="/">RSS Feed</a>
+    </p>
+  </div>
+</body>
+</html>

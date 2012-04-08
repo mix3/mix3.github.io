@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <link href="/css/style.css" rel="stylesheet" type="text/css">
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+  <link href="/css/prettify/prettify.css" rel="stylesheet" type="text/css" media="screen" />
+  <script src="/js/prettify/prettify.js" type="text/javascript"></script>
+  <script type="text/javascript">
+      $(function(){
+          $('pre').filter(function(){
+              console.log($(this).parent());
+              return !$(this).parent().hasClass('gist-highlight');
+          }).addClass('prettyprint linenums');
+          prettyPrint();
+          $('#content').fadeIn(2000);
+      });
+  </script>
+
+  <script type="text/javascript">
+  
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-10744212-4']);
+    _gaq.push(['_setDomainName', 'github.com']);
+    _gaq.push(['_setAllowHash', 'false']);
+    _gaq.push(['_trackPageview']);
+  
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  
+  </script>
+
+  <title>萌えキャラとはなんだったのか</title>
+</head>
+<body>
+<div id="wrap">
+  <div id="header">
+    <h1 id="logo-text"><a href="/" title="">萌えキャラとはなんだったのか</a></h1>
+    <p id="slogan">ギークにも絵描きにもなれない者の末路</p>
+    <div id="top-menu">
+      <p><a href="/index.rdf">rss feed</a></p>
+    </div>
+  </div>
+  <div  id="nav">
+    <ul>
+      <li id="current"><a href="/">Home</a></li>
+    </ul>
+  </div>
+  <div id="content">
+    <div id="main">
+<h2><a href="/2011/05/04/20110504_01/" title="">Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory) でCRUDアプリを作ってみた</a></h2>
+<p>Mojolicious::Liteは一つのファイルの中に全部突っ込んでWebアプリが作れるということなので、今自分が気になってるものを習作の意味を込めて全部詰め込んでCRUDアプリを作ってみました。jQueryも入れたかったけど書いていてカオスになったのでSNBinderの補助とページャ以外は無しにしました。</p>
+
+<p>色々突っ込んでみたものは以下</p>
+
+<ul>
+<li>Teng
+<ul>
+<li>ページャ（プラグイン）</li>
+<li>inflate/deflate</li>
+<li>triggerの代替 Class::Method::Modifiers</li>
+<li>Devel::KYTProf</li>
+</ul></li>
+<li>Xslate
+<ul>
+<li>Mojolicious::Liteで継承</li>
+</ul></li>
+<li>SNBinder
+<ul>
+<li>コンセプト</li>
+</ul></li>
+</ul>
+
+<h2>雑感</h2>
+
+<h3>Teng</h3>
+
+<p>nekokakさん作の軽量ORMであるTeng。</p>
+
+<ul>
+<li>Skinnyの後継</li>
+<li>DBIの薄いラッパー</li>
+</ul>
+
+<p>ということで、シンプルさを残しつつさらっと書きたいことはさらっと書けるように配慮されてて良い感じです。Skinnyと使い方はあまり変わらない事や、そもそもシンプルなのでコードを追いかけやすいということもあって理解はしやすそうです。ただドキュメントはまだまだ少ない感じで【実践Teng — Teng-Doc v0.01 documentation】という非公式のページも出来ているものの未掲載も残っていて、使用例などと合わせてドキュメントの充実が待たれているといった所でしょうか。</p>
+
+<h3>Xslate</h3>
+
+<p>なんだかとてつもなく速いテンプレートエンジン。自分はまだテンプレートエンジンの速度を気にしないといけないような状況には出会っていないので、速さというものの有り難さが分らないのですが速いそうです。また、テンプレートの書き方を選択出来るようでTTの文法で書く事も出来るようです。あと継承が扱えるのが良い感じです。テンプレートエンジンで継承は思いの外対応していないことが多いので。</p>
+
+<h3>SNBinder</h3>
+
+<p>データとテンプレートの組み合わせたものを一つの部品として見て、画面に貼付けて行く事で画面を構築して行くというコンセプトの、jsのテンプレートエンジン。この考え方は自分の大好きなJavaのWebアプリケーションフレームワーク、WicketのViewと似ていて非常に気に入っています。よくあるテンプレートエンジンのテンプレートの中にコードを埋め込んで画面を作る方法よりテンプレートがHTML的にプレーンでシンプルになるのが良いと思います。ただSNBinderはあまりにも機能がミニマムなのであえて使うほどでも無いかなとも思っています。後、データはサーバでViewがクライアントにあるので記述がシームレスに出来ないのもまた障壁のひとつかなと。Wicketだと全てJavaでサーバサイドで書けるので書いていて本当に幸せです。Java使いの方はWicketを使いましょう！</p>
+
+<h2>メモ</h2>
+
+<p>以下今回コードを書いていてのメモ</p>
+
+<h3>triggerの代替 Class::Method::Modifiers</h3>
+
+<p>Skinnyで言うtriggerがTengでは廃止されていて、代替としてClass::Method::Modifiersを使う事を提案されています。今回はTimestampとSoftDeleteの振る舞いを表現するために使ってみました。具体的にはcreated_at,updated_at,deleted_atの３カラムを用意してinsert,update,deleteの操作でそれぞれ自動的に日付が入力されるようにしました。また検索時にSoftDeleteされたものが検索の対象から排除されるようにしました。Class::Method::Modifiersの使い方を理解していないのでこれで良いのかは怪しいですが、それぞれsearchやinsertなどの動作を変更して*_atの値を操作しています。</p>
+
+<pre><code>package Message;
+use parent 'Teng';
+__PACKAGE__-&gt;load_plugin('Pager');
+
+use Class::Method::Modifiers;
+
+around delete =&gt; sub {
+    my ($orig, $self, $table_name, $delete_condition) = @_;
+    my $update_row_data = {
+        deleted_at =&gt; DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo'),
+    };
+    $self-&gt;update($table_name, $update_row_data, $delete_condition);
+};
+
+before update =&gt; sub {
+    my ($self, $table_name, $update_row_data, $update_condition) = @_;
+    if (!$update_row_data-&gt;{deleted_at}) {
+        $update_row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo');
+    }
+};
+
+before insert =&gt; sub {
+    my ($self, $table_name, $row_data) = @_;
+    $row_data-&gt;{created_at} = DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo');
+    $row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo');
+};
+
+before fast_insert =&gt; sub {
+    my ($self, $table_name, $row_data) = @_;
+    $row_data-&gt;{created_at} = DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo');
+    $row_data-&gt;{updated_at} = DateTime-&gt;now-&gt;set_time_zone('Asia/Tokyo');
+};
+
+before search =&gt; sub {
+    my ($self, $table_name, $search_condition, $search_attr) = @_;
+    $search_condition-&gt;{deleted_at} = \'IS NULL';
+};
+
+before search_with_pager =&gt; sub {
+    my ($self, $table_name, $where, $opts) = @_;
+    $where-&gt;{deleted_at} = \'IS NULL';
+};
+
+1;
+
+my $result = $model-&gt;single('message', {
+    id =&gt; $self-&gt;param('id')
+});
+
+$model-&gt;fast_insert('message', {
+    message =&gt; $self-&gt;param('message'),
+});
+
+$model-&gt;update('message',
+    {
+        message =&gt; $self-&gt;param('message'),
+    },
+    {
+        id =&gt; $self-&gt;param('id'),
+    }
+);
+
+$model-&gt;delete('message', {
+    id =&gt; $self-&gt;param('id'),
+});
+
+my ($rows, $pager) = $model-&gt;search_with_pager(
+    'message',
+    {
+    },
+    {
+        order_by =&gt; 'id DESC',
+        page =&gt; $page,
+        rows =&gt; 3,
+    }
+);
+</code></pre>
+
+<h3>Mojolicious::LiteでのXslateの継承</h3>
+
+<p>Xslateで継承を使わないというのはありえないと思うのですが、Mojolicious::Liteでのサンプルが見つからなかったのでちょっと悩みました。実際はhogehoge.txで定義してincludeやcascadeなどでそれを指定するだけでした。</p>
+
+<pre><code>@@ base.tx
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+  &lt;head&gt;
+    &lt;meta http-equiv="content-type" content="text/html; charset=utf-8" /&gt;
+    &lt;script src="http://www.google.com/jsapi" type="text/javascript"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript"&gt;//&lt;![CDATA[
+        google.load('jquery', '1.4.4');
+    //]]&gt;&lt;/script&gt;
+    &lt;script src="https://github.com/snakajima/SNBinder/raw/master/snbinder-0.5.3.js" type="text/javascript"&gt;&lt;/script&gt;
+: include main_js
+    &lt;title&gt;Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory)&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+:   block content -&gt; { }
+  &lt;/body&gt;
+&lt;/html&gt;
+
+@@ form.tx
+&lt;form method="post" action="&lt;: $path :&gt;"&gt;
+: if ($id) {
+  &lt;input type="hidden" name="id" value="&lt;: $id :&gt;"&gt;
+: }
+  &lt;p&gt;&lt;textarea name="message" cols="50" rows="10" &gt;&lt;: $message :&gt;&lt;/textarea&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;input type="submit" /&gt;&lt;/p&gt;
+&lt;/form&gt;
+
+@@ index.html.tx
+: cascade base
+: override content -&gt; {
+
+: include form { path =&gt; "/create" }
+
+&lt;div id="main" style="display:none;"&gt;
+  &lt;p&gt;Accessing server ...&lt;/p&gt;
+&lt;/div&gt;
+
+: }
+</code></pre>
+
+<h3>SQLite/OnMemory</h3>
+
+<p>実はSQLiteってオンメモリ（正しくはインメモリかな？）で動作するんですね。知りませんでした。これのおかげで必要なCPANモジュールが入っていれば本当に一つのファイルで動作するアプリになりました。ただしオンメモリなので切断されると当然データが消えます。また、複数プロセスから接続は出来ないようでStarmanなどのHTTPDと組み合わせて動かすと勝手に複数ワーカーが起動して動作するため上手く動きません。オンメモリでもDB名を付けることが出来たり、コネクションプールで接続を維持し続ける方法があったりするんじゃないかとは思うのですが、ちょっと良くわかりません。H2DBではそういうことが出来た覚えがあるのですがさて。</p>
+
+<pre><code>my $model = Message-&gt;new(
+    dbh =&gt; DBI-&gt;connect(
+        'dbi:SQLite:dbname=:memory:', '', '',
+        {
+            RaiseError     =&gt; 1,
+            PrintError     =&gt; 0,
+            AutoCommit     =&gt; 1,
+            sqlite_unicode =&gt; 1,
+        }
+    )
+);
+</code></pre>
+
+<h2>コード</h2>
+
+<p>コードはGistに上げています</p>
+
+<script src="https://gist.github.com/953572.js"> </script>
+
+<p class="post-footer"><span class="date">2011-05-04</span></p>
+<h2><a href="/2011/05/04/20110504_02/" title="">Qudoでログ回収</a></h2>
+<ul>
+<li>SCPやrsyncやらで各アプリケーションサーバから回収
+<ul>
+<li>自由が利く</li>
+</ul></li>
+<li>各アプリケーションサーバから解析サーバへ投げてもらう
+<ul>
+<li>HDFSなどHadoopが扱うファイルシステムに直接入れる事が可能</li>
+<li>※ただし、各アプリケーションサーバがそのファイルシステムを扱えるように色々セットアップが必要</li>
+</ul></li>
+</ul>
+
+<p>後者のアプリから投げてもらう方だと各サーバでファイルシステムを扱えるようセットアップが必要になるので、そこまでアプリ側に負担を掛けられないかなということで今考えているのは前者の方法となります。</p>
+
+<h3>コード</h3>
+
+<p>Hadoopが扱うファイルシステムはHDFSという前提で前回構築した環境でサンプルを作ってみました。</p>
+
+<h3>シェルスクリプトで並列回収</h3>
+
+<p>まず最初にシェルスクリプトで書いてみました。「これだと回収先のアプリが100万個ある場合は100万個同時にダウンロードしちゃうってことだよね？」というもっともな指摘で没になりました。まったくもってその通りだと思います。</p>
+
+<script src="https://gist.github.com/954830.js"> </script>
+
+<h3>Qudoで並列回収</h3>
+
+<ul>
+<li>ジョブ／キューを使いたい
+<ul>
+<li>なんとなくジョブは消えてほしく無い</li>
+<li>失敗したらリトライしてほしい</li>
+</ul></li>
+<li>回収は並列
+<ul>
+<li>でも同時実行数は上限あり</li>
+</ul></li>
+</ul>
+
+<p>以上の要件で最初はTheSchwartz＆Parallel::Preforkで考えていましたが何やらGearmanでもDBを使って動作させられるという話があったりQudoを見つけてみたりで、でもやりたいことって別にそんなに複雑な事でもないので結局何使っても良いかなと思ってQudoを選びました。後々機能を増やしたい時にフックポイントが色々用意されているので悪くないかなと。</p>
+
+<script src="https://gist.github.com/951476.js"> </script>
+
+<p>どうでも良いですがnekokakさん曰くQudoは「駆動」らしいですが「弓道」の方が良いと思います＾＾</p>
+
+<p class="post-footer"><span class="date">2011-05-04</span></p>
+<!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
+    </div>
+    <div id="sidebar">
+<h3>Profile</h3>
+<script src="https://iddy.jp/profile/mix3/linktool/" type="text/javascript" charset="utf-8"></script>
+<h3>Archives</h3>
+<ul class="sidemenu">
+  <li><a href="/archives/2011/11/">2011年11月</a></li>
+  <li><a href="/archives/2011/07/">2011年07月</a></li>
+  <li><a href="/archives/2011/06/">2011年06月</a></li>
+  <li><a href="/archives/2011/05/">2011年05月</a></li>
+  <li><a href="/archives/2011/04/">2011年04月</a></li>
+</ul>
+    </div>
+  </div>
+  <div id="footer">
+    <p>
+      &copy; All your copyright info here  
+  
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+      <a href="http://www.bluewebtemplates.com/" title="Website Templates">website templates</a> by <a href="http://www.styleshout.com/">styleshout</a> |
+      Valid <a href="http://validator.w3.org/check?uri=referer">XHTML</a> | 
+      <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a>
+  
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+      <a href="/">Home</a>&nbsp;|&nbsp;
+      <a href="/">RSS Feed</a>
+    </p>
+  </div>
+</body>
+</html>
