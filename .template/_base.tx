@@ -41,7 +41,11 @@
     <h1 id="logo-text"><a href="/" title=""><: $blog.config.title :></a></h1>
     <p id="slogan"><: $blog.config.description :></p>
     <div id="top-menu">
-      <p><a href="/index.rdf">rss feed</a></p>
+      <p>
+        <a href="/index.rdf">rss feed</a> | 
+        <a href="https://github.com/mix3">github</a> | 
+        <a href="http://www.pixiv.net/member.php?id=88339">pixiv</a>
+      </p>
     </div>
   </div>
   <div  id="nav">
