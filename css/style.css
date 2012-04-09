@@ -29,7 +29,7 @@ a, a:visited {
 }
 a:hover {
 	color: #73471B;
-	background: inherit;
+	/* background: inherit; */
 	text-decoration: underline;
 }
 
