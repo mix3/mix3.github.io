@@ -1,0 +1,10 @@
+: around side -> {
+<h3>Profile</h3>
+<script src="https://iddy.jp/profile/mix3/linktool/" type="text/javascript" charset="utf-8"></script>
+<h3>Archives</h3>
+<ul class="sidemenu">
+:   for $side.archive_key -> $key {
+  <li><a href="/archives/<: $key :>/"><: $side.archive_key2name[$key] :></a></li>
+:   }
+</ul>
+: }

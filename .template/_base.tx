@@ -33,14 +33,13 @@
   
   </script>
 
-  <title>萌えキャラとは何だったのか - Hadoopを触ってみた
-</title>
+  <title><: $blog.config.title :><: block subtitle -> {} :></title>
 </head>
 <body>
 <div id="wrap">
   <div id="header">
-    <h1 id="logo-text"><a href="/" title="">萌えキャラとは何だったのか</a></h1>
-    <p id="slogan">ギークにも絵描きにもなれない者の末路</p>
+    <h1 id="logo-text"><a href="/" title=""><: $blog.config.title :></a></h1>
+    <p id="slogan"><: $blog.config.description :></p>
     <div id="top-menu">
       <p><a href="/index.rdf">rss feed</a></p>
     </div>
@@ -52,29 +51,10 @@
   </div>
   <div id="content">
     <div id="main">
-<h2><a href="/2011/04/30/20110430/" title="">Hadoopを触ってみた</a></h2>
-<p>具体的にはgistに書いた。</p>
-
-<p>完全分散モードが結構癖が強い感じなので気をつけたい。</p>
-
-<script src="https://gist.github.com/944255.js"> </script>
-
-<script src="https://gist.github.com/944342.js"> </script>
-
-<p class="post-footer"><span class="date">2011-04-30</span></p>
-<!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
+: block main -> {}
     </div>
     <div id="sidebar">
-<h3>Profile</h3>
-<script src="https://iddy.jp/profile/mix3/linktool/" type="text/javascript" charset="utf-8"></script>
-<h3>Archives</h3>
-<ul class="sidemenu">
-  <li><a href="/archives/2011/11/">2011年11月</a></li>
-  <li><a href="/archives/2011/07/">2011年07月</a></li>
-  <li><a href="/archives/2011/06/">2011年06月</a></li>
-  <li><a href="/archives/2011/05/">2011年05月</a></li>
-  <li><a href="/archives/2011/04/">2011年04月</a></li>
-</ul>
+: block side -> {}
     </div>
   </div>
   <div id="footer">
