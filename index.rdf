@@ -10,32 +10,53 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>Capture::Tiny</title>
+<description>
+<![CDATA[
+<p>前回pixivブログは github pages のコピーだから大丈夫とか書いたけど、github pages で書き始める前のpixivブログはバックアップ取ってなかったのでほんとは大丈夫じゃなかった mix3 です。SSH+LDAP とか keepalived を試してみた記事が消えたのはちょっともったいなかったかな。まあ、Google検索でキャッシュ漁ればある程度は発掘出来そうではあるけれども。</p>
+
+<h3>p5-SWFEditor</h3>
+
+<p>アウトプットが無さ過ぎて良くないなぁということでひねり出してみる。</p>
+
+<p>前の記事に書いたp5-SWFEditorですが、swf_info と print_tag_data はCが標準出力をしていて、これをテストしようとすると標準出力をキャプチャしないといけなくてちょっと困ってしまいました。Capture::Tiny というものを使うとキャプチャ出来るというのは<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんから教わって試してみたけれどなぜか上手く行かず。言われて試してみたときは途中までしかキャプチャ出来ませんでした。</p>
+
+<p>ただ、途中までしかキャプチャできないという時点で出力がバッファされているというのはピンと来ていて、実際その通りだったのですが、Perlでこれをどうこうする方法が分からず結局今もどうすれば良いのかというのは分かっていません。今はXSのほうでfflushするようにしてテストが出来るようにしています。</p>
+
+<p>以下標準出力を捕まえる方法を探っていたときに書いたサンプルです。fflushしたときの標準出力とPerlIO_stdoutfを使った標準出力はキャプチャできていますが、素直にprintfしたときはキャプチャできず遅れてバッファに溜まっていたものが標準出力されてしまっています。</p>
+
+<script src="https://gist.github.com/2384966.js"> </script>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.com/2012/04/14/20120414/</guid>
+<pubDate>Sat, 14 Apr 2012 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>やったー cpan auhor になったよー＼(^o^)／</title>
 <description>
 <![CDATA[
+<p>今年入ってからミスが多すぎてそろそろ本当に首になるか、潔く自分から辞めるかした方が良いんじゃないかと真剣に考えるmix3です。</p>
 
-今年入ってからミスが多すぎてそろそろ本当に首になるか、潔く自分から辞めるかした方が良いんじゃないかと真剣に考えるmix3です。
+<h3><a href="http://pixiv.cc/mix3">pixivブログ消滅</a></h3>
 
-### [pixivブログ消滅](http://pixiv.cc/mix3)
+<p>pixivブログで書いていた事は github の pages のコピーだったので、pixivブログのサービス終了には特にどうということは無かったのですが、本当にサービスが終了して見れなくなってしまったので、ようやっと github の方に完全に移行しました。</p>
 
-pixivブログで書いていた事は github の pages のコピーだったので、pixivブログのサービス終了には特にどうということは無かったのですが、本当にサービスが終了して見れなくなってしまったので、ようやっと github の方に完全に移行しました。
+<p>移行にあたって、ブログ生成スクリプトを改修（リファクタリング的には今も相当酷いが）して、Octpressのような感じでURLがそれっぽくなるようにしてみました。後はカテゴリかタグに対応してページング出来れば良いかなと思っています。</p>
 
-移行にあたって、ブログ生成スクリプトを改修（リファクタリング的には今も相当酷いが）して、Octpressのような感じでURLがそれっぽくなるようにしてみました。後はカテゴリかタグに対応してページング出来れば良いかなと思っています。
+<p>それにしても 元 pixiv ユーザ（本当は今もpixivユーザのつもりだけど今となってはまともに描いてないので…）として pixiv ブログ自体は気に入ってたのでちょっと残念です。</p>
 
-それにしても 元 pixiv ユーザ（本当は今もpixivユーザのつもりだけど今となってはまともに描いてないので…）として pixiv ブログ自体は気に入ってたのでちょっと残念です。
+<h3><a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a></h3>
 
-### [p5-SWFEditor](https://github.com/mix3/p5-SWFEditor)
+<p>タイトルに書いた通り、<a href="http://search.cpan.org/~himachoco/">cpan author</a> になりました。p5-SWFEditorという swf の画像置換やMovieClipの置換など、swf を perl から色々弄れるライブラリを作成してアップしました。</p>
 
-タイトルに書いた通り、[cpan author](http://search.cpan.org/~himachoco/) になりました。p5-SWFEditorという swf の画像置換やMovieClipの置換など、swf を perl から色々弄れるライブラリを作成してアップしました。
+<p>p5-SWFEditorの中身は <a href="https://twitter.com/#!/yoya">@yoya</a> さんの好意により <a href="https://twitter.com/#!/yoya">@yoya</a> さん作 <a href="http://sourceforge.jp/projects/swfed/">SWFEditor for PHP</a> をまるっとそのまま使わせてもらっています。自分がしたのは C で書かれている SWFEditor の機能を使うためのインタフェースを XS で書いた形になります。
+（そもそも SWFEdito for PHP が移植性などを考慮してSWF操作のコア部分とそれを使うインタフェースに分離して作られているので非常に移植しやすくなっています。素晴らしいですね！）</p>
 
-p5-SWFEditorの中身は [@yoya](https://twitter.com/#!/yoya) さんの好意により [@yoya](https://twitter.com/#!/yoya) さん作 [SWFEditor for PHP](http://sourceforge.jp/projects/swfed/) をまるっとそのまま使わせてもらっています。自分がしたのは C で書かれている SWFEditor の機能を使うためのインタフェースを XS で書いた形になります。
-（そもそも SWFEdito for PHP が移植性などを考慮してSWF操作のコア部分とそれを使うインタフェースに分離して作られているので非常に移植しやすくなっています。素晴らしいですね！）
+<p>SWFEditor の Perl バインディングの作成を快く許可して下さった <a href="https://twitter.com/#!/yoya">@yoya</a> さんに心から感謝致します。</p>
 
-SWFEditor の Perl バインディングの作成を快く許可して下さった [@yoya](https://twitter.com/#!/yoya) さんに心から感謝致します。
+<h3>ということで</h3>
 
-### ということで
-
-ブログ移行にともないpixivブログからCSSを持ってきてそれっぽくしたのでそれのお知らせと、p5-SWFEditor を cpan にアップして cpan author になったよー というお知らせでした。
+<p>ブログ移行にともないpixivブログからCSSを持ってきてそれっぽくしたのでそれのお知らせと、p5-SWFEditor を cpan にアップして cpan author になったよー というお知らせでした。</p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2012/04/10/20120410/</guid>
@@ -45,27 +66,29 @@ SWFEditor の Perl バインディングの作成を快く許可して下さっ�
 <title>bonding設定で死んだ</title>
 <description>
 <![CDATA[
-### bondingとは
+<h3>bondingとは</h3>
 
-bondingというのはNICを冗長化するもののことのようです。ラウンドロビンで負荷分散したりマスタースレーブ構成にして片方が死んでも大丈夫なように出来るようです。
+<p>bondingというのはNICを冗長化するもののことのようです。ラウンドロビンで負荷分散したりマスタースレーブ構成にして片方が死んでも大丈夫なように出来るようです。</p>
 
-参考[意外と知らない？NICを冗長化するボンディング（bonding）Add Star](http://d.hatena.ne.jp/sen-u/20061002/p1)
+<p>参考<a href="http://d.hatena.ne.jp/sen-u/20061002/p1">意外と知らない？NICを冗長化するボンディング（bonding）Add Star</a></p>
 
-### ネットワークが遅延？
+<h3>ネットワークが遅延？</h3>
 
-ネットワークの知識なんてほぼ０なのでbondingなんて当然知らなかったのですが、でも設定しないといけないということなのでWebを漁ってとりあえずラウンドロビンで設定したのですが、これがいけなかった。
+<p>ネットワークの知識なんてほぼ０なのでbondingなんて当然知らなかったのですが、でも設定しないといけないということなのでWebを漁ってとりあえずラウンドロビンで設定したのですが、これがいけなかった。</p>
 
-並列(最大100プロセス)でアクセス掛ける負荷試験を行ってると、MySQLの接続でtimeoutが結構出る。
+<p>並列(最大100プロセス)でアクセス掛ける負荷試験を行ってると、MySQLの接続でtimeoutが結構出る。</p>
 
-根本的な問題として負荷試験のシナリオにミスがあったりはするのですが、それとは別にネットワークに遅延が発生する模様。
+<p>根本的な問題として負荷試験のシナリオにミスがあったりはするのですが、それとは別にネットワークに遅延が発生する模様。</p>
 
-インフラのプロフェッショナル[@fujiwara](http://twitter.com/fujiwara)さんや[@shin1rosei](http://twitter.com/shin1rosei)さんに調べてもらって自分の設定したbondingの設定がラウンドロビンなのがマズいという事が判明。並列度が上がると、NICの切り替わりで問題が顕在化するみたいです。
+<p>インフラのプロフェッショナル<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんや<a href="https://twitter.com/#!/shin1rosei">@shin1rosei</a>さんに調べてもらって自分の設定したbondingの設定がラウンドロビンなのがマズいという事が判明。並列度が上がると、NICの切り替わりで問題が顕在化するみたいです。</p>
 
-正直分った瞬間回線切って首吊って死にたい気分になりました...
+<p>正直分った瞬間回線切って首吊って死にたい気分になりました...</p>
 
-&lt;script src=&quot;http://togetter.com/js/parts.js&quot;&gt;&lt;/script&gt;&lt;script&gt;tgtr.ListWidget({id:&#39;222670&#39;,url:&#39;http://togetter.com/&#39;,width:&#39;320px&#39;,height:&#39;240px&#39;});&lt;/script&gt;
+<script src="http://togetter.com/js/parts.js"></script>
 
-自分のした設定にどんな意味があるのか、ちゃんと考える様にします...
+<script>tgtr.ListWidget({id:'222670',url:'http://togetter.com/',width:'320px',height:'240px'});</script>
+
+<p>自分のした設定にどんな意味があるのか、ちゃんと考える様にします...</p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2011/11/23/2011123/</guid>
@@ -75,350 +98,393 @@ bondingというのはNICを冗長化するもののことのようです。ラ�
 <title>Play framework + Scala に入門してみる</title>
 <description>
 <![CDATA[
-### Scalaクラスタの怒りが聞こえる…
+<h3>Scalaクラスタの怒りが聞こえる…</h3>
 
-Scalaクラスタの怒りに満ちたTLが見えて当該セッションのUstを見れなかったのが悔しいです。何があったかはTogetterからある程度察する事が出来ます。
+<p>Scalaクラスタの怒りに満ちたTLが見えて当該セッションのUstを見れなかったのが悔しいです。何があったかはTogetterからある程度察する事が出来ます。</p>
 
-参考：[2011/07/22_Advanced_Tech_Night No.2 「ジャバラーが知っておくべき最近の開発言語のこと」(#atn2011 )](http://togetter.com/li/164689) 
+<p>参考：<a href="http://togetter.com/li/164689">2011/07/22_Advanced_Tech_Night No.2 「ジャバラーが知っておくべき最近の開発言語のこと」(#atn2011 )</a> </p>
 
-### Play framework + Scala に入門してみる
+<h3>Play framework + Scala に入門してみる</h3>
 
-そんな流れがあったのでScalaを触りたい気持ちが強くなりPlay frameworkの勉強と一緒にScalaをやってみようかと思い立ちました。Play frameworkというのははJava版Ruby on Railsといった感じでJavaだけれど非常に効率に良い開発が出来るフレームワークです（らしいです）Wicketとはまた違う爽快感のあるフレームワークのようです。
+<p>そんな流れがあったのでScalaを触りたい気持ちが強くなりPlay frameworkの勉強と一緒にScalaをやってみようかと思い立ちました。Play frameworkというのははJava版Ruby on Railsといった感じでJavaだけれど非常に効率に良い開発が出来るフレームワークです（らしいです）Wicketとはまた違う爽快感のあるフレームワークのようです。</p>
 
-### インストール
+<h3>インストール</h3>
 
-インストールは非常に簡単です。zipを落として適当に配置してPATHを通すだけ。ただしplayのコマンドはpythonで書かれているのでpythonが必要になるかもしれません。[play]とだけ打つとセットアップが出来ていれば以下のように結果が返ってくるでしょう。
+<p>インストールは非常に簡単です。zipを落として適当に配置してPATHを通すだけ。ただしplayのコマンドはpythonで書かれているのでpythonが必要になるかもしれません。[play]とだけ打つとセットアップが出来ていれば以下のように結果が返ってくるでしょう。</p>
 
-#### $ play
+<h4>$ play</h4>
 
-    ~        _            _ 
-    ~  _ __ | | __ _ _  _| |
-    ~ | &#39;_ \| |/ _&#39; | || |_|
-    ~ |  __/|_|\____|\__ (_)
-    ~ |_|            |__/   
-    ~
-    ~ play! 1.2.2, http://www.playframework.org
-    ~
-    ~ Usage: play cmd [app_path] [--options]
-    ~ 
-    ~ with,  new      Create a new application
-    ~        run      Run the application in the current shell
-    ~        help     Show play help
-    ~
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Usage: play cmd [app_path] [--options]
+~ 
+~ with,  new      Create a new application
+~        run      Run the application in the current shell
+~        help     Show play help
+~
+</code></pre>
 
-セットアップの確認が出来ればさっそく動作確認してみましょう。
+<p>セットアップの確認が出来ればさっそく動作確認してみましょう。</p>
 
-### プロジェクトの作成、アプリケーションの実行
+<h3>プロジェクトの作成、アプリケーションの実行</h3>
 
-以下のように打つとプロジェクトが作成出来ます。作成途中アプリケーションの名前を聞かれます。基本デフォルトのままで良いでしょう。スケルトンが作成されます。
+<p>以下のように打つとプロジェクトが作成出来ます。作成途中アプリケーションの名前を聞かれます。基本デフォルトのままで良いでしょう。スケルトンが作成されます。</p>
 
-#### $ play new [project_name] --with scala
+<h4>$ play new [project_name] --with scala</h4>
 
-    ~        _            _ 
-    ~  _ __ | | __ _ _  _| |
-    ~ | &#39;_ \| |/ _&#39; | || |_|
-    ~ |  __/|_|\____|\__ (_)
-    ~ |_|            |__/   
-    ~
-    ~ play! 1.2.2, http://www.playframework.org
-    ~
-    ~ The new application will be created in /path/to/[project_name]
-    ~ What is the application name? [project_name] 
-    ~
-    ~ OK, the application is created.
-    ~ Start it with : play run project_name
-    ~ Have fun!
-    ~
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ The new application will be created in /path/to/[project_name]
+~ What is the application name? [project_name] 
+~
+~ OK, the application is created.
+~ Start it with : play run project_name
+~ Have fun!
+~
+</code></pre>
 
-以下のようにして作成されたアプリケーションを起動する事が出来ます。9000番ポートで待っているようなので[http://localhost:9000/](http://localhost:9000/)にアクセスしましょう。いかにもな導入ページが返って来たらOKです。
+<p>以下のようにして作成されたアプリケーションを起動する事が出来ます。9000番ポートで待っているようなので<a href="http://localhost:9000/">http://localhost:9000/</a>にアクセスしましょう。いかにもな導入ページが返って来たらOKです。</p>
 
-#### $ play run [project_name]
+<h4>$ play run [project_name]</h4>
 
-    ~        _            _ 
-    ~  _ __ | | __ _ _  _| |
-    ~ | &#39;_ \| |/ _&#39; | || |_|
-    ~ |  __/|_|\____|\__ (_)
-    ~ |_|            |__/   
-    ~
-    ~ play! 1.2.2, http://www.playframework.org
-    ~
-    ~ Ctrl+C to stop
-    ~ 
-    Listening for transport dt_socket at address: 8000
-    01:35:10,384 INFO  ~ Starting /path/to/[project_name]
-    01:35:11,399 WARN  ~ You&#39;re running Play! in DEV mode
-    01:35:11,609 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-    01:43:01,925 INFO  ~ Application &#39;[project_name]&#39; is now started !
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Ctrl+C to stop
+~ 
+Listening for transport dt_socket at address: 8000
+01:35:10,384 INFO  ~ Starting /path/to/[project_name]
+01:35:11,399 WARN  ~ You're running Play! in DEV mode
+01:35:11,609 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+01:43:01,925 INFO  ~ Application '[project_name]' is now started !
+</code></pre>
 
-### Scalaで動作するプロジェクトを作成してみる。
+<h3>Scalaで動作するプロジェクトを作成してみる。</h3>
 
-今度はScalaのプロジェクトを作成してみます。ちなみに以下のように conf/dependencies.yml にScalaに依存することを追記して $ play dependencies [project_name] とすることでScala対応のプロジェクトにすることも出来ますが、スケルトンコードがJavaのままなので作り直したいと思います。
+<p>今度はScalaのプロジェクトを作成してみます。ちなみに以下のように conf/dependencies.yml にScalaに依存することを追記して $ play dependencies [project_name] とすることでScala対応のプロジェクトにすることも出来ますが、スケルトンコードがJavaのままなので作り直したいと思います。</p>
 
-#### $ diff -u [project_name]/conf/dependencies.yml.orig [project_name]/conf/dependencies.yml
-    --- project_name/conf/dependencies.yml.orig 2011-07-24 02:04:56.000000000 +0900
-    +++ project_name/conf/dependencies.yml  2011-07-24 02:04:46.000000000 +0900
-    @@ -2,3 +2,4 @@
-     
-     require:
-         - play
-    +    - play -&gt; scala 0.9.1
+<h4>$ diff -u [project_name]/conf/dependencies.yml.orig [project_name]/conf/dependencies.yml</h4>
 
-#### $ play dependencies [project_name]
+<pre><code>--- project_name/conf/dependencies.yml.orig 2011-07-24 02:04:56.000000000 +0900
++++ project_name/conf/dependencies.yml  2011-07-24 02:04:46.000000000 +0900
+@@ -2,3 +2,4 @@
 
-    ~            _            _ 
-    ~  _ __ | | __ _ _  _| |
-    ~ | &#39;_ \| |/ _&#39; | || |_|
-    ~ |  __/|_|\____|\__ (_)
-    ~ |_|            |__/   
-    ~
-    ~ play! 1.2.2, http://www.playframework.org
-    ~
-    ~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
-    ~
-    ~   play-&gt;scala 0.9.1 (from playLocalModules)
-    ~
-    ~ Installing resolved dependencies,
-    ~
-    ~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
-    ~
-    ~ Done!
-    ~
+ require:
+     - play
++    - play -&gt; scala 0.9.1
+</code></pre>
 
-### Scala対応のプロジェクトを作成して動作確認する
+<h4>$ play dependencies [project_name]</h4>
 
-Scala対応のプロジェクトを作成するにはまず以下のようにしてScalaモジュールをインストールする必要があります。
+<pre><code>~            _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
+~
+~   play-&gt;scala 0.9.1 (from playLocalModules)
+~
+~ Installing resolved dependencies,
+~
+~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
+~
+~ Done!
+~
+</code></pre>
 
-#### $ play install scala
+<h3>Scala対応のプロジェクトを作成して動作確認する</h3>
 
-    ~        _            _ 
-    ~  _ __ | | __ _ _  _| |
-    ~ | &#39;_ \| |/ _&#39; | || |_|
-    ~ |  __/|_|\____|\__ (_)
-    ~ |_|            |__/   
-    ~
-    ~ play! 1.2.2, http://www.playframework.org
-    ~
-    ~ Will install scala-0.9.1
-    ~ This module is compatible with: 1.2.2
-    ~ Do you want to install this version (y/n)? y
-    ~ Installing module scala-0.9.1...
-    ~
-    ~ Fetching http://www.playframework.org/modules/scala-0.9.1.zip
-    ~ [--------------------------100%-------------------------] 60034.6 KiB/s    
-    ~ Unzipping...
-    ~
-    ~ Module scala-0.9.1 is installed!
-    ~ You can now use it by adding it to the dependencies.yml file:
-    ~
-    ~ require:
-    ~     play -&gt; scala 0.9.1
-    ~
+<p>Scala対応のプロジェクトを作成するにはまず以下のようにしてScalaモジュールをインストールする必要があります。</p>
 
-インストールが済んだら実際にScala対応のプロジェクトを作成してみましょう。
+<h4>$ play install scala</h4>
 
-#### $ play new [project_name] --with scala
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Will install scala-0.9.1
+~ This module is compatible with: 1.2.2
+~ Do you want to install this version (y/n)? y
+~ Installing module scala-0.9.1...
+~
+~ Fetching http://www.playframework.org/modules/scala-0.9.1.zip
+~ [--------------------------100%-------------------------] 60034.6 KiB/s    
+~ Unzipping...
+~
+~ Module scala-0.9.1 is installed!
+~ You can now use it by adding it to the dependencies.yml file:
+~
+~ require:
+~     play -&gt; scala 0.9.1
+~
+</code></pre>
 
-    ~        _            _ 
-    ~  _ __ | | __ _ _  _| |
-    ~ | &#39;_ \| |/ _&#39; | || |_|
-    ~ |  __/|_|\____|\__ (_)
-    ~ |_|            |__/   
-    ~
-    ~ play! 1.2.2, http://www.playframework.org
-    ~
-    ~ The new application will be created in /path/to/[project_name]
-    ~ What is the application name? [project_name] 
-    ~
-    ~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
-    ~
-    ~   play-&gt;scala 0.9.1 (from playLocalModules)
-    ~
-    ~ Installing resolved dependencies,
-    ~
-    ~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
-    ~
-    ~ Done!
-    ~
-    ~ OK, the application is created.
-    ~ Start it with : play run project_name
-    ~ Have fun!
-    ~
+<p>インストールが済んだら実際にScala対応のプロジェクトを作成してみましょう。</p>
 
-動作確認はJavaの時と同様に $ play run [project_name] で出来ます。
+<h4>$ play new [project_name] --with scala</h4>
 
-#### $ play run project_name/
-    ~        _                _ 
-    ~  _ __ | | __ _ _  _| |
-    ~ | &#39;_ \| |/ _&#39; | || |_|
-    ~ |  __/|_|\____|\__ (_)
-    ~ |_|            |__/   
-    ~
-    ~ play! 1.2.2, http://www.playframework.org
-    ~
-    ~ Ctrl+C to stop
-    ~ 
-    Listening for transport dt_socket at address: 8000
-    02:15:51,036 INFO  ~ Starting /path/to/[project_name]
-    02:15:51,067 INFO  ~ Module scala is available (/path/to/[play]/modules/scala-0.9.1)
-    02:15:54,598 INFO  ~ Scala support is active
-    02:15:54,598 WARN  ~ You&#39;re running Play! in DEV mode
-    02:15:54,734 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-    Compiling:
-        /path/to/[project_name]/app/controllers.scala
-        /path/to/[play]/modules/docviewer/app/controllers/PlayDocumentation.java
-        /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
-        /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
-        /path/to/[play]/modules/docviewer/app/DocViewerPlugin.java
-        /path/to/[project_name]/tmp/generated/views.html.main.scala
-        /path/to/[play]/modules/docviewer/app/helpers/CheatSheetHelper.java
-    Traversing /path/to/[project_name]/app/controllers.scala
-    Traversing /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
-    Traversing /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
-    Traversing /path/to/[project_name]/tmp/generated/views.html.main.scala
-    API phase took : 0.503 s
-    02:16:21,114 INFO  ~ Application &#39;[project_name]&#39; is now started !
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ The new application will be created in /path/to/[project_name]
+~ What is the application name? [project_name] 
+~
+~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
+~
+~   play-&gt;scala 0.9.1 (from playLocalModules)
+~
+~ Installing resolved dependencies,
+~
+~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
+~
+~ Done!
+~
+~ OK, the application is created.
+~ Start it with : play run project_name
+~ Have fun!
+~
+</code></pre>
 
-### プロジェクト構成
+<p>動作確認はJavaの時と同様に $ play run [project_name] で出来ます。</p>
 
-Playのプロジェクトは以下のような構成となっています。アプリケーションを構築して行く際は主にapp以下を弄って行く事になるでしょう。
+<h4>$ play run project_name/</h4>
 
-* app
- * コントローラ、モデル、ビューなど。
-* conf
- * アプリケーションの設定。ルーティングの設定もここ。
-* lib
- * jarファイルなどのlib関係。
-* modules
- * プロジェクトが依存しているものがこの下に書き出されるのかな？
-* public
- * 静的ファイルなど。
-* test
- * テスト関係など。
-* tmp
- * 生成されたclassファイルの配置やキャッシュなど。
+<pre><code>~        _                _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Ctrl+C to stop
+~ 
+Listening for transport dt_socket at address: 8000
+02:15:51,036 INFO  ~ Starting /path/to/[project_name]
+02:15:51,067 INFO  ~ Module scala is available (/path/to/[play]/modules/scala-0.9.1)
+02:15:54,598 INFO  ~ Scala support is active
+02:15:54,598 WARN  ~ You're running Play! in DEV mode
+02:15:54,734 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+Compiling:
+    /path/to/[project_name]/app/controllers.scala
+    /path/to/[play]/modules/docviewer/app/controllers/PlayDocumentation.java
+    /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
+    /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
+    /path/to/[play]/modules/docviewer/app/DocViewerPlugin.java
+    /path/to/[project_name]/tmp/generated/views.html.main.scala
+    /path/to/[play]/modules/docviewer/app/helpers/CheatSheetHelper.java
+Traversing /path/to/[project_name]/app/controllers.scala
+Traversing /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
+Traversing /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
+Traversing /path/to/[project_name]/tmp/generated/views.html.main.scala
+API phase took : 0.503 s
+02:16:21,114 INFO  ~ Application '[project_name]' is now started !
+</code></pre>
 
-### とりあえず中身を眺めてみる
+<h3>プロジェクト構成</h3>
 
-生成されるスケルトンは以下のようになっています。ルーティングとコントローラ/アクションの対応は直感的で分かりやすいですね。Controllerを継承したApplicationがコントローラ、その中で定義したメソッドがアクションのようです。
+<p>Playのプロジェクトは以下のような構成となっています。アプリケーションを構築して行く際は主にapp以下を弄って行く事になるでしょう。</p>
 
-ただアクションで何を返すかが非常に分りづらいですね（もちろん基本はテンプレートですが）テンプレートそのものも@が出て来て関数定義っぽいし非常に分りづらいです。Webデザイナー殺しですね&lt;s&gt;死ねば良いと思います＾＾&lt;/s&gt;
+<ul>
+<li>app
+<ul>
+<li>コントローラ、モデル、ビューなど。</li>
+</ul></li>
+<li>conf
+<ul>
+<li>アプリケーションの設定。ルーティングの設定もここ。</li>
+</ul></li>
+<li>lib
+<ul>
+<li>jarファイルなどのlib関係。</li>
+</ul></li>
+<li>modules
+<ul>
+<li>プロジェクトが依存しているものがこの下に書き出されるのかな？</li>
+</ul></li>
+<li>public
+<ul>
+<li>静的ファイルなど。</li>
+</ul></li>
+<li>test
+<ul>
+<li>テスト関係など。</li>
+</ul></li>
+<li>tmp
+<ul>
+<li>生成されたclassファイルの配置やキャッシュなど。</li>
+</ul></li>
+</ul>
 
-#### $ cat [project_name]/conf/routes
+<h3>とりあえず中身を眺めてみる</h3>
 
-    # Routes
-    # This file defines all application routes (Higher priority routes first)
-    # ~~~~
-    
-    # Home page
-    GET     /                                       Application.index
-    
-    # Ignore favicon requests
-    GET     /favicon.ico                            404
-    
-    # Map static resources from the /app/public folder to the /public path
-    GET     /public/                                staticDir:public
-    
-    # Catch all
-    *       /{controller}/{action}                  {controller}.{action}
+<p>生成されるスケルトンは以下のようになっています。ルーティングとコントローラ/アクションの対応は直感的で分かりやすいですね。Controllerを継承したApplicationがコントローラ、その中で定義したメソッドがアクションのようです。</p>
 
-#### $ cat [project_name]/app/controllers.scala 
-    package controllers
-    
-    import play._
-    import play.mvc._
-    
-    object Application extends Controller {
-        
-        import views.Application._
-        
-        def index = {
-            html.index(&quot;Your Scala application is ready!&quot;)
-        }
-        
+<p>ただアクションで何を返すかが非常に分りづらいですね（もちろん基本はテンプレートですが）テンプレートそのものも@が出て来て関数定義っぽいし非常に分りづらいです。Webデザイナー殺しですね<s>死ねば良いと思います＾＾</s></p>
+
+<h4>$ cat [project_name]/conf/routes</h4>
+
+<pre><code># Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                                       Application.index
+
+# Ignore favicon requests
+GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/                                staticDir:public
+
+# Catch all
+*       /{controller}/{action}                  {controller}.{action}
+</code></pre>
+
+<h4>$ cat [project_name]/app/controllers.scala</h4>
+
+<pre><code>package controllers
+
+import play._
+import play.mvc._
+
+object Application extends Controller {
+
+    import views.Application._
+
+    def index = {
+        html.index("Your Scala application is ready!")
     }
 
-#### $ cat [project_name]/app/views/Application/index.scala.html
+}
+</code></pre>
 
-    @(title:String)
-    
-    @main(title) {
-        
-        @views.defaults.html.welcome(title)
-        
-    }
+<h4>$ cat [project_name]/app/views/Application/index.scala.html</h4>
 
-#### $ cat [project_name]/app/views/main.scala.html
- 
-    @(title:String = &quot;&quot;)(body: =&gt; Html)
-    
-    &lt;!DOCTYPE html&gt;
-    &lt;html&gt;
-        &lt;head&gt;
-            &lt;title&gt;@title&lt;/title&gt;
-            &lt;link rel=&quot;stylesheet&quot; media=&quot;screen&quot; href=&quot;@asset(&quot;public/stylesheets/main.css&quot;)&quot;&gt;
-            &lt;link rel=&quot;shortcut icon&quot; type=&quot;image/png&quot; href=&quot;@asset(&quot;public/images/favicon.png&quot;)&quot;&gt;
-            &lt;script src=&quot;@asset(&quot;public/javascripts/jquery-1.5.2.min.js&quot;)&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
-        &lt;/head&gt;
-        &lt;body&gt;
-            @body
-        &lt;/body&gt;
-    &lt;/html&gt;
+<pre><code>@(title:String)
 
-### アクションとビュー
+@main(title) {
 
-とりあえずスケルトンでは以下のような感じで動いているようです。
+    @views.defaults.html.welcome(title)
 
-* views/[レイアウト].scala.html
- * レイアウトを定義
-* views/[コントローラ]/[アクション].scala.html
- * @レイアウト(引数) { HTML }
- * レイアウトとHTMLをガッチャンコして返す
+}
+</code></pre>
 
-HTMLの部分が@views.defaults.html.welcome(title)となってこれが何を差しているのかが分りづらくしています。ここを&amp;lt;h1&amp;gt;@title&amp;lt;/h1&amp;gt;とでもすればもう少し見通しが良くなるのではないかと思います。具体的には以下のような感じ。
+<h4>$ cat [project_name]/app/views/main.scala.html</h4>
 
-#### $ diff -u [project_name]/app/views/Application/index.scala.html.orig [project_name]/app/views/Application/index.scala.html
-    --- project_name/app/views/Application/index.scala.html.orig    2011-07-24 03:45:31.000000000 +0900
-    +++ project_name/app/views/Application/index.scala.html 2011-07-24 03:47:38.000000000 +0900
-    @@ -2,6 +2,6 @@
-     
-     @main(title) {
-         
-    -    @views.defaults.html.welcome(title)
-    +    &lt;h1&gt;@title&lt;/h1&gt;
-         
-    -}
-    \ No newline at end of file
-    +}
+<pre><code>@(title:String = "")(body: =&gt; Html)
 
-#### $ diff -u project_name/app/controllers.scala.orig project_name/app/controllers.scala
-    --- project_name/app/controllers.scala.orig 2011-07-24 03:49:42.000000000 +0900
-    +++ project_name/app/controllers.scala  2011-07-24 03:48:58.000000000 +0900
-    @@ -8,7 +8,11 @@
-         import views.Application._
-         
-         def index = {
-    -        html.index(&quot;Your Scala application is ready!&quot;)
-    +        html.index(&quot;index&quot;)
-         }
-         
-    +    def sample = {
-    +        html.index(&quot;sample&quot;)
-    +    }
-    +
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;@title&lt;/title&gt;
+        &lt;link rel="stylesheet" media="screen" href="@asset("public/stylesheets/main.css")"&gt;
+        &lt;link rel="shortcut icon" type="image/png" href="@asset("public/images/favicon.png")"&gt;
+        &lt;script src="@asset("public/javascripts/jquery-1.5.2.min.js")" type="text/javascript"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        @body
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3>アクションとビュー</h3>
+
+<p>とりあえずスケルトンでは以下のような感じで動いているようです。</p>
+
+<ul>
+<li>views/[レイアウト].scala.html
+<ul>
+<li>レイアウトを定義</li>
+</ul></li>
+<li>views/[コントローラ]/[アクション].scala.html
+<ul>
+<li>@レイアウト(引数) { HTML }</li>
+<li>レイアウトとHTMLをガッチャンコして返す</li>
+</ul></li>
+</ul>
+
+<p>HTMLの部分が@views.defaults.html.welcome(title)となってこれが何を差しているのかが分りづらくしています。ここを&lt;h1&gt;@title&lt;/h1&gt;とでもすればもう少し見通しが良くなるのではないかと思います。具体的には以下のような感じ。</p>
+
+<h4>$ diff -u [project_name]/app/views/Application/index.scala.html.orig [project_name]/app/views/Application/index.scala.html</h4>
+
+<pre><code>--- project_name/app/views/Application/index.scala.html.orig    2011-07-24 03:45:31.000000000 +0900
++++ project_name/app/views/Application/index.scala.html 2011-07-24 03:47:38.000000000 +0900
+@@ -2,6 +2,6 @@
+
+ @main(title) {
+
+-    @views.defaults.html.welcome(title)
++    &lt;h1&gt;@title&lt;/h1&gt;
+
+-}
+\ No newline at end of file
++}
+</code></pre>
+
+<h4>$ diff -u project_name/app/controllers.scala.orig project_name/app/controllers.scala</h4>
+
+<pre><code>--- project_name/app/controllers.scala.orig 2011-07-24 03:49:42.000000000 +0900
++++ project_name/app/controllers.scala  2011-07-24 03:48:58.000000000 +0900
+@@ -8,7 +8,11 @@
+     import views.Application._
+
+     def index = {
+-        html.index("Your Scala application is ready!")
++        html.index("index")
      }
 
-アクションも増やしてみました。これでルーティング設定も確認出来ます。$ play run [project_name] として以下へアクセスするとそれぞれindex、sampleが&amp;lt;h1&amp;gt;で表示されることが確認出来ると思います。
++    def sample = {
++        html.index("sample")
++    }
++
+ }
+</code></pre>
 
-* [http://localhost:9000/](http://localhost:9000/)
-* [http://localhost:9000/Application/sample](http://localhost:9000/Application/sample)
+<p>アクションも増やしてみました。これでルーティング設定も確認出来ます。$ play run [project_name] として以下へアクセスするとそれぞれindex、sampleが&lt;h1&gt;で表示されることが確認出来ると思います。</p>
 
-なんとなくではありますがアクションからテンプレートが呼ばれ、引数を使ってレイアウトを解決して表示していることが見えてきた感じがします。
+<ul>
+<li><a href="http://localhost:9000/">http://localhost:9000/</a></li>
+<li><a href="http://localhost:9000/Application/sample">http://localhost:9000/Application/sample</a></li>
+</ul>
 
-### まとめ
+<p>なんとなくではありますがアクションからテンプレートが呼ばれ、引数を使ってレイアウトを解決して表示していることが見えてきた感じがします。</p>
 
-とりあえず一旦ここまで。何をしているか理解出来たらまたコントローラ／アクション／テンプレートの関係を文字に起こしてみたいと思います。
+<h3>まとめ</h3>
 
-Play frameworkですが面白そうではあるもののやはりテンプレート周りが気に入らないですね。テンプレートの中にコードを埋め込んだり、独自の構文でロジックを埋め込んだりというのはどうしても慣れないです。どんなに簡単な構文でそれが可能だとしてもデザイナーとの連携の時にはやはり困ると思うのです。「ここは動的な情報が入るのでこういう書き方をして下さい」なんて絶対混乱します。テンプレートをHTMLで書くならそのテンプレートはプレーンなHTMLであるべきだと自分は思います。
+<p>とりあえず一旦ここまで。何をしているか理解出来たらまたコントローラ／アクション／テンプレートの関係を文字に起こしてみたいと思います。</p>
+
+<p>Play frameworkですが面白そうではあるもののやはりテンプレート周りが気に入らないですね。テンプレートの中にコードを埋め込んだり、独自の構文でロジックを埋め込んだりというのはどうしても慣れないです。どんなに簡単な構文でそれが可能だとしてもデザイナーとの連携の時にはやはり困ると思うのです。「ここは動的な情報が入るのでこういう書き方をして下さい」なんて絶対混乱します。テンプレートをHTMLで書くならそのテンプレートはプレーンなHTMLであるべきだと自分は思います。</p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2011/07/24/20110724/</guid>
@@ -428,232 +494,237 @@ Play frameworkですが面白そうではあるもののやはりテンプレー
 <title>blessとMouse</title>
 <description>
 <![CDATA[
-### 健康診断
+<h3>健康診断</h3>
 
-健康診断へ行って血を取ってきました。前回はチューブ通して採血の容器に取ってたのが今回は針から直結するようになって、それのおかげか何なのかは分りませんが採血スピードが向上して地味に嬉しかったです。痛いのは嫌いなのです…
+<p>健康診断へ行って血を取ってきました。前回はチューブ通して採血の容器に取ってたのが今回は針から直結するようになって、それのおかげか何なのかは分りませんが採血スピードが向上して地味に嬉しかったです。痛いのは嫌いなのです…</p>
 
-### blessとMouseの速度比較
+<h3>blessとMouseの速度比較</h3>
 
-すこし気になってblessとMouse、その他の速度比較。いろんなところでやられてるので今更自分でする事でもないでしょうが。なおblessで作るクラスは手を抜いて型制限などの実装はせずアクセサを用意して値を操作するだけにしました。適当適当。
+<p>すこし気になってblessとMouse、その他の速度比較。いろんなところでやられてるので今更自分でする事でもないでしょうが。なおblessで作るクラスは手を抜いて型制限などの実装はせずアクセサを用意して値を操作するだけにしました。適当適当。</p>
 
-[いまさら聞けない「Moose」超入門](http://blog.livedoor.jp/sasata299/archives/51281496.html)を参考にblessとMouseのコードを書き足しました。以下の処理の速度を比較しています。
+<p><a href="http://blog.livedoor.jp/sasata299/archives/51281496.html">いまさら聞けない「Moose」超入門</a>を参考にblessとMouseのコードを書き足しました。以下の処理の速度を比較しています。</p>
 
-1. hoge/fugaのアクセサを持ったクラスをnew
- * 初期値はfugaに1
-2. hogeに&#39;bbb&#39;を代入
-3. fugaの値を取得
-4. hogeの値を取得
+<ol>
+<li>hoge/fugaのアクセサを持ったクラスをnew
+<ul>
+<li>初期値はfugaに1</li>
+</ul></li>
+<li>hogeに'bbb'を代入</li>
+<li>fugaの値を取得</li>
+<li>hogeの値を取得</li>
+</ol>
 
-#### cost.pl
+<h4>cost.pl</h4>
 
-    # おまじないしない場合
-    package MooseTest;
-    use Moose;
-     
-    has &#39;hoge&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Str&#39; );
-    has &#39;fuga&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Int&#39; );
-     
-    no Moose;
-    
-    1;
-    
-    # おまじないする場合
-    package MooseTest_mi;
-    use Moose;
-     
-    has &#39;hoge&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Str&#39; );
-    has &#39;fuga&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Int&#39; );
-     
-    __PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
-     
-    no Moose;
-    
-    1;
-    
-    # おまじないしない場合
-    package MouseTest;
-    use Mouse;
-     
-    has &#39;hoge&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Str&#39; );
-    has &#39;fuga&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Int&#39; );
-    
-    no Mouse;
-    
-    1;
-    
-    # おまじないする場合
-    package MouseTest_mi;
-    use Mouse;
-     
-    has &#39;hoge&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Str&#39; );
-    has &#39;fuga&#39; =&gt; ( is =&gt; &#39;rw&#39;, isa =&gt; &#39;Int&#39; );
-     
-    __PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
-    
-    no Mouse;
-    
-    1;
-    
-    # Class::Accessor を使った場合
-    package ClassAccessorTest;
-    use strict;
-    use warnings;
-    use base &#39;Class::Accessor&#39;;
-     
-    __PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
-    
-    1;
-    
-    # Class::Accessor::Fast を使った場合
-    package ClassAccessorFastTest;
-    use strict;
-    use warnings;
-    use base &#39;Class::Accessor::Fast&#39;;
-     
-    __PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
-    
-    1;
-    
-    # perl5 OOP の場合
-    package Bless;
-    use strict;
-    use warnings;
-    
-    sub new {
-        my $class = shift;
-        my $self  = shift || {};
-        return bless $self, $class;
+<pre><code># おまじないしない場合
+package MooseTest;
+use Moose;
+
+has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
+has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
+
+no Moose;
+
+1;
+
+# おまじないする場合
+package MooseTest_mi;
+use Moose;
+
+has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
+has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
+
+__PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
+
+no Moose;
+
+1;
+
+# おまじないしない場合
+package MouseTest;
+use Mouse;
+
+has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
+has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
+
+no Mouse;
+
+1;
+
+# おまじないする場合
+package MouseTest_mi;
+use Mouse;
+
+has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
+has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
+
+__PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
+
+no Mouse;
+
+1;
+
+# Class::Accessor を使った場合
+package ClassAccessorTest;
+use strict;
+use warnings;
+use base 'Class::Accessor';
+
+__PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
+
+1;
+
+# Class::Accessor::Fast を使った場合
+package ClassAccessorFastTest;
+use strict;
+use warnings;
+use base 'Class::Accessor::Fast';
+
+__PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
+
+1;
+
+# perl5 OOP の場合
+package Bless;
+use strict;
+use warnings;
+
+sub new {
+    my $class = shift;
+    my $self  = shift || {};
+    return bless $self, $class;
+}
+
+sub hoge {
+    my $self = shift;
+    if (@_) {
+        $self-&gt;{hoge} = shift;
+    } else {
+        $self-&gt;{hoge};
     }
-    
-    sub hoge {
-        my $self = shift;
-        if (@_) {
-            $self-&gt;{hoge} = shift;
-        } else {
-            $self-&gt;{hoge};
-        }
+}
+
+sub fuga {
+    my $self = shift;
+    if (@_) {
+        $self-&gt;{fuga} = shift;
+    } else {
+        $self-&gt;{fuga};
     }
-    
-    sub fuga {
-        my $self = shift;
-        if (@_) {
-            $self-&gt;{fuga} = shift;
-        } else {
-            $self-&gt;{fuga};
-        }
-    }
-    
-    1;
-    
-    package main;
-    use strict;
-    use warnings;
-    use Benchmark qw(cmpthese timethese);
-     
-    cmpthese timethese(100000, {
-        moose =&gt; sub {
-            my $moose = MooseTest-&gt;new( fuga =&gt; 1 );
-            $moose-&gt;hoge(&#39;bbb&#39;);
-            $moose-&gt;fuga;
-            $moose-&gt;hoge;
-        },
-        moose_mi =&gt; sub {
-            my $moose = MooseTest_mi-&gt;new( fuga =&gt; 1 );
-            $moose-&gt;hoge(&#39;bbb&#39;);
-            $moose-&gt;fuga;
-            $moose-&gt;hoge;
-        },
-        mouse =&gt; sub {
-            my $mouse = MouseTest-&gt;new( fuga =&gt; 1 );
-            $mouse-&gt;hoge(&#39;bbb&#39;);
-            $mouse-&gt;fuga;
-            $mouse-&gt;hoge;
-        },
-        mouse_mi =&gt; sub {
-            my $mouse = MouseTest_mi-&gt;new( fuga =&gt; 1 );
-            $mouse-&gt;hoge(&#39;bbb&#39;);
-            $mouse-&gt;fuga;
-            $mouse-&gt;hoge;
-        },
-        accessor =&gt; sub {
-            my $class = ClassAccessorTest-&gt;new({ fuga =&gt; 1 });
-            $class-&gt;hoge(&#39;bbb&#39;);
-            $class-&gt;fuga;
-            $class-&gt;hoge;
-        },
-        accessor_fast =&gt; sub {
-            my $class = ClassAccessorFastTest-&gt;new({ fuga =&gt; 1 });
-            $class-&gt;hoge(&#39;bbb&#39;);
-            $class-&gt;fuga;
-            $class-&gt;hoge;
-        },
-        bless =&gt; sub {
-            my $class = Bless-&gt;new({ fuga =&gt; 1 });
-            $class-&gt;hoge(&#39;bbb&#39;);
-            $class-&gt;fuga;
-            $class-&gt;hoge;
-        },
-    });
+}
 
-結果はこんな感じになりました。何回か実行するとばらつくので３つほど結果を書き出しています。
+1;
 
-    Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-      accessor:  2 wallclock secs ( 1.19 usr +  0.00 sys =  1.19 CPU) @ 84033.61/s (n=100000)
-    accessor_fast:  0 wallclock secs ( 0.58 usr +  0.00 sys =  0.58 CPU) @ 172413.79/s (n=100000)
-         bless:  1 wallclock secs ( 0.41 usr +  0.00 sys =  0.41 CPU) @ 243902.44/s (n=100000)
-         moose: 21 wallclock secs (21.26 usr +  0.02 sys = 21.28 CPU) @ 4699.25/s (n=100000)
-      moose_mi:  2 wallclock secs ( 1.67 usr +  0.00 sys =  1.67 CPU) @ 59880.24/s (n=100000)
-         mouse:  0 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
-      mouse_mi: -1 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
-                      Rate moose moose_mi accessor accessor_fast mouse_mi mouse bless
-    moose           4699/s    --     -92%     -94%          -97%     -98%  -98%  -98%
-    moose_mi       59880/s 1174%       --     -29%          -65%     -69%  -69%  -75%
-    accessor       84034/s 1688%      40%       --          -51%     -57%  -57%  -66%
-    accessor_fast 172414/s 3569%     188%     105%            --     -12%  -12%  -29%
-    mouse_mi      196078/s 4073%     227%     133%           14%       --    0%  -20%
-    mouse         196078/s 4073%     227%     133%           14%       0%    --  -20%
-    bless         243902/s 5090%     307%     190%           41%      24%   24%    --
+package main;
+use strict;
+use warnings;
+use Benchmark qw(cmpthese timethese);
 
-    Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-      accessor:  1 wallclock secs ( 0.87 usr +  0.00 sys =  0.87 CPU) @ 114942.53/s (n=100000)
-    accessor_fast:  0 wallclock secs ( 0.56 usr +  0.00 sys =  0.56 CPU) @ 178571.43/s (n=100000)
-         bless:  1 wallclock secs ( 0.43 usr +  0.00 sys =  0.43 CPU) @ 232558.14/s (n=100000)
-         moose: 18 wallclock secs (18.30 usr +  0.00 sys = 18.30 CPU) @ 5464.48/s (n=100000)
-      moose_mi:  2 wallclock secs ( 1.57 usr +  0.00 sys =  1.57 CPU) @ 63694.27/s (n=100000)
-         mouse:  0 wallclock secs ( 0.55 usr +  0.00 sys =  0.55 CPU) @ 181818.18/s (n=100000)
-      mouse_mi:  1 wallclock secs ( 0.65 usr +  0.00 sys =  0.65 CPU) @ 153846.15/s (n=100000)
-                      Rate moose moose_mi accessor mouse_mi accessor_fast mouse bless
-    moose           5464/s    --     -91%     -95%     -96%          -97%  -97%  -98%
-    moose_mi       63694/s 1066%       --     -45%     -59%          -64%  -65%  -73%
-    accessor      114943/s 2003%      80%       --     -25%          -36%  -37%  -51%
-    mouse_mi      153846/s 2715%     142%      34%       --          -14%  -15%  -34%
-    accessor_fast 178571/s 3168%     180%      55%      16%            --   -2%  -23%
-    mouse         181818/s 3227%     185%      58%      18%            2%    --  -22%
-    bless         232558/s 4156%     265%     102%      51%           30%   28%    --
+cmpthese timethese(100000, {
+    moose =&gt; sub {
+        my $moose = MooseTest-&gt;new( fuga =&gt; 1 );
+        $moose-&gt;hoge('bbb');
+        $moose-&gt;fuga;
+        $moose-&gt;hoge;
+    },
+    moose_mi =&gt; sub {
+        my $moose = MooseTest_mi-&gt;new( fuga =&gt; 1 );
+        $moose-&gt;hoge('bbb');
+        $moose-&gt;fuga;
+        $moose-&gt;hoge;
+    },
+    mouse =&gt; sub {
+        my $mouse = MouseTest-&gt;new( fuga =&gt; 1 );
+        $mouse-&gt;hoge('bbb');
+        $mouse-&gt;fuga;
+        $mouse-&gt;hoge;
+    },
+    mouse_mi =&gt; sub {
+        my $mouse = MouseTest_mi-&gt;new( fuga =&gt; 1 );
+        $mouse-&gt;hoge('bbb');
+        $mouse-&gt;fuga;
+        $mouse-&gt;hoge;
+    },
+    accessor =&gt; sub {
+        my $class = ClassAccessorTest-&gt;new({ fuga =&gt; 1 });
+        $class-&gt;hoge('bbb');
+        $class-&gt;fuga;
+        $class-&gt;hoge;
+    },
+    accessor_fast =&gt; sub {
+        my $class = ClassAccessorFastTest-&gt;new({ fuga =&gt; 1 });
+        $class-&gt;hoge('bbb');
+        $class-&gt;fuga;
+        $class-&gt;hoge;
+    },
+    bless =&gt; sub {
+        my $class = Bless-&gt;new({ fuga =&gt; 1 });
+        $class-&gt;hoge('bbb');
+        $class-&gt;fuga;
+        $class-&gt;hoge;
+    },
+});
+</code></pre>
 
-    Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-      accessor:  1 wallclock secs ( 0.90 usr +  0.00 sys =  0.90 CPU) @ 111111.11/s (n=100000)
-    accessor_fast:  0 wallclock secs ( 0.75 usr +  0.00 sys =  0.75 CPU) @ 133333.33/s (n=100000)
-         bless:  1 wallclock secs ( 0.47 usr +  0.00 sys =  0.47 CPU) @ 212765.96/s (n=100000)
-         moose: 22 wallclock secs (21.62 usr +  0.01 sys = 21.63 CPU) @ 4623.21/s (n=100000)
-      moose_mi:  1 wallclock secs ( 1.61 usr +  0.00 sys =  1.61 CPU) @ 62111.80/s (n=100000)
-         mouse:  1 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
-      mouse_mi:  0 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
-                      Rate moose moose_mi accessor accessor_fast bless mouse_mi mouse
-    moose           4623/s    --     -93%     -96%          -97%  -98%     -98%  -98%
-    moose_mi       62112/s 1243%       --     -44%          -53%  -71%     -72%  -72%
-    accessor      111111/s 2303%      79%       --          -17%  -48%     -50%  -50%
-    accessor_fast 133333/s 2784%     115%      20%            --  -37%     -40%  -40%
-    bless         212766/s 4502%     243%      91%           60%    --      -4%   -4%
-    mouse_mi      222222/s 4707%     258%     100%           67%    4%       --    0%
-    mouse         222222/s 4707%     258%     100%           67%    4%       0%    --
+<p>結果はこんな感じになりました。何回か実行するとばらつくので３つほど結果を書き出しています。</p>
 
-Mouseが爆速でblessより速いこともあるようです。にわかに信じられないのですが。何か最適化されているものでもあるのでしょうか？ちゃんと中身を見ないといけませんね。
+<pre><code>Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
+  accessor:  2 wallclock secs ( 1.19 usr +  0.00 sys =  1.19 CPU) @ 84033.61/s (n=100000)
+accessor_fast:  0 wallclock secs ( 0.58 usr +  0.00 sys =  0.58 CPU) @ 172413.79/s (n=100000)
+     bless:  1 wallclock secs ( 0.41 usr +  0.00 sys =  0.41 CPU) @ 243902.44/s (n=100000)
+     moose: 21 wallclock secs (21.26 usr +  0.02 sys = 21.28 CPU) @ 4699.25/s (n=100000)
+  moose_mi:  2 wallclock secs ( 1.67 usr +  0.00 sys =  1.67 CPU) @ 59880.24/s (n=100000)
+     mouse:  0 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
+  mouse_mi: -1 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
+                  Rate moose moose_mi accessor accessor_fast mouse_mi mouse bless
+moose           4699/s    --     -92%     -94%          -97%     -98%  -98%  -98%
+moose_mi       59880/s 1174%       --     -29%          -65%     -69%  -69%  -75%
+accessor       84034/s 1688%      40%       --          -51%     -57%  -57%  -66%
+accessor_fast 172414/s 3569%     188%     105%            --     -12%  -12%  -29%
+mouse_mi      196078/s 4073%     227%     133%           14%       --    0%  -20%
+mouse         196078/s 4073%     227%     133%           14%       0%    --  -20%
+bless         243902/s 5090%     307%     190%           41%      24%   24%    --
 
+Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
+  accessor:  1 wallclock secs ( 0.87 usr +  0.00 sys =  0.87 CPU) @ 114942.53/s (n=100000)
+accessor_fast:  0 wallclock secs ( 0.56 usr +  0.00 sys =  0.56 CPU) @ 178571.43/s (n=100000)
+     bless:  1 wallclock secs ( 0.43 usr +  0.00 sys =  0.43 CPU) @ 232558.14/s (n=100000)
+     moose: 18 wallclock secs (18.30 usr +  0.00 sys = 18.30 CPU) @ 5464.48/s (n=100000)
+  moose_mi:  2 wallclock secs ( 1.57 usr +  0.00 sys =  1.57 CPU) @ 63694.27/s (n=100000)
+     mouse:  0 wallclock secs ( 0.55 usr +  0.00 sys =  0.55 CPU) @ 181818.18/s (n=100000)
+  mouse_mi:  1 wallclock secs ( 0.65 usr +  0.00 sys =  0.65 CPU) @ 153846.15/s (n=100000)
+                  Rate moose moose_mi accessor mouse_mi accessor_fast mouse bless
+moose           5464/s    --     -91%     -95%     -96%          -97%  -97%  -98%
+moose_mi       63694/s 1066%       --     -45%     -59%          -64%  -65%  -73%
+accessor      114943/s 2003%      80%       --     -25%          -36%  -37%  -51%
+mouse_mi      153846/s 2715%     142%      34%       --          -14%  -15%  -34%
+accessor_fast 178571/s 3168%     180%      55%      16%            --   -2%  -23%
+mouse         181818/s 3227%     185%      58%      18%            2%    --  -22%
+bless         232558/s 4156%     265%     102%      51%           30%   28%    --
 
-### 思う事
+Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
+  accessor:  1 wallclock secs ( 0.90 usr +  0.00 sys =  0.90 CPU) @ 111111.11/s (n=100000)
+accessor_fast:  0 wallclock secs ( 0.75 usr +  0.00 sys =  0.75 CPU) @ 133333.33/s (n=100000)
+     bless:  1 wallclock secs ( 0.47 usr +  0.00 sys =  0.47 CPU) @ 212765.96/s (n=100000)
+     moose: 22 wallclock secs (21.62 usr +  0.01 sys = 21.63 CPU) @ 4623.21/s (n=100000)
+  moose_mi:  1 wallclock secs ( 1.61 usr +  0.00 sys =  1.61 CPU) @ 62111.80/s (n=100000)
+     mouse:  1 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
+  mouse_mi:  0 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
+                  Rate moose moose_mi accessor accessor_fast bless mouse_mi mouse
+moose           4623/s    --     -93%     -96%          -97%  -98%     -98%  -98%
+moose_mi       62112/s 1243%       --     -44%          -53%  -71%     -72%  -72%
+accessor      111111/s 2303%      79%       --          -17%  -48%     -50%  -50%
+accessor_fast 133333/s 2784%     115%      20%            --  -37%     -40%  -40%
+bless         212766/s 4502%     243%      91%           60%    --      -4%   -4%
+mouse_mi      222222/s 4707%     258%     100%           67%    4%       --    0%
+mouse         222222/s 4707%     258%     100%           67%    4%       0%    --
+</code></pre>
 
-速度というのは最近気にしているテーマで、Webアプリの１リクエストのレスポンスタイムが10msと100msとあったとして、それの時間差が90msと何となく微々たる物のように思う物でも分間10リクエストとして合計100msと1000msになり差が900msとどんどん大きくなっていくのが恐ろしいなぁと思ったりしています。もしもこれが分間じゃなくて秒間だったら？10リクエストじゃなくて100リクエストだったら？1000リクエストだったら？…まだ実感の伴わない話なのでアレですが今後直面する問題だろうなと感じています。モダンだ流行だと色々なものに飛びつくのも勉強になって良いですが、ただ実際それが実用に堪えうるのかどうかちゃんと検証することも覚えないといけないなと。そんなことを考えています。
+<p>Mouseが爆速でblessより速いこともあるようです。にわかに信じられないのですが。何か最適化されているものでもあるのでしょうか？ちゃんと中身を見ないといけませんね。</p>
+
+<h3>思う事</h3>
+
+<p>速度というのは最近気にしているテーマで、Webアプリの１リクエストのレスポンスタイムが10msと100msとあったとして、それの時間差が90msと何となく微々たる物のように思う物でも分間10リクエストとして合計100msと1000msになり差が900msとどんどん大きくなっていくのが恐ろしいなぁと思ったりしています。もしもこれが分間じゃなくて秒間だったら？10リクエストじゃなくて100リクエストだったら？1000リクエストだったら？…まだ実感の伴わない話なのでアレですが今後直面する問題だろうなと感じています。モダンだ流行だと色々なものに飛びつくのも勉強になって良いですが、ただ実際それが実用に堪えうるのかどうかちゃんと検証することも覚えないといけないなと。そんなことを考えています。</p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2011/07/22/20110722/</guid>
@@ -663,98 +734,110 @@ Mouseが爆速でblessより速いこともあるようです。にわかに信�
 <title>MySQLのパーティショニングを触ってみる</title>
 <description>
 <![CDATA[
-MySQLで大容量のデータを扱うと削除処理が重くて涙目になることがあるので残さないデータを扱うテーブルはパーティショニングしてあげるのが良いようです。ログデータは典型的かもしれませんね。メリットとしては以下のような感じだと思います。
+<p>MySQLで大容量のデータを扱うと削除処理が重くて涙目になることがあるので残さないデータを扱うテーブルはパーティショニングしてあげるのが良いようです。ログデータは典型的かもしれませんね。メリットとしては以下のような感じだと思います。</p>
 
-* DROP TABLE のようにパーティションのデータをサクっと消せる
-* 刈り込みが出来る（検索範囲を限定出来る場合が有り、各クエリのパフォーマンスが良くなる可能性がある）
+<ul>
+<li>DROP TABLE のようにパーティションのデータをサクっと消せる</li>
+<li>刈り込みが出来る（検索範囲を限定出来る場合が有り、各クエリのパフォーマンスが良くなる可能性がある）</li>
+</ul>
 
-使う場合の注意として[漢のコンピュータ道](http://nippondanji.blogspot.com/2009/04/1.html)にてこんな感じに挙げられています。
+<p>使う場合の注意として<a href="http://nippondanji.blogspot.com/2009/04/1.html">漢のコンピュータ道</a>にてこんな感じに挙げられています。</p>
 
-* インデックスをつけるだけでカバー出来る場合が多い。
-* パーショニングを使わずに、単にテーブルを分けてしまえばいい。
-* テーブルが巨大にならないとあまり効果を実感できない。
-* 使い方を間違えると性能が落ちてしまう。
+<ul>
+<li>インデックスをつけるだけでカバー出来る場合が多い。</li>
+<li>パーショニングを使わずに、単にテーブルを分けてしまえばいい。</li>
+<li>テーブルが巨大にならないとあまり効果を実感できない。</li>
+<li>使い方を間違えると性能が落ちてしまう。</li>
+</ul>
 
-以下、日別にパーティションを区切っていくサンプルになります。
+<p>以下、日別にパーティションを区切っていくサンプルになります。</p>
 
-### テーブル作成
+<h3>テーブル作成</h3>
 
-    DROP TABLE IF EXISTS partition;
-    CREATE TABLE partition (
-        id         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        created_at DATETIME            NOT NULL,
-        PRIMARY KEY (id, created_at)
-    ) ENGINE=InnoDB;
+<pre><code>DROP TABLE IF EXISTS partition;
+CREATE TABLE partition (
+    id         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    created_at DATETIME            NOT NULL,
+    PRIMARY KEY (id, created_at)
+) ENGINE=InnoDB;
+</code></pre>
 
-### ベースとなるパーティションの作成
+<h3>ベースとなるパーティションの作成</h3>
 
-    ALTER TABLE partition PARTITION BY RANGE (TO_DAYS(created_at))
-        (PARTITION p20110720 VALUES LESS THAN (TO_DAYS(&#39;2011-07-21 00:00:00&#39;)) COMMENT = &#39;2011-07-21 00:00:00&#39;);
+<pre><code>ALTER TABLE partition PARTITION BY RANGE (TO_DAYS(created_at))
+    (PARTITION p20110720 VALUES LESS THAN (TO_DAYS('2011-07-21 00:00:00')) COMMENT = '2011-07-21 00:00:00');
+</code></pre>
 
-### mysql_partition_cron.sh 
+<h3>mysql_partition_cron.sh</h3>
 
-cronで順次パーティションを追加していきます。以下では毎日次の日の１日分を追加していますが１週間毎に纏めて追加とかしても良いでしょう。実際に運用する際はログを取ってメールを投げる等監視しておく方が良いですね。
+<p>cronで順次パーティションを追加していきます。以下では毎日次の日の１日分を追加していますが１週間毎に纏めて追加とかしても良いでしょう。実際に運用する際はログを取ってメールを投げる等監視しておく方が良いですね。</p>
 
-    #!/bin/bash
-    
-    DAYSTR=`date --date &#39;1 day&#39; +&quot;%Y%m%d&quot;`
-    DAY_2=`date --date &#39;2 day&#39; +&quot;%Y-%m-%d 00:00:00&quot;`
-    
-    QUERY=&quot;ALTER TABLE partition ADD PARTITION (PARTITION p$DAYSTR VALUES LESS THAN (TO_DAYS(&#39;$DAY_2&#39;)) COMMENT = &#39;$DAY_2&#39;)&quot;
-    echo $QUERY
-    echo $QUERY | mysql -u root partition
+<pre><code>#!/bin/bash
 
-### 確認
+DAYSTR=`date --date '1 day' +"%Y%m%d"`
+DAY_2=`date --date '2 day' +"%Y-%m-%d 00:00:00"`
 
-#### INSERT
+QUERY="ALTER TABLE partition ADD PARTITION (PARTITION p$DAYSTR VALUES LESS THAN (TO_DAYS('$DAY_2')) COMMENT = '$DAY_2')"
+echo $QUERY
+echo $QUERY | mysql -u root partition
+</code></pre>
 
-    mysql&gt; insert into partition value (null, &#39;2011-07-20&#39;);
-    Query OK, 1 row affected (0.00 sec)
+<h3>確認</h3>
 
-    mysql&gt; insert into partition value (null, &#39;2011-07-21&#39;);
-    Query OK, 1 row affected (0.00 sec)
+<h4>INSERT</h4>
 
-    mysql&gt; insert into partition value (null, &#39;2011-07-22&#39;);
-    ERROR 1526 (HY000): Table has no partition for value 734705
+<pre><code>mysql&gt; insert into partition value (null, '2011-07-20');
+Query OK, 1 row affected (0.00 sec)
 
-存在しないパーティションへのINSERTはエラーになるので、パーティションの追加忘れ、追加ミスには注意。
+mysql&gt; insert into partition value (null, '2011-07-21');
+Query OK, 1 row affected (0.00 sec)
 
-    mysql&gt; insert into partition value (null, &#39;2011-07-19&#39;);
-    Query OK, 1 row affected (0.01 sec)
+mysql&gt; insert into partition value (null, '2011-07-22');
+ERROR 1526 (HY000): Table has no partition for value 734705
+</code></pre>
 
-#### パーティション分布
-    mysql&gt; SELECT table_schema, table_name, partition_name, partition_ordinal_position, table_rows FROM information_schema.partitions WHERE table_name = &#39;partition&#39;;
-    +--------------+------------+----------------+----------------------------+------------+
-    | table_schema | table_name | partition_name | partition_ordinal_position | table_rows |
-    +--------------+------------+----------------+----------------------------+------------+
-    | partition    | partition  | p20110720      |                          1 |          2 |
-    | partition    | partition  | p20110721      |                          2 |          1 |
-    +--------------+------------+----------------+----------------------------+------------+
-    2 rows in set (0.00 sec)
+<p>存在しないパーティションへのINSERTはエラーになるので、パーティションの追加忘れ、追加ミスには注意。</p>
 
-#### 刈り込み
+<pre><code>mysql&gt; insert into partition value (null, '2011-07-19');
+Query OK, 1 row affected (0.01 sec)
+</code></pre>
 
-    mysql&gt; explain partitions select * from partition where created_at &lt; &#39;2011-07-21 00:00:00&#39;;
-    +----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-    | id | select_type | table     | partitions | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
-    +----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-    |  1 | SIMPLE      | partition | p20110720  | index | NULL          | PRIMARY | 16      | NULL |    2 | Using where; Using index |
-    +----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-    1 row in set (0.00 sec)
+<h4>パーティション分布</h4>
 
-    mysql&gt; explain partitions select * from partition where created_at &lt; &#39;2011-07-22 00:00:00&#39;;
-    +----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-    | id | select_type | table     | partitions          | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
-    +----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-    |  1 | SIMPLE      | partition | p20110720,p20110721 | index | NULL          | PRIMARY | 16      | NULL |    3 | Using where; Using index |
-    +----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-    1 row in set (0.01 sec)
+<pre><code>mysql&gt; SELECT table_schema, table_name, partition_name, partition_ordinal_position, table_rows FROM information_schema.partitions WHERE table_name = 'partition';
++--------------+------------+----------------+----------------------------+------------+
+| table_schema | table_name | partition_name | partition_ordinal_position | table_rows |
++--------------+------------+----------------+----------------------------+------------+
+| partition    | partition  | p20110720      |                          1 |          2 |
+| partition    | partition  | p20110721      |                          2 |          1 |
++--------------+------------+----------------+----------------------------+------------+
+2 rows in set (0.00 sec)
+</code></pre>
 
-前者だとp20110720からのみの検索になってるので刈り込み出来ているようです。これが大容量のデータに対してだと本来インデックがメモリに乗りきらずスワップしちゃうという状況でも、刈り込みによってメモリに収まる可能性が出て来るので、そうなった場合にパーティショニングの威力が発揮されるというのが想像出来ますね。
+<h4>刈り込み</h4>
 
-### まとめ
+<pre><code>mysql&gt; explain partitions select * from partition where created_at &lt; '2011-07-21 00:00:00';
++----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
+| id | select_type | table     | partitions | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
++----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
+|  1 | SIMPLE      | partition | p20110720  | index | NULL          | PRIMARY | 16      | NULL |    2 | Using where; Using index |
++----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
+1 row in set (0.00 sec)
 
-削除のコストは思いの外大きくて、レプリケーション環境下でしこしこ古いデータを削除するだけのバッチを走らせたときに削除間隔を大きく取らないと同期ズレがずんどこずんどこ溜まっていく、というのを経験したことがあります。パーティションを使うとそういう苦労はせずに済みそうなので有効活用したいですね。
+mysql&gt; explain partitions select * from partition where created_at &lt; '2011-07-22 00:00:00';
++----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
+| id | select_type | table     | partitions          | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
++----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
+|  1 | SIMPLE      | partition | p20110720,p20110721 | index | NULL          | PRIMARY | 16      | NULL |    3 | Using where; Using index |
++----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
+1 row in set (0.01 sec)
+</code></pre>
+
+<p>前者だとp20110720からのみの検索になってるので刈り込み出来ているようです。これが大容量のデータに対してだと本来インデックがメモリに乗りきらずスワップしちゃうという状況でも、刈り込みによってメモリに収まる可能性が出て来るので、そうなった場合にパーティショニングの威力が発揮されるというのが想像出来ますね。</p>
+
+<h3>まとめ</h3>
+
+<p>削除のコストは思いの外大きくて、レプリケーション環境下でしこしこ古いデータを削除するだけのバッチを走らせたときに削除間隔を大きく取らないと同期ズレがずんどこずんどこ溜まっていく、というのを経験したことがあります。パーティションを使うとそういう苦労はせずに済みそうなので有効活用したいですね。</p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2011/07/20/20110720/</guid>
@@ -764,106 +847,121 @@ cronで順次パーティションを追加していきます。以下では毎�
 <title>さくらVPSをちょこちょこ触ってみる</title>
 <description>
 <![CDATA[
-と言っても特に何かしたとかは無かったり。
+<p>と言っても特に何かしたとかは無かったり。</p>
 
-* sshのポートを変えた
-* iptablesを設定した
-* logwatchを導入した
-* pacoを導入した
+<ul>
+<li>sshのポートを変えた</li>
+<li>iptablesを設定した</li>
+<li>logwatchを導入した</li>
+<li>pacoを導入した</li>
+</ul>
 
-### sshのポート変更
+<h3>sshのポート変更</h3>
 
-セキュリティ的にはsshを公開鍵認証にしておくだけで基本大丈夫だとは思うのですが、アタックされることには変わりなく気持ち悪い物は気持ち悪いので一応変えておきました。
+<p>セキュリティ的にはsshを公開鍵認証にしておくだけで基本大丈夫だとは思うのですが、アタックされることには変わりなく気持ち悪い物は気持ち悪いので一応変えておきました。</p>
 
-### iptablesの設定
+<h3>iptablesの設定</h3>
 
-何処でも見かける設定ですが以下のような基準でiptablesを設定するスクリプトを組みました。
+<p>何処でも見かける設定ですが以下のような基準でiptablesを設定するスクリプトを組みました。</p>
 
-* 内から外への通信以外は拒否
- * ただし内から外への通信の応答は通す
-* SSH用の穴は用意する
+<ul>
+<li>内から外への通信以外は拒否
+<ul>
+<li>ただし内から外への通信の応答は通す</li>
+</ul></li>
+<li>SSH用の穴は用意する</li>
+</ul>
 
-#### iptables-init.sh
+<h4>iptables-init.sh</h4>
 
-    #!/bin/sh
-    
-    # ルールクリア
-    iptables -F
-    iptables -X
-    
-    # 内から外への通信以外は破棄
-    iptables -P INPUT   DROP
-    iptables -P OUTPUT  ACCEPT
-    iptables -P FORWARD DROP
-    
-    # ループバックは全て許可
-    iptables -A INPUT  -i lo -j ACCEPT
-    iptables -A OUTPUT -o lo -j ACCEPT
-    
-    # プライベートネットワークなんて無かったんや…
-    iptables -A INPUT -s 10.0.0.0/8     -j DROP
-    iptables -A INPUT -s 127.16.0.0/12  -j DROP
-    iptables -A INPUT -s 192.168.0.0/16 -j DROP
-    
-    # SSH用の穴
-    iptables -A INPUT -p tcp --dport {SSHのポート} -j ACCEPT
-    
-    # 内から外への通信の応答は通す
-    iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+<pre><code>#!/bin/sh
 
-### logwatchの導入
+# ルールクリア
+iptables -F
+iptables -X
 
-ログも監視しないと意味ないのでlogwatchなるログを定期的に（デフォルトはcron.dailyを利用した毎日）メールで知らせるプログラムを導入してみました。yumで入れるとバージョンが結構古かったりするので[sourceforge](http://sourceforge.net/projects/logwatch/files/)から落としてインストールしました。rpmで入れるとデフォルトの設定ファイルが/usr/share/logwatch/default.conf以下となるようです。/etc/logwatch/conf以下に設定ファイルを置くと設定を上書きするようです。
+# 内から外への通信以外は破棄
+iptables -P INPUT   DROP
+iptables -P OUTPUT  ACCEPT
+iptables -P FORWARD DROP
 
-とりあえずSSHのログとDiskスペースのログを監視するようにしました。デフォルトではService = Allで全部を監視するようにしてその後除外を設定しているのでその設定をコメントアウトしてSSHのログとDiskスペースのログに決め打ちしました。
+# ループバックは全て許可
+iptables -A INPUT  -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
 
-#### /usr/share/logwatch/default.conf/logwatch.conf
+# プライベートネットワークなんて無かったんや…
+iptables -A INPUT -s 10.0.0.0/8     -j DROP
+iptables -A INPUT -s 127.16.0.0/12  -j DROP
+iptables -A INPUT -s 192.168.0.0/16 -j DROP
 
-    #Service = All
-    #Service = &quot;-zz-network&quot; 
-    #Service = &quot;-zz-sys&quot; 
-    #Service = &quot;-eximstats&quot;
+# SSH用の穴
+iptables -A INPUT -p tcp --dport {SSHのポート} -j ACCEPT
 
-#### /etc/logwatch/conf/logwatch.conf
+# 内から外への通信の応答は通す
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+</code></pre>
 
-    MailTo = 送信先メールアドレス
-    MailFrom = 送信元メールアドレス
-    Service = sshd
-    Service = zz-disk_space
+<h3>logwatchの導入</h3>
 
-rpmで入れているならばおそらく/etc/cron.daily/0logwatchにlogwatchスクリプトへのシンボリックリンクが貼られているので毎日定期的に実行されメールが届くようになるハズです。ただしデフォルトでは前日のログを送信する設定（Range = yesterday）になっていてログが記録されていなければ送信されません。
+<p>ログも監視しないと意味ないのでlogwatchなるログを定期的に（デフォルトはcron.dailyを利用した毎日）メールで知らせるプログラムを導入してみました。yumで入れるとバージョンが結構古かったりするので<a href="http://sourceforge.net/projects/logwatch/files/">sourceforge</a>から落としてインストールしました。rpmで入れるとデフォルトの設定ファイルが/usr/share/logwatch/default.conf以下となるようです。/etc/logwatch/conf以下に設定ファイルを置くと設定を上書きするようです。</p>
 
-### pacoの導入
+<p>とりあえずSSHのログとDiskスペースのログを監視するようにしました。デフォルトではService = Allで全部を監視するようにしてその後除外を設定しているのでその設定をコメントアウトしてSSHのログとDiskスペースのログに決め打ちしました。</p>
 
-pacoはmake installしたソフトを管理するものです。yumなどのパッケージ管理ソフトで管理されている以外のものについてもきちっと管理したい場合は導入するととても幸せになれそうです。
+<h4>/usr/share/logwatch/default.conf/logwatch.conf</h4>
 
-* 参考
- * [paco](http://paco.sourceforge.net/)
- * [make install&quot;したソフトウェアを管理できる超便利ツール「Paco」](http://d.hatena.ne.jp/rx7/20081011/p2)
+<pre><code>#Service = All
+#Service = "-zz-network" 
+#Service = "-zz-sys" 
+#Service = "-eximstats"
+</code></pre>
 
-pacoのインストール自体はconfigure make make installで出来ます。またpaco自身をpacoで管理するためにmake installの後make logmeを実行します。これ以降make installするときはpaco -D make insatllというふうにすることでそのソフトをpacoの管理下に置いてくれます。
+<h4>/etc/logwatch/conf/logwatch.conf</h4>
 
-#### 注意
+<pre><code>MailTo = 送信先メールアドレス
+MailFrom = 送信元メールアドレス
+Service = sshd
+Service = zz-disk_space
+</code></pre>
 
-pacoはデフォルトで/usr/local/bin以下にインストールされるのですがsudoで実行するとPATHが引き継がれずpacoが見つからないためmake logmeに失敗してしまいました。./configure prefix=/binなどインストール場所を設定してsudoでも実行出来るようにするか、sudo時の環境変数の引き継ぎをするなどして回避しましょう。
+<p>rpmで入れているならばおそらく/etc/cron.daily/0logwatchにlogwatchスクリプトへのシンボリックリンクが貼られているので毎日定期的に実行されメールが届くようになるハズです。ただしデフォルトでは前日のログを送信する設定（Range = yesterday）になっていてログが記録されていなければ送信されません。</p>
 
-なおsudo時の環境変数の引き継ぎ方法は色々あるようです。
+<h3>pacoの導入</h3>
 
-#### bashrcで設定
+<p>pacoはmake installしたソフトを管理するものです。yumなどのパッケージ管理ソフトで管理されている以外のものについてもきちっと管理したい場合は導入するととても幸せになれそうです。</p>
 
-    alias sudo=&quot;sudo env PATH=$PATH&quot;
+<ul>
+<li>参考
+<ul>
+<li><a href="http://paco.sourceforge.net/">paco</a></li>
+<li><a href="http://d.hatena.ne.jp/rx7/20081011/p2">make install"したソフトウェアを管理できる超便利ツール「Paco」</a></li>
+</ul></li>
+</ul>
 
-#### visudoで設定
+<p>pacoのインストール自体はconfigure make make installで出来ます。またpaco自身をpacoで管理するためにmake installの後make logmeを実行します。これ以降make installするときはpaco -D make insatllというふうにすることでそのソフトをpacoの管理下に置いてくれます。</p>
 
-    Defaults:{run_user} !env_reset
-        or
-    Defaults env_keep+=&quot;PATH&quot;
+<h4>注意</h4>
 
-#### sudo -s で実行
+<p>pacoはデフォルトで/usr/local/bin以下にインストールされるのですがsudoで実行するとPATHが引き継がれずpacoが見つからないためmake logmeに失敗してしまいました。./configure prefix=/binなどインストール場所を設定してsudoでも実行出来るようにするか、sudo時の環境変数の引き継ぎをするなどして回避しましょう。</p>
 
-### 次回は
+<p>なおsudo時の環境変数の引き継ぎ方法は色々あるようです。</p>
 
-Nginx+plackでなんか適当に外から見れる環境を作りたいかな。
+<h4>bashrcで設定</h4>
+
+<pre><code>alias sudo="sudo env PATH=$PATH"
+</code></pre>
+
+<h4>visudoで設定</h4>
+
+<pre><code>Defaults:{run_user} !env_reset
+    or
+Defaults env_keep+="PATH"
+</code></pre>
+
+<h4>sudo -s で実行</h4>
+
+<h3>次回は</h3>
+
+<p>Nginx+plackでなんか適当に外から見れる環境を作りたいかな。</p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2011/07/17/20110717/</guid>
@@ -873,39 +971,46 @@ Nginx+plackでなんか適当に外から見れる環境を作りたいかな。
 <title>さくらVPS借りてみた</title>
 <description>
 <![CDATA[
-### さくらVPS借りてみた
+<h3>さくらVPS借りてみた</h3>
 
-インフラエンジニアを目指す宣言したは良いものの、自分で管理する外部に晒されている環境すら持ってないのはどうかという話があるのでまずはさくらVPSを借りてみることに請求が来る前に試用出来るようですぐに使えるのは凄いですねぇ。さくら様様です。（ちなみに一応自宅サーバ用のマシンは手元にあるのですが外部ディスプレイ手に入れてからとか考えてたら結局こっち来てから起動することはありませんでした…）
+<p>インフラエンジニアを目指す宣言したは良いものの、自分で管理する外部に晒されている環境すら持ってないのはどうかという話があるのでまずはさくらVPSを借りてみることに請求が来る前に試用出来るようですぐに使えるのは凄いですねぇ。さくら様様です。（ちなみに一応自宅サーバ用のマシンは手元にあるのですが外部ディスプレイ手に入れてからとか考えてたら結局こっち来てから起動することはありませんでした…）</p>
 
-インフラやりたいと言いつつミドルウェアの知識はまったく０に近い状態なので、ミドルウェアの勉強用に使って行きたいかなと思います。
+<p>インフラやりたいと言いつつミドルウェアの知識はまったく０に近い状態なので、ミドルウェアの勉強用に使って行きたいかなと思います。</p>
 
-### とりあえず入れて最初にやったこと
+<h3>とりあえず入れて最初にやったこと</h3>
 
-* ユーザの設定
- * rootのパスを変更する
- * 一般ユーザを追加する(sudoで管理者の権限を得るためにグループはwheelに入れる)
- * 一般ユーザのパスを変更する
- * visudoでwheelグループがsudoで管理者権限で実行できるように変更
-* SSHのログインを公開鍵に変更
- * /etc/ssh/sshd_config を修正
- * キーペアを作成してログイン
-* system-config-securitylevel-tui でssh以外を閉じる
-* git,perlbrew,cpanmを入れる
+<ul>
+<li>ユーザの設定
+<ul>
+<li>rootのパスを変更する</li>
+<li>一般ユーザを追加する(sudoで管理者の権限を得るためにグループはwheelに入れる)</li>
+<li>一般ユーザのパスを変更する</li>
+<li>visudoでwheelグループがsudoで管理者権限で実行できるように変更</li>
+</ul></li>
+<li>SSHのログインを公開鍵に変更
+<ul>
+<li>/etc/ssh/sshd_config を修正</li>
+<li>キーペアを作成してログイン</li>
+</ul></li>
+<li>system-config-securitylevel-tui でssh以外を閉じる</li>
+<li>git,perlbrew,cpanmを入れる</li>
+</ul>
 
-大体こんな感じ。SSHは以下のような感じで設定。コメントアウト外したりyes,no変えたり。
+<p>大体こんな感じ。SSHは以下のような感じで設定。コメントアウト外したりyes,no変えたり。</p>
 
-    PermitRootLogin no
-    AuthorizedKeysFile      .ssh/authorized_keys
-    PasswordAuthentication no
-    ChallengeResponseAuthentication no
+<pre><code>PermitRootLogin no
+AuthorizedKeysFile      .ssh/authorized_keys
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+</code></pre>
 
-「ChallengeResponseAuthentication no」はデフォルトでnoだけれどこれがyesになってると公開鍵の認証に失敗したらパスワード認証も試すといった挙動をするので、公開鍵に限定する場合はちゃんとnoになってることをチェック。
+<p>「ChallengeResponseAuthentication no」はデフォルトでnoだけれどこれがyesになってると公開鍵の認証に失敗したらパスワード認証も試すといった挙動をするので、公開鍵に限定する場合はちゃんとnoになってることをチェック。</p>
 
-ファイアーウォールの設定は一旦 system-config-securitylevel-tui 使ってやりましたが、細かく設定する場合は当然 iptables を使って設定しないといけないので、おいおいここは最適化していきたいです。
+<p>ファイアーウォールの設定は一旦 system-config-securitylevel-tui 使ってやりましたが、細かく設定する場合は当然 iptables を使って設定しないといけないので、おいおいここは最適化していきたいです。</p>
 
-他にもデーモンを止める話とかもあるので以下とか参考にしつつ最適化していきたいです。
+<p>他にもデーモンを止める話とかもあるので以下とか参考にしつつ最適化していきたいです。</p>
 
-[さくらVPSを使うときに最初にやっておきたいこと(CentOS編)](http://sakura.off-soft.net/blog/sakura_vps_centos_first_setup.html)
+<p><a href="http://sakura.off-soft.net/blog/sakura_vps_centos_first_setup.html">さくらVPSを使うときに最初にやっておきたいこと(CentOS編)</a></p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2011/07/05/20110705/</guid>
@@ -915,30 +1020,34 @@ Nginx+plackでなんか適当に外から見れる環境を作りたいかな。
 <title>Markdownブログ</title>
 <description>
 <![CDATA[
-### Markdownブログ
+<h3>Markdownブログ</h3>
 
-Markdownでブログが書きたかった。githubのページ公開機能なら何でも良かった。今は反省している。
+<p>Markdownでブログが書きたかった。githubのページ公開機能なら何でも良かった。今は反省している。</p>
 
-[https://github.com/mix3/mix3.github.com](https://github.com/mix3/mix3.github.com)
+<p><a href="https://github.com/mix3/mix3.github.com">https://github.com/mix3/mix3.github.com</a></p>
 
-#### 使い方
+<h4>使い方</h4>
 
-1. resource以下に.mdでMarkdownの文書を作成する。
-2. script/generate.plを実行する
-3. githubにコミットする
-4. [こんな感じになる](http://mix3.github.com/)
+<ol>
+<li>resource以下に.mdでMarkdownの文書を作成する。</li>
+<li>script/generate.plを実行する</li>
+<li>githubにコミットする</li>
+<li><a href="http://mix3.github.com/">こんな感じになる</a></li>
+</ol>
 
-#### ちなみに
+<h4>ちなみに</h4>
 
-pixivブログでjsを使ってごにょごにょしようとしてみたがムリっぽい。HTMLの中にMarkdownを埋め込んだり別サーバに置いてみたり色々してみたがどうにも上手く行かず。
+<p>pixivブログでjsを使ってごにょごにょしようとしてみたがムリっぽい。HTMLの中にMarkdownを埋め込んだり別サーバに置いてみたり色々してみたがどうにも上手く行かず。</p>
 
-* 別ドメインにならざるを得ずセキュリティ制限が掛かる
-* JSONPだとヒアドキュメントが使えないのでキモイ
-* ２重エスケープなどで上手く表示出来ない
+<ul>
+<li>別ドメインにならざるを得ずセキュリティ制限が掛かる</li>
+<li>JSONPだとヒアドキュメントが使えないのでキモイ</li>
+<li>２重エスケープなどで上手く表示出来ない</li>
+</ul>
 
-などなど。
+<p>などなど。</p>
 
-ということでpixivブログで割と満足している現状全く使いどころが無いMarkdownブログだけどまあいっか。
+<p>ということでpixivブログで割と満足している現状全く使いどころが無いMarkdownブログだけどまあいっか。</p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2011/07/03/20110703/</guid>
@@ -948,212 +1057,83 @@ pixivブログでjsを使ってごにょごにょしようとしてみたがム�
 <title>MobaSiFを弄ってみた</title>
 <description>
 <![CDATA[
-MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。
+<p>MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。</p>
 
-* アプリケーションロジックを記述
-* レスポンスの値を生成＆セット
+<ul>
+<li>アプリケーションロジックを記述</li>
+<li>レスポンスの値を生成＆セット</li>
+</ul>
 
-具体的に書くと以下のような感じ。
+<p>具体的に書くと以下のような感じ。</p>
 
-#### conf/pages.conf
+<h4>conf/pages.conf</h4>
 
-    our %PAGE = (
-        &#39;test&#39; =&gt; [0,0,0, &#39;Page::Sample&#39;, &#39;pageMain&#39;],
-    );
+<pre><code>our %PAGE = (
+    'test' =&gt; [0,0,0, 'Page::Sample', 'pageMain'],
+);
+</code></pre>
 
-#### pm/Page/Sample.pm
+<h4>pm/Page/Sample.pm</h4>
 
-    package Page::Sample;
-    sub pageMain {
-        my $func = shift;
-        # レスポンスの生成
-        my $html = HTMLTemplate::insert(&#39;sample/index&#39;, $rhData);
-        # レスポンスヘッダに値をセット
-        Response::output(¥$html);
-    }
+<pre><code>package Page::Sample;
+sub pageMain {
+    my $func = shift;
+    # レスポンスの生成
+    my $html = HTMLTemplate::insert('sample/index', $rhData);
+    # レスポンスヘッダに値をセット
+    Response::output(¥$html);
+}
+</code></pre>
 
-#### template/_system/sample/index.html
+<h4>template/_system/sample/index.html</h4>
 
-    &lt;html&gt;
-    &lt;head&gt;&lt;title&gt;$CON:title$&lt;/title&gt;&lt;/head&gt;
-    &lt;body&gt;
-        test
-    &lt;/body&gt;
-    &lt;/html&gt;
+<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;$CON:title$&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    test
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
 
-普段触るフレームワークだと「レスポンスの生成」も「レスポンスヘッダへの値のセット」も自分ですることはまず無くて。テンプレートに渡す値をハッシュで用意して、テンプレート自体はクエリパスなどから自動で判断するかもしくは明示的に指定するかする場合が多い。
+<p>普段触るフレームワークだと「レスポンスの生成」も「レスポンスヘッダへの値のセット」も自分ですることはまず無くて。テンプレートに渡す値をハッシュで用意して、テンプレート自体はクエリパスなどから自動で判断するかもしくは明示的に指定するかする場合が多い。</p>
 
-ということでこの辺り結構違和感が大きいのでちょっとそれっぽくなるように手を入れてみた。
+<p>ということでこの辺り結構違和感が大きいのでちょっとそれっぽくなるように手を入れてみた。</p>
 
-#### pm/Context.pm
+<h4>pm/Context.pm</h4>
 
-&lt;script src=&quot;https://gist.github.com/1038137.js?file=Context.pm&quot;&gt;&lt;/script&gt;
+<script src="https://gist.github.com/1038137.js?file=Context.pm"></script>
 
-#### pm/Page/Main.pm
+<h4>pm/Page/Main.pm</h4>
 
-&lt;script src=&quot;https://gist.github.com/1038137.js?file=Main.pm&quot;&gt;&lt;/script&gt;
+<script src="https://gist.github.com/1038137.js?file=Main.pm"></script>
 
-#### conf/pages.conf
+<h4>conf/pages.conf</h4>
 
-    our %PAGE = (
-            .
-            .
-            .
-        &#39;test&#39;  =&gt; [0,0,0, &#39;Page::Sample&#39;, &#39;test&#39;],
-        &#39;test1&#39; =&gt; [0,0,0, &#39;Page::Sample&#39;, &#39;test1&#39;],
-        &#39;test2&#39; =&gt; [0,0,0, &#39;Page::Sample&#39;, &#39;test2&#39;],
-    );
+<pre><code>our %PAGE = (
+        .
+        .
+        .
+    'test'  =&gt; [0,0,0, 'Page::Sample', 'test'],
+    'test1' =&gt; [0,0,0, 'Page::Sample', 'test1'],
+    'test2' =&gt; [0,0,0, 'Page::Sample', 'test2'],
+);
+</code></pre>
 
-#### pm/Page/Sample.pm
+<h4>pm/Page/Sample.pm</h4>
 
-&lt;script src=&quot;https://gist.github.com/1038137.js?file=Sample.pm&quot;&gt;&lt;/script&gt;
+<script src="https://gist.github.com/1038137.js?file=Sample.pm"></script>
 
-#### template/_system/sample/test.html
+<h4>template/_system/sample/test.html</h4>
 
-&lt;script src=&quot;https://gist.github.com/1038137.js?file=test.html&quot;&gt;&lt;/script&gt;
+<script src="https://gist.github.com/1038137.js?file=test.html"></script>
 
-### 次回はDB周りを触ってみる
+<h3>次回はDB周りを触ってみる</h3>
 
-commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。
+<p>commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。</p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2011/06/22/20110622/</guid>
 <pubDate>Wed, 22 Jun 2011 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>MobaSiFを触ってみた</title>
-<description>
-<![CDATA[
-### インストール
-
-環境はCentOS5.6で極力yumで対処してみた。
-
-* CentOS 5.6
-* Apache 2.2.3 (yum install)
-* fastcgi 2.4.0 (yum install)
-* mod_fastcgi 2.4.2 (source install)
-* mysql 5.1.57 (rpm install)
-* perl 5.8.8 (yum install)
-
-ちなみにMobaSiFのdocsに記載されている対応環境の内容は以下の通り
-
-               要求       確認環境
-    CentOS     4.x / 5.x  4.5 (i386)
-    Apache     1.3.x      1.3.41
-    MySQL      5.0.x      5.0.51a
-    perl       5.8.x      5.8.0
-    fastcgi    2.4.x      2.4.6
-
-### 詰まった所、注意点
-
-* MobaSiF
- * mod_fastcgiとmod_fcgidがあるがMobaSiFはmod_fastcgi
- * yumで入れたApacheのバージョンが2.2だったが、mod_fastcgiは2.0までしか対応していない。
- * パッチを当てれば2.2にmod_fastcgiを入れるられる⇒&#39;Apache2.2＋fastcgiで Ruby on Rails&#39;
-* perl
- * FastCGIがシステム標準のperlを使うのでperlbrewを使うと混乱する。
- * 素直にシステム標準のperlを使うのが楽
-* Apache
- * MobaSiFとは全然関係ないがバーチャルホストでDocumentRootの設定に変な癖がある⇒VirtualHost環境化でのPermission Denied
-
-### MobaSiFのミニマムサ
-ンプル
-
-MobaSiFでのページとURLの対応は以下のようになる
-
-* ルート
- * http://[domain]/
-* 各ページ（アンダースコア＋ページ名）
- * http://[domain]/[_ページ名前]
-
-### ページを追加してみる
-
-#### conf/pages.conf
-
-    our %PAGE = {
-            .
-            .
-            .
-        &#39;sample&#39; =&gt; [0,    package Page::Sample;
-    
-    use strict;
-    use HTMLTemplate;
-    use Response;
-    
-    sub pageMain {
-        my $func = shift;
-        my $rhData = {};
-    
-        my $html = HTMLTemplate::insert(&quot;sample/top&quot;, $rhData);
-        Response::output(\$html);
-    }
-    
-    1;0,0, &#39;Page::Sample&#39;, &#39;pageMain&#39;],
-        # http://[domain]/_sample にアクセスすると Page::SampleモジュールのpageMainの処理が走る
-    };
-
-#### pm/Page/Sample.pm
-
-    package Page::Sample;
-    
-    use strict;
-    use HTMLTemplate;
-    use Response;
-    
-    sub pageMain {
-        my $func = shift;
-        my $rhData = {};
-    
-        my $html = HTMLTemplate::insert(&quot;sample/top&quot;, $rhData);
-        Response::output(\$html);
-    }
-    
-    1;
-
-### テンプレートのコンパイル
-
-MobaSiFでは速度を出すためにアプリで機種毎に出し分けなどの処理をしないよう最初からテンプレートを機種別に生成したりするようです。（変なバイナリデータをテンプレートに埋め込んでいたり他にも色々やってそうな感じ）
-
-    $ perl script/tool/compile_template
-
-#### conf/pages.confの数字の意味
-
-    &#39;ページ名&#39; =&gt; [ UID_ST, USER_ST, SERV_ST, モジュール, サブルーチン ]
-
-* UID_ST
- * 0:情報なし
- * 2:serial/uid あり
-* USER_ST
- * 0:非会員でもOK
- * 1:会員（メアド未登録でもOK）
- * 2:会員（メアド登録済）
-* SERV_ST (以下を足したもの)
- * 1:自主退会だと不能
- * 2:運用退会だと不能
- * 4:PENALTYだと不能
- * 8:メール不達だと不能
-
-### まとめ
-
-* 機能は非常にミニマム
- * 文字コードはテンプレートやコード等でsjis,utf8,eucが入り交じる
- * テンプレートの中に絵文字のバイナリを直接書く
- * ロジックの所でレスポンスにテンプレートと引数を合成したものの返り値を渡す処理を自分で書く。
-
-⇒多分拡張して使われる事が前提と思ってよい。
-
-* 古いのでPlackに対応していないため、動作確認までの環境構築が非常に面倒。
- * 開発段階でわざわざApacheとFastCGIを入れないといけない
-
-⇒今時Plack対応して欲しいかも。開発段階でFastCGIがどうのとかあんまり考えたく無い。
-
-以下で説明されている通りモダンじゃないのは確かかもしれませんね。 
-
-[第42回PHP勉強会 MobaSiF 発表資料](http://www.slideshare.net/bobpp/42php-mobasif-1351953)
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.com/2011/06/21/20110621/</guid>
-<pubDate>Tue, 21 Jun 2011 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>

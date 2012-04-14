@@ -41,7 +41,7 @@ sub load_article {
 	my $self = shift;
 	my $search_dir = $self->{root}.'/'.$self->{config}->{resource}.'/*.md';
 	for my $path (glob $search_dir) {
-		push @{$self->{articles}}, Blog::Article->new($path);
+		push @{$self->{articles}}, Blog::Article->new($path, $self->{config});
 	}
 }
 

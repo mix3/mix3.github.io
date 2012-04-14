@@ -27,9 +27,12 @@ use Class::Accessor::Lite (
 );
 
 sub new {
-	my ($class, $path) = @_;
+	my ($class, $path, $config) = @_;
 
 	my $args = {};
+
+	$args->{config} = $config ? $config : {};
+
 	$args->{name} = basename($path, '.md');
 
 	my $fh;
@@ -91,11 +94,23 @@ sub new {
 		croak('require content');
 	}
 
-	$args->{content}     = markdown($args->{raw});
-	$args->{description} = html_escape($args->{raw});
+	my $raw = replace($args->{raw}, $args->{config}->{replace}->{before});
+	my $content = markdown($raw);
+	$args->{content} = replace($content, $args->{config}->{replace}->{after});
+
+	$args->{description} = $args->{content};#html_escape($args->{raw});
 
 	return bless $args, $class;
 }
+
+sub replace {
+	my ($content, $replace) = @_;
+	for my $key (keys %$replace) {
+		my $value = $replace->{$key};
+		$content =~ s!$key!&{$value}($&)!eg;
+	}
+	return $content;
+};
 
 sub html_escape {
 	my $content     = shift;
