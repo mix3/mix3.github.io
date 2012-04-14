@@ -56,7 +56,10 @@
   </div>
   <div id="content">
     <div id="main">
+      <div class="rslt_row autopagerize_page_element">
 : block main -> {}
+      </div>
+      <div class="autopagerize_insert_before"></div>
     </div>
     <div id="sidebar">
 : block side -> {}

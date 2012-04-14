@@ -11,4 +11,6 @@
   <li><a href="/archives/<: $key :>/"><: $side.archive_key2name[$key] :></a></li>
 :   }
 </ul>
+<h3>TagCloud</h3>
+<p><: $side.tag_cloud.html_and_css() | raw :></p>
 : }

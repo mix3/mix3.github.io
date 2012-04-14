@@ -11,6 +11,9 @@ use Blog::Article;
 use Text::Xslate;
 use Encode;
 use XML::RSS;
+use HTML::TagCloud;
+use URI::Escape;
+use Data::Page::Navigation;
 
 use Class::Accessor::Lite (
 	rw => [ qw/
@@ -50,11 +53,15 @@ sub generate {
 	# load
 	$self->load_article();
 	$self->load_archive();
+	$self->load_tag();
+	$self->load_article_list();
 	# generate
 	$self->_generate_article();
 	$self->_generate_index();
+	$self->_generate_article_list();
 	$self->_generate_rss();
 	$self->_generate_archive();
+	$self->_generate_tag();
 }
 
 sub _generate_index {
@@ -64,6 +71,7 @@ sub _generate_index {
 		blog     => $self,
 		side     => $self->side,
 		articles => $self->latest_articles,
+		pager    => $self->{article_list}->{pager}->{1},
 	});
 	open my $fh, '>', $file;
 	print $fh encode_utf8($render); 
@@ -75,6 +83,7 @@ sub side {
 	return {
 		archive_key      => $self->{archive}->{key},
 		archive_key2name => $self->{archive}->{key2name},
+		tag_cloud        => $self->{tag}->{cloud},
 	};
 }
 
@@ -165,6 +174,115 @@ sub load_archive {
 		key2archive => $archive,
 		key2name    => $key2name,
 	};
+}
+
+sub load_tag {
+	my $self = shift;
+	my $tag  = {};
+	for my $article (@{$self->{articles}}) {
+		for my $tag_name (@{$article->tag}) {
+			push @{$tag->{$tag_name}}, $article;
+		}
+	}
+	my $cloud = HTML::TagCloud->new;
+	my $tag_to_num = {};
+	for my $k (keys %$tag) {
+		$tag_to_num->{$k} = scalar(@{$tag->{$k}});
+	}
+	for my $k (keys %$tag_to_num) {
+		$cloud->add($k, '/tag/'.uri_escape_utf8($k).'/', $tag_to_num->{$k});
+	}
+	for my $k (keys %$tag) {
+		my @sorted_articles = sort { $b->date <=> $a->date } @{$tag->{$k}};
+		$tag->{$k} = \@sorted_articles;
+	}
+	my @sorted_key = sort { $b cmp $a } keys %$tag;
+	$self->{tag} = {
+		key     => \@sorted_key,
+		key2tag => $tag,
+		cloud   => $cloud,
+	};
+}
+
+sub _generate_tag {
+	my $self   = shift;
+	for my $k (@{$self->{tag}->{key}}) {
+		my $dir = $self->root.'/tag/'.$k;
+		mkpath($dir);
+		my $file = $dir.'/index.html';
+		my $render = $self->{tx}->render('list.tx', {
+			blog     => $self,
+			side     => $self->side,
+			articles => $self->{tag}->{key2tag}->{$k},
+		});
+		open my $fh, '>', $file;
+		print $fh encode_utf8($render); 
+		close $fh;
+	}
+}
+
+sub load_article_list {
+	my $self = shift;
+
+	my @sorted_articles = sort { $b->date <=> $a->date } @{$self->{articles}};
+
+	my $splice_article = {};
+	my $page_num = 0;
+
+	while (0 < @sorted_articles) {
+		$page_num++;
+		my @page_list = splice(@sorted_articles, 0, $self->config->{page_num});
+		$splice_article->{$page_num} = \@page_list;
+	}
+
+	my $url       = '/page';
+	my $last_page = scalar(keys %$splice_article);
+	my $total     = scalar(@{$self->{articles}});
+	my $pager     = {};
+	for (my $page = 1; $page <= $last_page; $page++) {
+		my $navi = Data::Page->new(
+			$total,
+			$self->config->{page_num},
+			$page,
+		);
+		$navi->pages_per_navigation(5);
+		my @list = $navi->pages_in_navigation(5);
+		$pager->{$page} = {
+			total        => $total,
+			url          => $url,
+			last_page    => $last_page,
+			current_page => $page,
+			has_next     => ($page < $last_page) ? 1 : 0,
+			has_prev     => (1 < $page)          ? 1 : 0,
+			list         => \@list,
+		};
+	}
+
+	my @sorted_key = sort { $a <=> $b } keys %$splice_article;
+
+	$self->{article_list} = {
+		page    => \@sorted_key,
+		article => $splice_article,
+		pager   => $pager,
+	};
+}
+
+sub _generate_article_list {
+	my $self   = shift;
+	for my $page (@{$self->{article_list}->{page}}) {
+		my $dir = $self->root.'/page/'.$page;
+		mkpath($dir);
+		my $file = $dir.'/index.html';
+		my $render = $self->{tx}->render('list.tx', {
+			blog     => $self,
+			side     => $self->side,
+			articles => $self->{article_list}->{article}->{$page},
+			pager    => $self->{article_list}->{pager}->{$page},
+		});
+		open my $fh, '>', $file;
+		print $fh encode_utf8($render); 
+		close $fh;
+	}
 }
 
 1;

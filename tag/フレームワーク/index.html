@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <link href="/css/style.css" rel="stylesheet" type="text/css">
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+  <link href="/css/prettify/prettify.css" rel="stylesheet" type="text/css" media="screen" />
+  <script src="/js/prettify/prettify.js" type="text/javascript"></script>
+  <script type="text/javascript">
+      $(function(){
+          $('pre').filter(function(){
+              console.log($(this).parent());
+              return !$(this).parent().hasClass('gist-highlight');
+          }).addClass('prettyprint linenums');
+          prettyPrint();
+          $('#content').fadeIn(2000);
+      });
+  </script>
+
+  <script type="text/javascript">
+  
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-10744212-4']);
+    _gaq.push(['_setDomainName', 'github.com']);
+    _gaq.push(['_setAllowHash', 'false']);
+    _gaq.push(['_trackPageview']);
+  
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  
+  </script>
+
+  <title>萌えキャラとは何だったのか</title>
+</head>
+<body>
+<div id="wrap">
+  <div id="header">
+    <h1 id="logo-text"><a href="/" title="">萌えキャラとは何だったのか</a></h1>
+    <p id="slogan">ギークにも絵描きにもなれない者の末路</p>
+    <div id="top-menu">
+      <p>
+        <a href="/index.rdf">rss feed</a> | 
+        <a href="https://twitter.com/#!/mix3">twitter</a> | 
+        <a href="https://github.com/mix3">github</a> | 
+        <a href="http://www.pixiv.net/member.php?id=88339">pixiv</a>
+      </p>
+    </div>
+  </div>
+  <div  id="nav">
+    <ul>
+      <li id="current"><a href="/">Home</a></li>
+    </ul>
+  </div>
+  <div id="content">
+    <div id="main">
+      <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2011/07/24/20110724/" title="">Play framework + Scala に入門してみる</a></h2>
+<h3>Scalaクラスタの怒りが聞こえる…</h3>
+
+<p>Scalaクラスタの怒りに満ちたTLが見えて当該セッションのUstを見れなかったのが悔しいです。何があったかはTogetterからある程度察する事が出来ます。</p>
+
+<p>参考：<a href="http://togetter.com/li/164689">2011/07/22_Advanced_Tech_Night No.2 「ジャバラーが知っておくべき最近の開発言語のこと」(#atn2011 )</a> </p>
+
+<h3>Play framework + Scala に入門してみる</h3>
+
+<p>そんな流れがあったのでScalaを触りたい気持ちが強くなりPlay frameworkの勉強と一緒にScalaをやってみようかと思い立ちました。Play frameworkというのははJava版Ruby on Railsといった感じでJavaだけれど非常に効率に良い開発が出来るフレームワークです（らしいです）Wicketとはまた違う爽快感のあるフレームワークのようです。</p>
+
+<h3>インストール</h3>
+
+<p>インストールは非常に簡単です。zipを落として適当に配置してPATHを通すだけ。ただしplayのコマンドはpythonで書かれているのでpythonが必要になるかもしれません。[play]とだけ打つとセットアップが出来ていれば以下のように結果が返ってくるでしょう。</p>
+
+<h4>$ play</h4>
+
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Usage: play cmd [app_path] [--options]
+~ 
+~ with,  new      Create a new application
+~        run      Run the application in the current shell
+~        help     Show play help
+~
+</code></pre>
+
+<p>セットアップの確認が出来ればさっそく動作確認してみましょう。</p>
+
+<h3>プロジェクトの作成、アプリケーションの実行</h3>
+
+<p>以下のように打つとプロジェクトが作成出来ます。作成途中アプリケーションの名前を聞かれます。基本デフォルトのままで良いでしょう。スケルトンが作成されます。</p>
+
+<h4>$ play new [project_name] --with scala</h4>
+
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ The new application will be created in /path/to/[project_name]
+~ What is the application name? [project_name] 
+~
+~ OK, the application is created.
+~ Start it with : play run project_name
+~ Have fun!
+~
+</code></pre>
+
+<p>以下のようにして作成されたアプリケーションを起動する事が出来ます。9000番ポートで待っているようなので<a href="http://localhost:9000/">http://localhost:9000/</a>にアクセスしましょう。いかにもな導入ページが返って来たらOKです。</p>
+
+<h4>$ play run [project_name]</h4>
+
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Ctrl+C to stop
+~ 
+Listening for transport dt_socket at address: 8000
+01:35:10,384 INFO  ~ Starting /path/to/[project_name]
+01:35:11,399 WARN  ~ You're running Play! in DEV mode
+01:35:11,609 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+01:43:01,925 INFO  ~ Application '[project_name]' is now started !
+</code></pre>
+
+<h3>Scalaで動作するプロジェクトを作成してみる。</h3>
+
+<p>今度はScalaのプロジェクトを作成してみます。ちなみに以下のように conf/dependencies.yml にScalaに依存することを追記して $ play dependencies [project_name] とすることでScala対応のプロジェクトにすることも出来ますが、スケルトンコードがJavaのままなので作り直したいと思います。</p>
+
+<h4>$ diff -u [project_name]/conf/dependencies.yml.orig [project_name]/conf/dependencies.yml</h4>
+
+<pre><code>--- project_name/conf/dependencies.yml.orig 2011-07-24 02:04:56.000000000 +0900
++++ project_name/conf/dependencies.yml  2011-07-24 02:04:46.000000000 +0900
+@@ -2,3 +2,4 @@
+
+ require:
+     - play
++    - play -&gt; scala 0.9.1
+</code></pre>
+
+<h4>$ play dependencies [project_name]</h4>
+
+<pre><code>~            _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
+~
+~   play-&gt;scala 0.9.1 (from playLocalModules)
+~
+~ Installing resolved dependencies,
+~
+~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
+~
+~ Done!
+~
+</code></pre>
+
+<h3>Scala対応のプロジェクトを作成して動作確認する</h3>
+
+<p>Scala対応のプロジェクトを作成するにはまず以下のようにしてScalaモジュールをインストールする必要があります。</p>
+
+<h4>$ play install scala</h4>
+
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Will install scala-0.9.1
+~ This module is compatible with: 1.2.2
+~ Do you want to install this version (y/n)? y
+~ Installing module scala-0.9.1...
+~
+~ Fetching http://www.playframework.org/modules/scala-0.9.1.zip
+~ [--------------------------100%-------------------------] 60034.6 KiB/s    
+~ Unzipping...
+~
+~ Module scala-0.9.1 is installed!
+~ You can now use it by adding it to the dependencies.yml file:
+~
+~ require:
+~     play -&gt; scala 0.9.1
+~
+</code></pre>
+
+<p>インストールが済んだら実際にScala対応のプロジェクトを作成してみましょう。</p>
+
+<h4>$ play new [project_name] --with scala</h4>
+
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ The new application will be created in /path/to/[project_name]
+~ What is the application name? [project_name] 
+~
+~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
+~
+~   play-&gt;scala 0.9.1 (from playLocalModules)
+~
+~ Installing resolved dependencies,
+~
+~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
+~
+~ Done!
+~
+~ OK, the application is created.
+~ Start it with : play run project_name
+~ Have fun!
+~
+</code></pre>
+
+<p>動作確認はJavaの時と同様に $ play run [project_name] で出来ます。</p>
+
+<h4>$ play run project_name/</h4>
+
+<pre><code>~        _                _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Ctrl+C to stop
+~ 
+Listening for transport dt_socket at address: 8000
+02:15:51,036 INFO  ~ Starting /path/to/[project_name]
+02:15:51,067 INFO  ~ Module scala is available (/path/to/[play]/modules/scala-0.9.1)
+02:15:54,598 INFO  ~ Scala support is active
+02:15:54,598 WARN  ~ You're running Play! in DEV mode
+02:15:54,734 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+Compiling:
+    /path/to/[project_name]/app/controllers.scala
+    /path/to/[play]/modules/docviewer/app/controllers/PlayDocumentation.java
+    /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
+    /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
+    /path/to/[play]/modules/docviewer/app/DocViewerPlugin.java
+    /path/to/[project_name]/tmp/generated/views.html.main.scala
+    /path/to/[play]/modules/docviewer/app/helpers/CheatSheetHelper.java
+Traversing /path/to/[project_name]/app/controllers.scala
+Traversing /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
+Traversing /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
+Traversing /path/to/[project_name]/tmp/generated/views.html.main.scala
+API phase took : 0.503 s
+02:16:21,114 INFO  ~ Application '[project_name]' is now started !
+</code></pre>
+
+<h3>プロジェクト構成</h3>
+
+<p>Playのプロジェクトは以下のような構成となっています。アプリケーションを構築して行く際は主にapp以下を弄って行く事になるでしょう。</p>
+
+<ul>
+<li>app
+<ul>
+<li>コントローラ、モデル、ビューなど。</li>
+</ul></li>
+<li>conf
+<ul>
+<li>アプリケーションの設定。ルーティングの設定もここ。</li>
+</ul></li>
+<li>lib
+<ul>
+<li>jarファイルなどのlib関係。</li>
+</ul></li>
+<li>modules
+<ul>
+<li>プロジェクトが依存しているものがこの下に書き出されるのかな？</li>
+</ul></li>
+<li>public
+<ul>
+<li>静的ファイルなど。</li>
+</ul></li>
+<li>test
+<ul>
+<li>テスト関係など。</li>
+</ul></li>
+<li>tmp
+<ul>
+<li>生成されたclassファイルの配置やキャッシュなど。</li>
+</ul></li>
+</ul>
+
+<h3>とりあえず中身を眺めてみる</h3>
+
+<p>生成されるスケルトンは以下のようになっています。ルーティングとコントローラ/アクションの対応は直感的で分かりやすいですね。Controllerを継承したApplicationがコントローラ、その中で定義したメソッドがアクションのようです。</p>
+
+<p>ただアクションで何を返すかが非常に分りづらいですね（もちろん基本はテンプレートですが）テンプレートそのものも@が出て来て関数定義っぽいし非常に分りづらいです。Webデザイナー殺しですね<s>死ねば良いと思います＾＾</s></p>
+
+<h4>$ cat [project_name]/conf/routes</h4>
+
+<pre><code># Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                                       Application.index
+
+# Ignore favicon requests
+GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/                                staticDir:public
+
+# Catch all
+*       /{controller}/{action}                  {controller}.{action}
+</code></pre>
+
+<h4>$ cat [project_name]/app/controllers.scala</h4>
+
+<pre><code>package controllers
+
+import play._
+import play.mvc._
+
+object Application extends Controller {
+
+    import views.Application._
+
+    def index = {
+        html.index("Your Scala application is ready!")
+    }
+
+}
+</code></pre>
+
+<h4>$ cat [project_name]/app/views/Application/index.scala.html</h4>
+
+<pre><code>@(title:String)
+
+@main(title) {
+
+    @views.defaults.html.welcome(title)
+
+}
+</code></pre>
+
+<h4>$ cat [project_name]/app/views/main.scala.html</h4>
+
+<pre><code>@(title:String = "")(body: =&gt; Html)
+
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;@title&lt;/title&gt;
+        &lt;link rel="stylesheet" media="screen" href="@asset("public/stylesheets/main.css")"&gt;
+        &lt;link rel="shortcut icon" type="image/png" href="@asset("public/images/favicon.png")"&gt;
+        &lt;script src="@asset("public/javascripts/jquery-1.5.2.min.js")" type="text/javascript"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        @body
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3>アクションとビュー</h3>
+
+<p>とりあえずスケルトンでは以下のような感じで動いているようです。</p>
+
+<ul>
+<li>views/[レイアウト].scala.html
+<ul>
+<li>レイアウトを定義</li>
+</ul></li>
+<li>views/[コントローラ]/[アクション].scala.html
+<ul>
+<li>@レイアウト(引数) { HTML }</li>
+<li>レイアウトとHTMLをガッチャンコして返す</li>
+</ul></li>
+</ul>
+
+<p>HTMLの部分が@views.defaults.html.welcome(title)となってこれが何を差しているのかが分りづらくしています。ここを&lt;h1&gt;@title&lt;/h1&gt;とでもすればもう少し見通しが良くなるのではないかと思います。具体的には以下のような感じ。</p>
+
+<h4>$ diff -u [project_name]/app/views/Application/index.scala.html.orig [project_name]/app/views/Application/index.scala.html</h4>
+
+<pre><code>--- project_name/app/views/Application/index.scala.html.orig    2011-07-24 03:45:31.000000000 +0900
++++ project_name/app/views/Application/index.scala.html 2011-07-24 03:47:38.000000000 +0900
+@@ -2,6 +2,6 @@
+
+ @main(title) {
+
+-    @views.defaults.html.welcome(title)
++    &lt;h1&gt;@title&lt;/h1&gt;
+
+-}
+\ No newline at end of file
++}
+</code></pre>
+
+<h4>$ diff -u project_name/app/controllers.scala.orig project_name/app/controllers.scala</h4>
+
+<pre><code>--- project_name/app/controllers.scala.orig 2011-07-24 03:49:42.000000000 +0900
++++ project_name/app/controllers.scala  2011-07-24 03:48:58.000000000 +0900
+@@ -8,7 +8,11 @@
+     import views.Application._
+
+     def index = {
+-        html.index("Your Scala application is ready!")
++        html.index("index")
+     }
+
++    def sample = {
++        html.index("sample")
++    }
++
+ }
+</code></pre>
+
+<p>アクションも増やしてみました。これでルーティング設定も確認出来ます。$ play run [project_name] として以下へアクセスするとそれぞれindex、sampleが&lt;h1&gt;で表示されることが確認出来ると思います。</p>
+
+<ul>
+<li><a href="http://localhost:9000/">http://localhost:9000/</a></li>
+<li><a href="http://localhost:9000/Application/sample">http://localhost:9000/Application/sample</a></li>
+</ul>
+
+<p>なんとなくではありますがアクションからテンプレートが呼ばれ、引数を使ってレイアウトを解決して表示していることが見えてきた感じがします。</p>
+
+<h3>まとめ</h3>
+
+<p>とりあえず一旦ここまで。何をしているか理解出来たらまたコントローラ／アクション／テンプレートの関係を文字に起こしてみたいと思います。</p>
+
+<p>Play frameworkですが面白そうではあるもののやはりテンプレート周りが気に入らないですね。テンプレートの中にコードを埋め込んだり、独自の構文でロジックを埋め込んだりというのはどうしても慣れないです。どんなに簡単な構文でそれが可能だとしてもデザイナーとの連携の時にはやはり困ると思うのです。「ここは動的な情報が入るのでこういう書き方をして下さい」なんて絶対混乱します。テンプレートをHTMLで書くならそのテンプレートはプレーンなHTMLであるべきだと自分は思います。</p>
+
+<p class="post-footer"><span class="date">2011-07-24</span></p>
+<h2><a href="/2011/06/22/20110622/" title="">MobaSiFを弄ってみた</a></h2>
+<p>MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。</p>
+
+<ul>
+<li>アプリケーションロジックを記述</li>
+<li>レスポンスの値を生成＆セット</li>
+</ul>
+
+<p>具体的に書くと以下のような感じ。</p>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = (
+    'test' =&gt; [0,0,0, 'Page::Sample', 'pageMain'],
+);
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<pre><code>package Page::Sample;
+sub pageMain {
+    my $func = shift;
+    # レスポンスの生成
+    my $html = HTMLTemplate::insert('sample/index', $rhData);
+    # レスポンスヘッダに値をセット
+    Response::output(¥$html);
+}
+</code></pre>
+
+<h4>template/_system/sample/index.html</h4>
+
+<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;$CON:title$&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    test
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>普段触るフレームワークだと「レスポンスの生成」も「レスポンスヘッダへの値のセット」も自分ですることはまず無くて。テンプレートに渡す値をハッシュで用意して、テンプレート自体はクエリパスなどから自動で判断するかもしくは明示的に指定するかする場合が多い。</p>
+
+<p>ということでこの辺り結構違和感が大きいのでちょっとそれっぽくなるように手を入れてみた。</p>
+
+<h4>pm/Context.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Context.pm"></script>
+
+<h4>pm/Page/Main.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Main.pm"></script>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = (
+        .
+        .
+        .
+    'test'  =&gt; [0,0,0, 'Page::Sample', 'test'],
+    'test1' =&gt; [0,0,0, 'Page::Sample', 'test1'],
+    'test2' =&gt; [0,0,0, 'Page::Sample', 'test2'],
+);
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Sample.pm"></script>
+
+<h4>template/_system/sample/test.html</h4>
+
+<script src="https://gist.github.com/1038137.js?file=test.html"></script>
+
+<h3>次回はDB周りを触ってみる</h3>
+
+<p>commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。</p>
+
+<p class="post-footer"><span class="date">2011-06-22</span></p>
+<h2><a href="/2011/06/21/20110621/" title="">MobaSiFを触ってみた</a></h2>
+<h3>インストール</h3>
+
+<p>環境はCentOS5.6で極力yumで対処してみた。</p>
+
+<ul>
+<li>CentOS 5.6</li>
+<li>Apache 2.2.3 (yum install)</li>
+<li>fastcgi 2.4.0 (yum install)</li>
+<li>mod_fastcgi 2.4.2 (source install)</li>
+<li>mysql 5.1.57 (rpm install)</li>
+<li>perl 5.8.8 (yum install)</li>
+</ul>
+
+<p>ちなみにMobaSiFのdocsに記載されている対応環境の内容は以下の通り</p>
+
+<pre><code>           要求       確認環境
+CentOS     4.x / 5.x  4.5 (i386)
+Apache     1.3.x      1.3.41
+MySQL      5.0.x      5.0.51a
+perl       5.8.x      5.8.0
+fastcgi    2.4.x      2.4.6
+</code></pre>
+
+<h3>詰まった所、注意点</h3>
+
+<ul>
+<li>MobaSiF
+<ul>
+<li>mod_fastcgiとmod_fcgidがあるがMobaSiFはmod_fastcgi</li>
+<li>yumで入れたApacheのバージョンが2.2だったが、mod_fastcgiは2.0までしか対応していない。</li>
+<li>パッチを当てれば2.2にmod_fastcgiを入れるられる⇒'Apache2.2＋fastcgiで Ruby on Rails'</li>
+</ul></li>
+<li>perl
+<ul>
+<li>FastCGIがシステム標準のperlを使うのでperlbrewを使うと混乱する。</li>
+<li>素直にシステム標準のperlを使うのが楽</li>
+</ul></li>
+<li>Apache
+<ul>
+<li>MobaSiFとは全然関係ないがバーチャルホストでDocumentRootの設定に変な癖がある⇒VirtualHost環境化でのPermission Denied</li>
+</ul></li>
+</ul>
+
+<h3>MobaSiFのミニマムサ</h3>
+
+<p>ンプル</p>
+
+<p>MobaSiFでのページとURLの対応は以下のようになる</p>
+
+<ul>
+<li>ルート
+<ul>
+<li>http://[domain]/</li>
+</ul></li>
+<li>各ページ（アンダースコア＋ページ名）
+<ul>
+<li>http://[domain]/[_ページ名前]</li>
+</ul></li>
+</ul>
+
+<h3>ページを追加してみる</h3>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = {
+        .
+        .
+        .
+    'sample' =&gt; [0,    package Page::Sample;
+
+use strict;
+use HTMLTemplate;
+use Response;
+
+sub pageMain {
+    my $func = shift;
+    my $rhData = {};
+
+    my $html = HTMLTemplate::insert("sample/top", $rhData);
+    Response::output(\$html);
+}
+
+1;0,0, 'Page::Sample', 'pageMain'],
+    # http://[domain]/_sample にアクセスすると Page::SampleモジュールのpageMainの処理が走る
+};
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<pre><code>package Page::Sample;
+
+use strict;
+use HTMLTemplate;
+use Response;
+
+sub pageMain {
+    my $func = shift;
+    my $rhData = {};
+
+    my $html = HTMLTemplate::insert("sample/top", $rhData);
+    Response::output(\$html);
+}
+
+1;
+</code></pre>
+
+<h3>テンプレートのコンパイル</h3>
+
+<p>MobaSiFでは速度を出すためにアプリで機種毎に出し分けなどの処理をしないよう最初からテンプレートを機種別に生成したりするようです。（変なバイナリデータをテンプレートに埋め込んでいたり他にも色々やってそうな感じ）</p>
+
+<pre><code>$ perl script/tool/compile_template
+</code></pre>
+
+<h4>conf/pages.confの数字の意味</h4>
+
+<pre><code>'ページ名' =&gt; [ UID_ST, USER_ST, SERV_ST, モジュール, サブルーチン ]
+</code></pre>
+
+<ul>
+<li>UID_ST
+<ul>
+<li>0:情報なし</li>
+<li>2:serial/uid あり</li>
+</ul></li>
+<li>USER_ST
+<ul>
+<li>0:非会員でもOK</li>
+<li>1:会員（メアド未登録でもOK）</li>
+<li>2:会員（メアド登録済）</li>
+</ul></li>
+<li>SERV_ST (以下を足したもの)
+<ul>
+<li>1:自主退会だと不能</li>
+<li>2:運用退会だと不能</li>
+<li>4:PENALTYだと不能</li>
+<li>8:メール不達だと不能</li>
+</ul></li>
+</ul>
+
+<h3>まとめ</h3>
+
+<ul>
+<li>機能は非常にミニマム
+<ul>
+<li>文字コードはテンプレートやコード等でsjis,utf8,eucが入り交じる</li>
+<li>テンプレートの中に絵文字のバイナリを直接書く</li>
+<li>ロジックの所でレスポンスにテンプレートと引数を合成したものの返り値を渡す処理を自分で書く。</li>
+</ul></li>
+</ul>
+
+<p>⇒多分拡張して使われる事が前提と思ってよい。</p>
+
+<ul>
+<li>古いのでPlackに対応していないため、動作確認までの環境構築が非常に面倒。
+<ul>
+<li>開発段階でわざわざApacheとFastCGIを入れないといけない</li>
+</ul></li>
+</ul>
+
+<p>⇒今時Plack対応して欲しいかも。開発段階でFastCGIがどうのとかあんまり考えたく無い。</p>
+
+<p>以下で説明されている通りモダンじゃないのは確かかもしれませんね。 </p>
+
+<p><a href="http://www.slideshare.net/bobpp/42php-mobasif-1351953">第42回PHP勉強会 MobaSiF 発表資料</a></p>
+
+<p class="post-footer"><span class="date">2011-06-21</span></p>
+<!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
+      </div>
+      <div class="autopagerize_insert_before"></div>
+    </div>
+    <div id="sidebar">
+<h3>Profile</h3>
+<p>
+  <a href="/"><img class="float-left" width="80" height="80" alt="avatar" src="/images/avatar.png"></a>
+  <a href="https://twitter.com/#!/mix3">mix3</a><br />
+  日々惰性で生きているダメ人間。Webエンジニアのような何かだが、実は絵を描くマのエンジニア志望なのは今も変わらない。
+</p>
+<h3>Archives</h3>
+<ul class="sidemenu">
+  <li><a href="/archives/2012/04/">2012年04月</a></li>
+  <li><a href="/archives/2011/11/">2011年11月</a></li>
+  <li><a href="/archives/2011/07/">2011年07月</a></li>
+  <li><a href="/archives/2011/06/">2011年06月</a></li>
+  <li><a href="/archives/2011/05/">2011年05月</a></li>
+  <li><a href="/archives/2011/04/">2011年04月</a></li>
+</ul>
+<h3>TagCloud</h3>
+<p><style type="text/css">
+
+#htmltagcloud {
+  text-align:  center; 
+  line-height: 1; 
+}
+span.tagcloud0 {font-size: 12px;}
+span.tagcloud0 a {text-decoration: none;}
+span.tagcloud1 {font-size: 13px;}
+span.tagcloud1 a {text-decoration: none;}
+span.tagcloud2 {font-size: 14px;}
+span.tagcloud2 a {text-decoration: none;}
+span.tagcloud3 {font-size: 15px;}
+span.tagcloud3 a {text-decoration: none;}
+span.tagcloud4 {font-size: 16px;}
+span.tagcloud4 a {text-decoration: none;}
+span.tagcloud5 {font-size: 17px;}
+span.tagcloud5 a {text-decoration: none;}
+span.tagcloud6 {font-size: 18px;}
+span.tagcloud6 a {text-decoration: none;}
+span.tagcloud7 {font-size: 19px;}
+span.tagcloud7 a {text-decoration: none;}
+span.tagcloud8 {font-size: 20px;}
+span.tagcloud8 a {text-decoration: none;}
+span.tagcloud9 {font-size: 21px;}
+span.tagcloud9 a {text-decoration: none;}
+span.tagcloud10 {font-size: 22px;}
+span.tagcloud10 a {text-decoration: none;}
+span.tagcloud11 {font-size: 23px;}
+span.tagcloud11 a {text-decoration: none;}
+span.tagcloud12 {font-size: 24px;}
+span.tagcloud12 a {text-decoration: none;}
+span.tagcloud13 {font-size: 25px;}
+span.tagcloud13 a {text-decoration: none;}
+span.tagcloud14 {font-size: 26px;}
+span.tagcloud14 a {text-decoration: none;}
+span.tagcloud15 {font-size: 27px;}
+span.tagcloud15 a {text-decoration: none;}
+span.tagcloud16 {font-size: 28px;}
+span.tagcloud16 a {text-decoration: none;}
+span.tagcloud17 {font-size: 29px;}
+span.tagcloud17 a {text-decoration: none;}
+span.tagcloud18 {font-size: 30px;}
+span.tagcloud18 a {text-decoration: none;}
+span.tagcloud19 {font-size: 31px;}
+span.tagcloud19 a {text-decoration: none;}
+span.tagcloud20 {font-size: 32px;}
+span.tagcloud20 a {text-decoration: none;}
+span.tagcloud21 {font-size: 33px;}
+span.tagcloud21 a {text-decoration: none;}
+span.tagcloud22 {font-size: 34px;}
+span.tagcloud22 a {text-decoration: none;}
+span.tagcloud23 {font-size: 35px;}
+span.tagcloud23 a {text-decoration: none;}
+span.tagcloud24 {font-size: 36px;}
+span.tagcloud24 a {text-decoration: none;}
+</style><div id="htmltagcloud">
+<span class="tagcloud0"><a href="/tag/CRUD/">CRUD</a></span>
+<span class="tagcloud0"><a href="/tag/Capture%3A%3ATiny/">Capture::Tiny</a></span>
+<span class="tagcloud0"><a href="/tag/Hadoop/">Hadoop</a></span>
+<span class="tagcloud0"><a href="/tag/Log/">Log</a></span>
+<span class="tagcloud0"><a href="/tag/Markdown/">Markdown</a></span>
+<span class="tagcloud15"><a href="/tag/MobaSiF/">MobaSiF</a></span>
+<span class="tagcloud0"><a href="/tag/Mojolicious/">Mojolicious</a></span>
+<span class="tagcloud0"><a href="/tag/Mouse/">Mouse</a></span>
+<span class="tagcloud0"><a href="/tag/MySQL/">MySQL</a></span>
+<span class="tagcloud0"><a href="/tag/Play/">Play</a></span>
+<span class="tagcloud0"><a href="/tag/Qudo/">Qudo</a></span>
+<span class="tagcloud0"><a href="/tag/SNBinder/">SNBinder</a></span>
+<span class="tagcloud0"><a href="/tag/SQLite/">SQLite</a></span>
+<span class="tagcloud0"><a href="/tag/Scala/">Scala</a></span>
+<span class="tagcloud0"><a href="/tag/Teng/">Teng</a></span>
+<span class="tagcloud0"><a href="/tag/Xslate/">Xslate</a></span>
+<span class="tagcloud0"><a href="/tag/bless/">bless</a></span>
+<span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>
+<span class="tagcloud0"><a href="/tag/cpan%20author/">cpan author</a></span>
+<span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
+<span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>
+<span class="tagcloud15"><a href="/tag/p5-SWFEdito/">p5-SWFEdito</a></span>
+<span class="tagcloud24"><a href="/tag/perl/">perl</a></span>
+<span class="tagcloud15"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
+<span class="tagcloud15"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
+<span class="tagcloud0"><a href="/tag/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91/">オブジェクト指向</a></span>
+<span class="tagcloud0"><a href="/tag/%E3%82%B5%E3%83%BC%E3%83%90%E7%AE%A1%E7%90%86/">サーバ管理</a></span>
+<span class="tagcloud0"><a href="/tag/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%A8%AD%E5%AE%9A/">ネットワーク設定</a></span>
+<span class="tagcloud0"><a href="/tag/%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%8B%E3%83%B3%E3%82%B0/">パーティショニング</a></span>
+<span class="tagcloud24"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
+<span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
+</div></p>
+    </div>
+  </div>
+  <div id="footer">
+    <p>
+      &copy; All your copyright info here  
+  
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+      <a href="http://www.bluewebtemplates.com/" title="Website Templates">website templates</a> by <a href="http://www.styleshout.com/">styleshout</a> |
+      Valid <a href="http://validator.w3.org/check?uri=referer">XHTML</a> | 
+      <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a>
+  
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+      <a href="/">Home</a>&nbsp;|&nbsp;
+      <a href="/">RSS Feed</a>
+    </p>
+  </div>
+</body>
+</html>

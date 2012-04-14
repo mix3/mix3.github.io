@@ -1,0 +1,28 @@
+: if ($pager.current_page == 1) {
+&lt;&lt;
+: } else {
+<a href="<: $pager.url :>/1/">&lt;&lt;</a>
+: }
+: if ($pager.has_prev) {
+<a href="<: $pager.url :>/<: $pager.current_page - 1 :>/">&lt;</a>
+: } else {
+&lt;
+: }
+: for $pager.list -> $page {
+<: if ($~page != 0) { :> | <: } :>
+:   if ($page == $pager.current_page) {
+<: $page :>
+:   } else {
+<a href="<: $pager.url :>/<: $page :>/"><: $page :></a>
+:   }
+: }
+: if ($pager.has_next) {
+<a href="<: $pager.url :>/<: $pager.current_page + 1 :>/" rel="next">&gt;</a>
+: } else {
+&gt;
+: }
+: if ($pager.current_page == $pager.last_page) {
+&gt;&gt;
+: } else {
+<a href="<: $pager.url :>/<: $pager.last_page :>/">&gt;&gt;</a>
+: }
