@@ -57,6 +57,52 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2011/05/04/20110504_02/" title="">Qudoでログ回収</a></h2>
+<ul>
+<li>SCPやrsyncやらで各アプリケーションサーバから回収
+<ul>
+<li>自由が利く</li>
+</ul></li>
+<li>各アプリケーションサーバから解析サーバへ投げてもらう
+<ul>
+<li>HDFSなどHadoopが扱うファイルシステムに直接入れる事が可能</li>
+<li>※ただし、各アプリケーションサーバがそのファイルシステムを扱えるように色々セットアップが必要</li>
+</ul></li>
+</ul>
+
+<p>後者のアプリから投げてもらう方だと各サーバでファイルシステムを扱えるようセットアップが必要になるので、そこまでアプリ側に負担を掛けられないかなということで今考えているのは前者の方法となります。</p>
+
+<h3>コード</h3>
+
+<p>Hadoopが扱うファイルシステムはHDFSという前提で前回構築した環境でサンプルを作ってみました。</p>
+
+<h3>シェルスクリプトで並列回収</h3>
+
+<p>まず最初にシェルスクリプトで書いてみました。「これだと回収先のアプリが100万個ある場合は100万個同時にダウンロードしちゃうってことだよね？」というもっともな指摘で没になりました。まったくもってその通りだと思います。</p>
+
+<script src="https://gist.github.com/954830.js"> </script>
+
+<h3>Qudoで並列回収</h3>
+
+<ul>
+<li>ジョブ／キューを使いたい
+<ul>
+<li>なんとなくジョブは消えてほしく無い</li>
+<li>失敗したらリトライしてほしい</li>
+</ul></li>
+<li>回収は並列
+<ul>
+<li>でも同時実行数は上限あり</li>
+</ul></li>
+</ul>
+
+<p>以上の要件で最初はTheSchwartz＆Parallel::Preforkで考えていましたが何やらGearmanでもDBを使って動作させられるという話があったりQudoを見つけてみたりで、でもやりたいことって別にそんなに複雑な事でもないので結局何使っても良いかなと思ってQudoを選びました。後々機能を増やしたい時にフックポイントが色々用意されているので悪くないかなと。</p>
+
+<script src="https://gist.github.com/951476.js"> </script>
+
+<p>どうでも良いですがnekokakさん曰くQudoは「駆動」らしいですが「弓道」の方が良いと思います＾＾</p>
+
+<p class="post-footer"><span class="date">2011-05-04</span></p>
 <h2><a href="/2011/04/30/20110430/" title="">Hadoopを触ってみた</a></h2>
 <p>具体的にはgistに書いた。</p>
 
@@ -94,6 +140,7 @@
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2012/08/">2012年08月</a></li>
   <li><a href="/archives/2012/04/">2012年04月</a></li>
   <li><a href="/archives/2011/11/">2011年11月</a></li>
   <li><a href="/archives/2011/07/">2011年07月</a></li>
@@ -181,7 +228,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
 <span class="tagcloud0"><a href="/tag/java/">java</a></span>
 <span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>
-<span class="tagcloud15"><a href="/tag/p5-SWFEdito/">p5-SWFEdito</a></span>
+<span class="tagcloud24"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
 <span class="tagcloud24"><a href="/tag/perl/">perl</a></span>
 <span class="tagcloud0"><a href="/tag/wicket/">wicket</a></span>
 <span class="tagcloud15"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
