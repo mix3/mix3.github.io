@@ -57,6 +57,36 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2012/11/07/20121107/" title="">巨大ファイルの削除</a></h2>
+<p>DBサーバのslow_queryログがローテートされておらず単一ファイルで100G超えしていて辛いmix3です。</p>
+
+<h3>巨大なファイルを rm するのは危険</h3>
+
+<p>実際に試していないのでどうなるのか分からないですが、おそらく消し終わるまで間IOが占有されてDBのパフォーマンスに影響が出ちゃうのでしょう。</p>
+
+<p>rm はやらないほうが良いねとなりました。</p>
+
+<h3>: > /path/to/file</h3>
+
+<p>じゃあどうすればという事で調べていたら</p>
+
+<pre><code>
+: > /path/to/file
+</code></pre>
+
+<p>を使ってはどうか？というようなものを見かけました</p>
+
+<p><a href="http://serverfault.com/questions/336917/is-there-a-way-to-delete-100gb-file-on-linux-without-thrashing-io-load">Is there a way to delete 100GB file on Linux without thrashing IO / load?</a></p>
+
+<p>容量に余裕のある別サーバで $ dd if=/dev/zero of=tempfile bs=1024000 count=100000 とかしてファイルを作って試したところ、readが発生するもののパフォーマンスにはあまり影響は無い感じで使えそうということに。</p>
+
+<h3>ちなみに</h3>
+
+<p>: > /path/to/file は空ファイルを作るときの方法のようで、<a href="http://d.hatena.ne.jp/japanrock_pg/20100212/1265972572">Linuxでファイルを空にする5つの方法</a> とかで見かけました</p>
+
+<p>他のやり方だとまた違ってくるのでしょうか？</p>
+
+<p class="post-footer"><span class="date">2012-11-07</span></p>
 <h2><a href="/2012/11/03/20121103/" title="">スレーブ遅延</a></h2>
 <p>今の案件に触れてからの自分の低能ぶりの凄まじさに自ら恐怖を禁じ得ず、椅子から転げ落ちて失禁しそうなmix3です。</p>
 
@@ -301,31 +331,6 @@ exit 0
 <script src="https://gist.github.com/2384966.js"> </script>
 
 <p class="post-footer"><span class="date">2012-04-14</span></p>
-<h2><a href="/2012/04/10/20120410/" title="">やったー cpan auhor になったよー＼(^o^)／</a></h2>
-<p>今年入ってからミスが多すぎてそろそろ本当に首になるか、潔く自分から辞めるかした方が良いんじゃないかと真剣に考えるmix3です。</p>
-
-<h3><a href="http://pixiv.cc/mix3">pixivブログ消滅</a></h3>
-
-<p>pixivブログで書いていた事は github の pages のコピーだったので、pixivブログのサービス終了には特にどうということは無かったのですが、本当にサービスが終了して見れなくなってしまったので、ようやっと github の方に完全に移行しました。</p>
-
-<p>移行にあたって、ブログ生成スクリプトを改修（リファクタリング的には今も相当酷いが）して、Octpressのような感じでURLがそれっぽくなるようにしてみました。後はカテゴリかタグに対応してページング出来れば良いかなと思っています。</p>
-
-<p>それにしても 元 pixiv ユーザ（本当は今もpixivユーザのつもりだけど今となってはまともに描いてないので…）として pixiv ブログ自体は気に入ってたのでちょっと残念です。</p>
-
-<h3><a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a></h3>
-
-<p>タイトルに書いた通り、<a href="http://search.cpan.org/~himachoco/">cpan author</a> になりました。p5-SWFEditorという swf の画像置換やMovieClipの置換など、swf を perl から色々弄れるライブラリを作成してアップしました。</p>
-
-<p>p5-SWFEditorの中身は <a href="https://twitter.com/#!/yoya">@yoya</a> さんの好意により <a href="https://twitter.com/#!/yoya">@yoya</a> さん作 <a href="http://sourceforge.jp/projects/swfed/">SWFEditor for PHP</a> をまるっとそのまま使わせてもらっています。自分がしたのは C で書かれている SWFEditor の機能を使うためのインタフェースを XS で書いた形になります。
-（そもそも SWFEdito for PHP が移植性などを考慮してSWF操作のコア部分とそれを使うインタフェースに分離して作られているので非常に移植しやすくなっています。素晴らしいですね！）</p>
-
-<p>SWFEditor の Perl バインディングの作成を快く許可して下さった <a href="https://twitter.com/#!/yoya">@yoya</a> さんに心から感謝致します。</p>
-
-<h3>ということで</h3>
-
-<p>ブログ移行にともないpixivブログからCSSを持ってきてそれっぽくしたのでそれのお知らせと、p5-SWFEditor を cpan にアップして cpan author になったよー というお知らせでした。</p>
-
-<p class="post-footer"><span class="date">2012-04-10</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 &lt;&lt;

@@ -10,6 +10,42 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>巨大ファイルの削除</title>
+<description>
+<![CDATA[
+<p>DBサーバのslow_queryログがローテートされておらず単一ファイルで100G超えしていて辛いmix3です。</p>
+
+<h3>巨大なファイルを rm するのは危険</h3>
+
+<p>実際に試していないのでどうなるのか分からないですが、おそらく消し終わるまで間IOが占有されてDBのパフォーマンスに影響が出ちゃうのでしょう。</p>
+
+<p>rm はやらないほうが良いねとなりました。</p>
+
+<h3>: > /path/to/file</h3>
+
+<p>じゃあどうすればという事で調べていたら</p>
+
+<pre><code>
+: > /path/to/file
+</code></pre>
+
+<p>を使ってはどうか？というようなものを見かけました</p>
+
+<p><a href="http://serverfault.com/questions/336917/is-there-a-way-to-delete-100gb-file-on-linux-without-thrashing-io-load">Is there a way to delete 100GB file on Linux without thrashing IO / load?</a></p>
+
+<p>容量に余裕のある別サーバで $ dd if=/dev/zero of=tempfile bs=1024000 count=100000 とかしてファイルを作って試したところ、readが発生するもののパフォーマンスにはあまり影響は無い感じで使えそうということに。</p>
+
+<h3>ちなみに</h3>
+
+<p>: > /path/to/file は空ファイルを作るときの方法のようで、<a href="http://d.hatena.ne.jp/japanrock_pg/20100212/1265972572">Linuxでファイルを空にする5つの方法</a> とかで見かけました</p>
+
+<p>他のやり方だとまた違ってくるのでしょうか？</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.com/2012/11/07/20121107/</guid>
+<pubDate>Wed, 07 Nov 2012 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>スレーブ遅延</title>
 <description>
 <![CDATA[
@@ -1088,130 +1124,6 @@ mysql&gt; explain partitions select * from partition where created_at &lt; '2011
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2011/07/20/20110720/</guid>
 <pubDate>Wed, 20 Jul 2011 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>さくらVPSをちょこちょこ触ってみる</title>
-<description>
-<![CDATA[
-<p>と言っても特に何かしたとかは無かったり。</p>
-
-<ul>
-<li>sshのポートを変えた</li>
-<li>iptablesを設定した</li>
-<li>logwatchを導入した</li>
-<li>pacoを導入した</li>
-</ul>
-
-<h3>sshのポート変更</h3>
-
-<p>セキュリティ的にはsshを公開鍵認証にしておくだけで基本大丈夫だとは思うのですが、アタックされることには変わりなく気持ち悪い物は気持ち悪いので一応変えておきました。</p>
-
-<h3>iptablesの設定</h3>
-
-<p>何処でも見かける設定ですが以下のような基準でiptablesを設定するスクリプトを組みました。</p>
-
-<ul>
-<li>内から外への通信以外は拒否
-<ul>
-<li>ただし内から外への通信の応答は通す</li>
-</ul></li>
-<li>SSH用の穴は用意する</li>
-</ul>
-
-<h4>iptables-init.sh</h4>
-
-<pre><code>#!/bin/sh
-
-# ルールクリア
-iptables -F
-iptables -X
-
-# 内から外への通信以外は破棄
-iptables -P INPUT   DROP
-iptables -P OUTPUT  ACCEPT
-iptables -P FORWARD DROP
-
-# ループバックは全て許可
-iptables -A INPUT  -i lo -j ACCEPT
-iptables -A OUTPUT -o lo -j ACCEPT
-
-# プライベートネットワークなんて無かったんや…
-iptables -A INPUT -s 10.0.0.0/8     -j DROP
-iptables -A INPUT -s 127.16.0.0/12  -j DROP
-iptables -A INPUT -s 192.168.0.0/16 -j DROP
-
-# SSH用の穴
-iptables -A INPUT -p tcp --dport {SSHのポート} -j ACCEPT
-
-# 内から外への通信の応答は通す
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-</code></pre>
-
-<h3>logwatchの導入</h3>
-
-<p>ログも監視しないと意味ないのでlogwatchなるログを定期的に（デフォルトはcron.dailyを利用した毎日）メールで知らせるプログラムを導入してみました。yumで入れるとバージョンが結構古かったりするので<a href="http://sourceforge.net/projects/logwatch/files/">sourceforge</a>から落としてインストールしました。rpmで入れるとデフォルトの設定ファイルが/usr/share/logwatch/default.conf以下となるようです。/etc/logwatch/conf以下に設定ファイルを置くと設定を上書きするようです。</p>
-
-<p>とりあえずSSHのログとDiskスペースのログを監視するようにしました。デフォルトではService = Allで全部を監視するようにしてその後除外を設定しているのでその設定をコメントアウトしてSSHのログとDiskスペースのログに決め打ちしました。</p>
-
-<h4>/usr/share/logwatch/default.conf/logwatch.conf</h4>
-
-<pre><code>#Service = All
-#Service = "-zz-network" 
-#Service = "-zz-sys" 
-#Service = "-eximstats"
-</code></pre>
-
-<h4>/etc/logwatch/conf/logwatch.conf</h4>
-
-<pre><code>MailTo = 送信先メールアドレス
-MailFrom = 送信元メールアドレス
-Service = sshd
-Service = zz-disk_space
-</code></pre>
-
-<p>rpmで入れているならばおそらく/etc/cron.daily/0logwatchにlogwatchスクリプトへのシンボリックリンクが貼られているので毎日定期的に実行されメールが届くようになるハズです。ただしデフォルトでは前日のログを送信する設定（Range = yesterday）になっていてログが記録されていなければ送信されません。</p>
-
-<h3>pacoの導入</h3>
-
-<p>pacoはmake installしたソフトを管理するものです。yumなどのパッケージ管理ソフトで管理されている以外のものについてもきちっと管理したい場合は導入するととても幸せになれそうです。</p>
-
-<ul>
-<li>参考
-<ul>
-<li><a href="http://paco.sourceforge.net/">paco</a></li>
-<li><a href="http://d.hatena.ne.jp/rx7/20081011/p2">make install"したソフトウェアを管理できる超便利ツール「Paco」</a></li>
-</ul></li>
-</ul>
-
-<p>pacoのインストール自体はconfigure make make installで出来ます。またpaco自身をpacoで管理するためにmake installの後make logmeを実行します。これ以降make installするときはpaco -D make insatllというふうにすることでそのソフトをpacoの管理下に置いてくれます。</p>
-
-<h4>注意</h4>
-
-<p>pacoはデフォルトで/usr/local/bin以下にインストールされるのですがsudoで実行するとPATHが引き継がれずpacoが見つからないためmake logmeに失敗してしまいました。./configure prefix=/binなどインストール場所を設定してsudoでも実行出来るようにするか、sudo時の環境変数の引き継ぎをするなどして回避しましょう。</p>
-
-<p>なおsudo時の環境変数の引き継ぎ方法は色々あるようです。</p>
-
-<h4>bashrcで設定</h4>
-
-<pre><code>alias sudo="sudo env PATH=$PATH"
-</code></pre>
-
-<h4>visudoで設定</h4>
-
-<pre><code>Defaults:{run_user} !env_reset
-    or
-Defaults env_keep+="PATH"
-</code></pre>
-
-<h4>sudo -s で実行</h4>
-
-<h3>次回は</h3>
-
-<p>Nginx+plackでなんか適当に外から見れる環境を作りたいかな。</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.com/2011/07/17/20110717/</guid>
-<pubDate>Sun, 17 Jul 2011 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>
