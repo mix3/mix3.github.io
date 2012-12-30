@@ -57,6 +57,113 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2011/07/20/20110720/" title="">MySQLのパーティショニングを触ってみる</a></h2>
+<p>MySQLで大容量のデータを扱うと削除処理が重くて涙目になることがあるので残さないデータを扱うテーブルはパーティショニングしてあげるのが良いようです。ログデータは典型的かもしれませんね。メリットとしては以下のような感じだと思います。</p>
+
+<ul>
+<li>DROP TABLE のようにパーティションのデータをサクっと消せる</li>
+<li>刈り込みが出来る（検索範囲を限定出来る場合が有り、各クエリのパフォーマンスが良くなる可能性がある）</li>
+</ul>
+
+<p>使う場合の注意として<a href="http://nippondanji.blogspot.com/2009/04/1.html">漢のコンピュータ道</a>にてこんな感じに挙げられています。</p>
+
+<ul>
+<li>インデックスをつけるだけでカバー出来る場合が多い。</li>
+<li>パーショニングを使わずに、単にテーブルを分けてしまえばいい。</li>
+<li>テーブルが巨大にならないとあまり効果を実感できない。</li>
+<li>使い方を間違えると性能が落ちてしまう。</li>
+</ul>
+
+<p>以下、日別にパーティションを区切っていくサンプルになります。</p>
+
+<h3>テーブル作成</h3>
+
+<pre><code>DROP TABLE IF EXISTS partition;
+CREATE TABLE partition (
+    id         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    created_at DATETIME            NOT NULL,
+    PRIMARY KEY (id, created_at)
+) ENGINE=InnoDB;
+</code></pre>
+
+<h3>ベースとなるパーティションの作成</h3>
+
+<pre><code>ALTER TABLE partition PARTITION BY RANGE (TO_DAYS(created_at))
+    (PARTITION p20110720 VALUES LESS THAN (TO_DAYS('2011-07-21 00:00:00')) COMMENT = '2011-07-21 00:00:00');
+</code></pre>
+
+<h3>mysql_partition_cron.sh</h3>
+
+<p>cronで順次パーティションを追加していきます。以下では毎日次の日の１日分を追加していますが１週間毎に纏めて追加とかしても良いでしょう。実際に運用する際はログを取ってメールを投げる等監視しておく方が良いですね。</p>
+
+<pre><code>#!/bin/bash
+
+DAYSTR=`date --date '1 day' +"%Y%m%d"`
+DAY_2=`date --date '2 day' +"%Y-%m-%d 00:00:00"`
+
+QUERY="ALTER TABLE partition ADD PARTITION (PARTITION p$DAYSTR VALUES LESS THAN (TO_DAYS('$DAY_2')) COMMENT = '$DAY_2')"
+echo $QUERY
+echo $QUERY | mysql -u root partition
+</code></pre>
+
+<h3>確認</h3>
+
+<h4>INSERT</h4>
+
+<pre><code>mysql&gt; insert into partition value (null, '2011-07-20');
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; insert into partition value (null, '2011-07-21');
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; insert into partition value (null, '2011-07-22');
+ERROR 1526 (HY000): Table has no partition for value 734705
+</code></pre>
+
+<p>存在しないパーティションへのINSERTはエラーになるので、パーティションの追加忘れ、追加ミスには注意。</p>
+
+<pre><code>mysql&gt; insert into partition value (null, '2011-07-19');
+Query OK, 1 row affected (0.01 sec)
+</code></pre>
+
+<h4>パーティション分布</h4>
+
+<pre><code>mysql&gt; SELECT table_schema, table_name, partition_name, partition_ordinal_position, table_rows FROM information_schema.partitions WHERE table_name = 'partition';
++--------------+------------+----------------+----------------------------+------------+
+| table_schema | table_name | partition_name | partition_ordinal_position | table_rows |
++--------------+------------+----------------+----------------------------+------------+
+| partition    | partition  | p20110720      |                          1 |          2 |
+| partition    | partition  | p20110721      |                          2 |          1 |
++--------------+------------+----------------+----------------------------+------------+
+2 rows in set (0.00 sec)
+</code></pre>
+
+<h4>刈り込み</h4>
+
+<pre><code>mysql&gt; explain partitions select * from partition where created_at &lt; '2011-07-21 00:00:00';
++----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
+| id | select_type | table     | partitions | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
++----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
+|  1 | SIMPLE      | partition | p20110720  | index | NULL          | PRIMARY | 16      | NULL |    2 | Using where; Using index |
++----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
+1 row in set (0.00 sec)
+
+mysql&gt; explain partitions select * from partition where created_at &lt; '2011-07-22 00:00:00';
++----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
+| id | select_type | table     | partitions          | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
++----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
+|  1 | SIMPLE      | partition | p20110720,p20110721 | index | NULL          | PRIMARY | 16      | NULL |    3 | Using where; Using index |
++----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
+1 row in set (0.01 sec)
+</code></pre>
+
+<p>前者だとp20110720からのみの検索になってるので刈り込み出来ているようです。これが大容量のデータに対してだと本来インデックがメモリに乗りきらずスワップしちゃうという状況でも、刈り込みによってメモリに収まる可能性が出て来るので、そうなった場合にパーティショニングの威力が発揮されるというのが想像出来ますね。</p>
+
+<h3>まとめ</h3>
+
+<p>削除のコストは思いの外大きくて、レプリケーション環境下でしこしこ古いデータを削除するだけのバッチを走らせたときに削除間隔を大きく取らないと同期ズレがずんどこずんどこ溜まっていく、というのを経験したことがあります。パーティションを使うとそういう苦労はせずに済みそうなので有効活用したいですね。</p>
+
+<p class="post-footer"><span class="date">2011-07-20</span></p>
 <h2><a href="/2011/07/17/20110717/" title="">さくらVPSをちょこちょこ触ってみる</a></h2>
 <p>と言っても特に何かしたとかは無かったり。</p>
 
@@ -325,173 +432,6 @@ sub pageMain {
 <p>commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。</p>
 
 <p class="post-footer"><span class="date">2011-06-22</span></p>
-<h2><a href="/2011/06/21/20110621/" title="">MobaSiFを触ってみた</a></h2>
-<h3>インストール</h3>
-
-<p>環境はCentOS5.6で極力yumで対処してみた。</p>
-
-<ul>
-<li>CentOS 5.6</li>
-<li>Apache 2.2.3 (yum install)</li>
-<li>fastcgi 2.4.0 (yum install)</li>
-<li>mod_fastcgi 2.4.2 (source install)</li>
-<li>mysql 5.1.57 (rpm install)</li>
-<li>perl 5.8.8 (yum install)</li>
-</ul>
-
-<p>ちなみにMobaSiFのdocsに記載されている対応環境の内容は以下の通り</p>
-
-<pre><code>           要求       確認環境
-CentOS     4.x / 5.x  4.5 (i386)
-Apache     1.3.x      1.3.41
-MySQL      5.0.x      5.0.51a
-perl       5.8.x      5.8.0
-fastcgi    2.4.x      2.4.6
-</code></pre>
-
-<h3>詰まった所、注意点</h3>
-
-<ul>
-<li>MobaSiF
-<ul>
-<li>mod_fastcgiとmod_fcgidがあるがMobaSiFはmod_fastcgi</li>
-<li>yumで入れたApacheのバージョンが2.2だったが、mod_fastcgiは2.0までしか対応していない。</li>
-<li>パッチを当てれば2.2にmod_fastcgiを入れるられる⇒'Apache2.2＋fastcgiで Ruby on Rails'</li>
-</ul></li>
-<li>perl
-<ul>
-<li>FastCGIがシステム標準のperlを使うのでperlbrewを使うと混乱する。</li>
-<li>素直にシステム標準のperlを使うのが楽</li>
-</ul></li>
-<li>Apache
-<ul>
-<li>MobaSiFとは全然関係ないがバーチャルホストでDocumentRootの設定に変な癖がある⇒VirtualHost環境化でのPermission Denied</li>
-</ul></li>
-</ul>
-
-<h3>MobaSiFのミニマムサ</h3>
-
-<p>ンプル</p>
-
-<p>MobaSiFでのページとURLの対応は以下のようになる</p>
-
-<ul>
-<li>ルート
-<ul>
-<li>http://[domain]/</li>
-</ul></li>
-<li>各ページ（アンダースコア＋ページ名）
-<ul>
-<li>http://[domain]/[_ページ名前]</li>
-</ul></li>
-</ul>
-
-<h3>ページを追加してみる</h3>
-
-<h4>conf/pages.conf</h4>
-
-<pre><code>our %PAGE = {
-        .
-        .
-        .
-    'sample' =&gt; [0,    package Page::Sample;
-
-use strict;
-use HTMLTemplate;
-use Response;
-
-sub pageMain {
-    my $func = shift;
-    my $rhData = {};
-
-    my $html = HTMLTemplate::insert("sample/top", $rhData);
-    Response::output(\$html);
-}
-
-1;0,0, 'Page::Sample', 'pageMain'],
-    # http://[domain]/_sample にアクセスすると Page::SampleモジュールのpageMainの処理が走る
-};
-</code></pre>
-
-<h4>pm/Page/Sample.pm</h4>
-
-<pre><code>package Page::Sample;
-
-use strict;
-use HTMLTemplate;
-use Response;
-
-sub pageMain {
-    my $func = shift;
-    my $rhData = {};
-
-    my $html = HTMLTemplate::insert("sample/top", $rhData);
-    Response::output(\$html);
-}
-
-1;
-</code></pre>
-
-<h3>テンプレートのコンパイル</h3>
-
-<p>MobaSiFでは速度を出すためにアプリで機種毎に出し分けなどの処理をしないよう最初からテンプレートを機種別に生成したりするようです。（変なバイナリデータをテンプレートに埋め込んでいたり他にも色々やってそうな感じ）</p>
-
-<pre><code>$ perl script/tool/compile_template
-</code></pre>
-
-<h4>conf/pages.confの数字の意味</h4>
-
-<pre><code>'ページ名' =&gt; [ UID_ST, USER_ST, SERV_ST, モジュール, サブルーチン ]
-</code></pre>
-
-<ul>
-<li>UID_ST
-<ul>
-<li>0:情報なし</li>
-<li>2:serial/uid あり</li>
-</ul></li>
-<li>USER_ST
-<ul>
-<li>0:非会員でもOK</li>
-<li>1:会員（メアド未登録でもOK）</li>
-<li>2:会員（メアド登録済）</li>
-</ul></li>
-<li>SERV_ST (以下を足したもの)
-<ul>
-<li>1:自主退会だと不能</li>
-<li>2:運用退会だと不能</li>
-<li>4:PENALTYだと不能</li>
-<li>8:メール不達だと不能</li>
-</ul></li>
-</ul>
-
-<h3>まとめ</h3>
-
-<ul>
-<li>機能は非常にミニマム
-<ul>
-<li>文字コードはテンプレートやコード等でsjis,utf8,eucが入り交じる</li>
-<li>テンプレートの中に絵文字のバイナリを直接書く</li>
-<li>ロジックの所でレスポンスにテンプレートと引数を合成したものの返り値を渡す処理を自分で書く。</li>
-</ul></li>
-</ul>
-
-<p>⇒多分拡張して使われる事が前提と思ってよい。</p>
-
-<ul>
-<li>古いのでPlackに対応していないため、動作確認までの環境構築が非常に面倒。
-<ul>
-<li>開発段階でわざわざApacheとFastCGIを入れないといけない</li>
-</ul></li>
-</ul>
-
-<p>⇒今時Plack対応して欲しいかも。開発段階でFastCGIがどうのとかあんまり考えたく無い。</p>
-
-<p>以下で説明されている通りモダンじゃないのは確かかもしれませんね。 </p>
-
-<p><a href="http://www.slideshare.net/bobpp/42php-mobasif-1351953">第42回PHP勉強会 MobaSiF 発表資料</a></p>
-
-<p class="post-footer"><span class="date">2011-06-21</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -519,6 +459,7 @@ sub pageMain {
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2012/12/">2012年12月</a></li>
   <li><a href="/archives/2012/11/">2012年11月</a></li>
   <li><a href="/archives/2012/08/">2012年08月</a></li>
   <li><a href="/archives/2012/04/">2012年04月</a></li>

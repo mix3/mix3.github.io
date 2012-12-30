@@ -33,7 +33,8 @@
   
   </script>
 
-  <title>萌えキャラとは何だったのか</title>
+  <title>萌えキャラとは何だったのか - トランザクション
+</title>
 </head>
 <body>
 <div id="wrap">
@@ -57,32 +58,84 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
-<h2><a href="/2011/11/23/2011123/" title="">bonding設定で死んだ</a></h2>
-<h3>bondingとは</h3>
+<h2><a href="/2012/12/30/20121230/" title="">トランザクション</a></h2>
+<p>トランザクションってなーに？mix3です</p>
 
-<p>bondingというのはNICを冗長化するもののことのようです。ラウンドロビンで負荷分散したりマスタースレーブ構成にして片方が死んでも大丈夫なように出来るようです。</p>
+<h3>同時更新処理</h3>
 
-<p>参考<a href="http://d.hatena.ne.jp/sen-u/20061002/p1">意外と知らない？NICを冗長化するボンディング（bonding）Add Star</a></p>
+<p><a href="http://mix3.github.com/2012/11/03/20121103/">スレーブ遅延</a>のときにSELECT > UPDATEで古い情報をもとにUPDATEしてしまうと不整合が発生すると書きましたが、</p>
 
-<h3>ネットワークが遅延？</h3>
+<p>たとえば同じ行を複数で同時にSELECT > UPDATEすると同じように不整合が発生することがあります。</p>
 
-<p>ネットワークの知識なんてほぼ０なのでbondingなんて当然知らなかったのですが、でも設定しないといけないということなのでWebを漁ってとりあえずラウンドロビンで設定したのですが、これがいけなかった。</p>
+<ol>
+<li>AがT1からSELECT</li>
+<li>BがT1からSELECT</li>
+<li>AがT1をUPDATE</li>
+<li>BがT1をUPDATE</li>
+</ol>
 
-<p>並列(最大100プロセス)でアクセス掛ける負荷試験を行ってると、MySQLの接続でtimeoutが結構出る。</p>
+<p>このような順序で更新がかかると、BがAの更新を上書きしてしまうため、実質Aの更新が無かった事になってしまいます。</p>
 
-<p>根本的な問題として負荷試験のシナリオにミスがあったりはするのですが、それとは別にネットワークに遅延が発生する模様。</p>
+<p>これも更新がアトミックであれば発生しないので可能であればアトミックな更新にするのが良いですが、更新が複数ある場合はそういった変更も出来ません。</p>
 
-<p>インフラのプロフェッショナル<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんや<a href="https://twitter.com/#!/shin1rosei">@shin1rosei</a>さんに調べてもらって自分の設定したbondingの設定がラウンドロビンなのがマズいという事が判明。並列度が上がると、NICの切り替わりで問題が顕在化するみたいです。</p>
+<h3>そんなときこそトランザクション。そんなふうに考えていた時期が僕にもありました。</h3>
 
-<p>正直分った瞬間回線切って首吊って死にたい気分になりました...</p>
+<p>で、そういうときはトランザクションを使う物だと思っていました。トランザクションは複数の処理を一つの処理としてまとめて成功するか失敗するか、どちらかを保証してくれます。</p>
 
-<script src="http://togetter.com/js/parts.js"></script>
+<p>なので、SELECT > UPDATEをトランザクションでまとめてしまえば大丈夫だよね！と思っていたので、以下のようなコードを書いて確認しました。</p>
 
-<script>tgtr.ListWidget({id:'222670',url:'http://togetter.com/',width:'320px',height:'240px'});</script>
+<script src="https://gist.github.com/4411441.js"></script>
 
-<p>自分のした設定にどんな意味があるのか、ちゃんと考える様にします...</p>
+<script src="https://gist.github.com/4411446.js"></script>
 
-<p class="post-footer"><span class="date">2011-11-23</span></p>
+<p>scoreが更新回数になるので、'v' => '&lt;更新回数>' と揃えば不整合無く更新出来たことになるのですが、</p>
+
+<p>見ての通りトランザクションを使った方は残念な結果になっています。で、すこしググッた結果トランザクションとロックは別で考えないと行けないことを知りました。</p>
+
+<p><strong>トランザクションを使ったからといって勝手に行読み込みなどをロックして整合性を保証してくれるとかでは全然無いんですね。</strong></p>
+
+<p>当たり前だろダラズ！と言われても仕方ないような勘違いですが、いやトランザクションを使わない世界でしばらく生きていたので…</p>
+
+<p>で、SELECTにテーブルロックや行ロックが掛かってないためにSELECT > UPDATEの不整合が防げていないようなので、SELECT文にFOR UPDATE を付けてそれを防いでみました</p>
+
+<script src="https://gist.github.com/4411474.js"></script>
+
+<p>結果またしても残念な結果になりました…</p>
+
+<h3>ちゃんとストレージエンジンを指定しましょう</h3>
+
+<p>結果から言うとストレージエンジンを指定していなかったのでトランザクションの使えないMyISAMでテーブルが作られていたからでした。</p>
+
+<script src="https://gist.github.com/4411511.js"></script>
+
+<p>こんな感じでInnoDBを指定する事で期待通り、不整合なく更新されるようになりました。めでたしめでたし。</p>
+
+<p>ちなみにSELECTのロックには共有ロックと排他ロックとあり、FOR UPDATEは排他ロックになります。LOCK IN SHARE MODEだと共有ロックになります。</p>
+
+<p>今回の場合にLOCK IN SHARE MODEを使うと10ものプロセスが共有ロックを取り合って凄い勢いでデッドロックしました。</p>
+
+<script src="https://gist.github.com/4411540.js"></script>
+
+<p>ロックするということは同時にデッドロックする可能性もあるということなので、適切なロックを選択して使い、デッドロックの可能性を減らしながら上手く付き合っていきたいですね。</p>
+
+<h3>まとめ</h3>
+
+<ul>
+<li>トランザクションはロックとはまた別問題
+<ul>
+<li>不整合を防ぎたいならちゃんとロックのことを考えてSQLを書く</li>
+</ul></li>
+<li>MySQLのデフォルトストレージエンジンはMyISAMだけど、それトランザクション使えないからね？</li>
+<li>ロックにも種類はあり、デッドロックには気をつける</li>
+</ul>
+
+<h3>今年のブログはこれが最後な気がするので。</h3>
+
+<p>来年はもっとブログをコードを書いてアウトプットを増やして行きたいです。</p>
+
+<h3>それでは良いお年を！</h3>
+
+<p class="post-footer"><span class="date">2012-12-30</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
       </div>
       <div class="autopagerize_insert_before"></div>

@@ -10,6 +10,90 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>トランザクション</title>
+<description>
+<![CDATA[
+<p>トランザクションってなーに？mix3です</p>
+
+<h3>同時更新処理</h3>
+
+<p><a href="http://mix3.github.com/2012/11/03/20121103/">スレーブ遅延</a>のときにSELECT > UPDATEで古い情報をもとにUPDATEしてしまうと不整合が発生すると書きましたが、</p>
+
+<p>たとえば同じ行を複数で同時にSELECT > UPDATEすると同じように不整合が発生することがあります。</p>
+
+<ol>
+<li>AがT1からSELECT</li>
+<li>BがT1からSELECT</li>
+<li>AがT1をUPDATE</li>
+<li>BがT1をUPDATE</li>
+</ol>
+
+<p>このような順序で更新がかかると、BがAの更新を上書きしてしまうため、実質Aの更新が無かった事になってしまいます。</p>
+
+<p>これも更新がアトミックであれば発生しないので可能であればアトミックな更新にするのが良いですが、更新が複数ある場合はそういった変更も出来ません。</p>
+
+<h3>そんなときこそトランザクション。そんなふうに考えていた時期が僕にもありました。</h3>
+
+<p>で、そういうときはトランザクションを使う物だと思っていました。トランザクションは複数の処理を一つの処理としてまとめて成功するか失敗するか、どちらかを保証してくれます。</p>
+
+<p>なので、SELECT > UPDATEをトランザクションでまとめてしまえば大丈夫だよね！と思っていたので、以下のようなコードを書いて確認しました。</p>
+
+<script src="https://gist.github.com/4411441.js"></script>
+
+<script src="https://gist.github.com/4411446.js"></script>
+
+<p>scoreが更新回数になるので、'v' => '&lt;更新回数>' と揃えば不整合無く更新出来たことになるのですが、</p>
+
+<p>見ての通りトランザクションを使った方は残念な結果になっています。で、すこしググッた結果トランザクションとロックは別で考えないと行けないことを知りました。</p>
+
+<p><strong>トランザクションを使ったからといって勝手に行読み込みなどをロックして整合性を保証してくれるとかでは全然無いんですね。</strong></p>
+
+<p>当たり前だろダラズ！と言われても仕方ないような勘違いですが、いやトランザクションを使わない世界でしばらく生きていたので…</p>
+
+<p>で、SELECTにテーブルロックや行ロックが掛かってないためにSELECT > UPDATEの不整合が防げていないようなので、SELECT文にFOR UPDATE を付けてそれを防いでみました</p>
+
+<script src="https://gist.github.com/4411474.js"></script>
+
+<p>結果またしても残念な結果になりました…</p>
+
+<h3>ちゃんとストレージエンジンを指定しましょう</h3>
+
+<p>結果から言うとストレージエンジンを指定していなかったのでトランザクションの使えないMyISAMでテーブルが作られていたからでした。</p>
+
+<script src="https://gist.github.com/4411511.js"></script>
+
+<p>こんな感じでInnoDBを指定する事で期待通り、不整合なく更新されるようになりました。めでたしめでたし。</p>
+
+<p>ちなみにSELECTのロックには共有ロックと排他ロックとあり、FOR UPDATEは排他ロックになります。LOCK IN SHARE MODEだと共有ロックになります。</p>
+
+<p>今回の場合にLOCK IN SHARE MODEを使うと10ものプロセスが共有ロックを取り合って凄い勢いでデッドロックしました。</p>
+
+<script src="https://gist.github.com/4411540.js"></script>
+
+<p>ロックするということは同時にデッドロックする可能性もあるということなので、適切なロックを選択して使い、デッドロックの可能性を減らしながら上手く付き合っていきたいですね。</p>
+
+<h3>まとめ</h3>
+
+<ul>
+<li>トランザクションはロックとはまた別問題
+<ul>
+<li>不整合を防ぎたいならちゃんとロックのことを考えてSQLを書く</li>
+</ul></li>
+<li>MySQLのデフォルトストレージエンジンはMyISAMだけど、それトランザクション使えないからね？</li>
+<li>ロックにも種類はあり、デッドロックには気をつける</li>
+</ul>
+
+<h3>今年のブログはこれが最後な気がするので。</h3>
+
+<p>来年はもっとブログをコードを書いてアウトプットを増やして行きたいです。</p>
+
+<h3>それでは良いお年を！</h3>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.com/2012/12/30/20121230/</guid>
+<pubDate>Sun, 30 Dec 2012 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>巨大ファイルの削除</title>
 <description>
 <![CDATA[
@@ -1011,119 +1095,6 @@ mouse         222222/s 4707%     258%     100%           67%    4%       0%    -
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2011/07/22/20110722/</guid>
 <pubDate>Fri, 22 Jul 2011 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>MySQLのパーティショニングを触ってみる</title>
-<description>
-<![CDATA[
-<p>MySQLで大容量のデータを扱うと削除処理が重くて涙目になることがあるので残さないデータを扱うテーブルはパーティショニングしてあげるのが良いようです。ログデータは典型的かもしれませんね。メリットとしては以下のような感じだと思います。</p>
-
-<ul>
-<li>DROP TABLE のようにパーティションのデータをサクっと消せる</li>
-<li>刈り込みが出来る（検索範囲を限定出来る場合が有り、各クエリのパフォーマンスが良くなる可能性がある）</li>
-</ul>
-
-<p>使う場合の注意として<a href="http://nippondanji.blogspot.com/2009/04/1.html">漢のコンピュータ道</a>にてこんな感じに挙げられています。</p>
-
-<ul>
-<li>インデックスをつけるだけでカバー出来る場合が多い。</li>
-<li>パーショニングを使わずに、単にテーブルを分けてしまえばいい。</li>
-<li>テーブルが巨大にならないとあまり効果を実感できない。</li>
-<li>使い方を間違えると性能が落ちてしまう。</li>
-</ul>
-
-<p>以下、日別にパーティションを区切っていくサンプルになります。</p>
-
-<h3>テーブル作成</h3>
-
-<pre><code>DROP TABLE IF EXISTS partition;
-CREATE TABLE partition (
-    id         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    created_at DATETIME            NOT NULL,
-    PRIMARY KEY (id, created_at)
-) ENGINE=InnoDB;
-</code></pre>
-
-<h3>ベースとなるパーティションの作成</h3>
-
-<pre><code>ALTER TABLE partition PARTITION BY RANGE (TO_DAYS(created_at))
-    (PARTITION p20110720 VALUES LESS THAN (TO_DAYS('2011-07-21 00:00:00')) COMMENT = '2011-07-21 00:00:00');
-</code></pre>
-
-<h3>mysql_partition_cron.sh</h3>
-
-<p>cronで順次パーティションを追加していきます。以下では毎日次の日の１日分を追加していますが１週間毎に纏めて追加とかしても良いでしょう。実際に運用する際はログを取ってメールを投げる等監視しておく方が良いですね。</p>
-
-<pre><code>#!/bin/bash
-
-DAYSTR=`date --date '1 day' +"%Y%m%d"`
-DAY_2=`date --date '2 day' +"%Y-%m-%d 00:00:00"`
-
-QUERY="ALTER TABLE partition ADD PARTITION (PARTITION p$DAYSTR VALUES LESS THAN (TO_DAYS('$DAY_2')) COMMENT = '$DAY_2')"
-echo $QUERY
-echo $QUERY | mysql -u root partition
-</code></pre>
-
-<h3>確認</h3>
-
-<h4>INSERT</h4>
-
-<pre><code>mysql&gt; insert into partition value (null, '2011-07-20');
-Query OK, 1 row affected (0.00 sec)
-
-mysql&gt; insert into partition value (null, '2011-07-21');
-Query OK, 1 row affected (0.00 sec)
-
-mysql&gt; insert into partition value (null, '2011-07-22');
-ERROR 1526 (HY000): Table has no partition for value 734705
-</code></pre>
-
-<p>存在しないパーティションへのINSERTはエラーになるので、パーティションの追加忘れ、追加ミスには注意。</p>
-
-<pre><code>mysql&gt; insert into partition value (null, '2011-07-19');
-Query OK, 1 row affected (0.01 sec)
-</code></pre>
-
-<h4>パーティション分布</h4>
-
-<pre><code>mysql&gt; SELECT table_schema, table_name, partition_name, partition_ordinal_position, table_rows FROM information_schema.partitions WHERE table_name = 'partition';
-+--------------+------------+----------------+----------------------------+------------+
-| table_schema | table_name | partition_name | partition_ordinal_position | table_rows |
-+--------------+------------+----------------+----------------------------+------------+
-| partition    | partition  | p20110720      |                          1 |          2 |
-| partition    | partition  | p20110721      |                          2 |          1 |
-+--------------+------------+----------------+----------------------------+------------+
-2 rows in set (0.00 sec)
-</code></pre>
-
-<h4>刈り込み</h4>
-
-<pre><code>mysql&gt; explain partitions select * from partition where created_at &lt; '2011-07-21 00:00:00';
-+----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-| id | select_type | table     | partitions | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
-+----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-|  1 | SIMPLE      | partition | p20110720  | index | NULL          | PRIMARY | 16      | NULL |    2 | Using where; Using index |
-+----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-1 row in set (0.00 sec)
-
-mysql&gt; explain partitions select * from partition where created_at &lt; '2011-07-22 00:00:00';
-+----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-| id | select_type | table     | partitions          | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
-+----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-|  1 | SIMPLE      | partition | p20110720,p20110721 | index | NULL          | PRIMARY | 16      | NULL |    3 | Using where; Using index |
-+----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-1 row in set (0.01 sec)
-</code></pre>
-
-<p>前者だとp20110720からのみの検索になってるので刈り込み出来ているようです。これが大容量のデータに対してだと本来インデックがメモリに乗りきらずスワップしちゃうという状況でも、刈り込みによってメモリに収まる可能性が出て来るので、そうなった場合にパーティショニングの威力が発揮されるというのが想像出来ますね。</p>
-
-<h3>まとめ</h3>
-
-<p>削除のコストは思いの外大きくて、レプリケーション環境下でしこしこ古いデータを削除するだけのバッチを走らせたときに削除間隔を大きく取らないと同期ズレがずんどこずんどこ溜まっていく、というのを経験したことがあります。パーティションを使うとそういう苦労はせずに済みそうなので有効活用したいですね。</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.com/2011/07/20/20110720/</guid>
-<pubDate>Wed, 20 Jul 2011 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>
