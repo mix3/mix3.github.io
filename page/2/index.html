@@ -57,6 +57,53 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2012/04/22/20120422/" title="">修論で作ったなつかしのもの</a></h2>
+<p>若い子たちが優秀すぎて生きるのが辛い（迫真） mix3です。</p>
+
+<p>新入社員の自己紹介としてネタが無い時に卒論、修論が鉄板として出てくるのか何かそういうのを聞く機会があったりなかったりして、懐かしいなぁとか思ったり思わなかったりしていました。みんな凄い事してて生きるのがどんどん辛くなります。ほんと自分は適当で不真面目で教授に迷惑ばかり掛けていました。今もそうです。ごめんなさい。猛省。</p>
+
+<h3>プロトタイピング</h3>
+
+<p>ソフトウェア開発の手法としてプロトタイピングというものがあります。「中身は無いが動く」ものを作り、早い段階から作るものに対しての評価、フィードバック得ることで、手戻りを減らすことを目的とした手法です。</p>
+
+<p>このプロトタイピングという手法は手戻りを防ぐという点で、当たり前ではあるけれども重要な開発手法なのですが、プロトタイプの製作に時間が掛かったりすると意味が無かったり、プロトタイプを見せたらそれを完成品と勘違いされたり（もう完成しているということで、納期や費用を削られそうになったり）という笑い話のような本当の話があったりして、工夫しないとそのまま適用するのは難しい手法だったりします。</p>
+
+<h3>mocketch</h3>
+
+<p>と、プロトタイピングには手法そのものに派生があるほど色々あるのですが、そんな難しいことは自分のような阿呆には考えられないので、修論ではとにもかくにも「プロトタイプを早く作れられれば良いんだろ？」と思考を放棄して動くものを作ってました。それが<a href="https://github.com/mix3/mocketch">mocketch</a>です。ウェブアプリのプロトタイプとして作るものが「モックアップ」や「スケッチ」などと呼ばれているっぽいのでそれをガッチャンコしただけという。酷いですね。</p>
+
+<p>具体的に何がしたかったかというと「HTMLを書くだけでそれがウェブアプリとして動くもの」を目指していました。HTMLで紙芝居だけでも十分というか実際そういう感じのようですが、それが実際に動くものだともっとイメージがしやすいしプロトタイプとしてより良いだろうという安易な考えでした。酷いですね。</p>
+
+<p>何気にgithubから落としてきて mvn jetty:run するだけで動いて自分でビビってしまいました。maven 凄いです。java 可愛いよ。</p>
+
+<p>以下実際に動かしてみたときのスクショ。さすがにサーバに上げて動かすのは怖いので。</p>
+
+<p>１）以下のような感じでHTMLを書くと<br />
+<a href="/images/20120422/mocketch1.png"><img src="/images/20120422/mocketch1.png" width="300" /></a></p>
+
+<p>２）なんかフォームが表示されて<br />
+<img src="/images/20120422/mocketch2.png" /></p>
+
+<p>３）適当に入力する<br />
+<img src="/images/20120422/mocketch3.png" /></p>
+
+<p>４）なんんかそれっぽく入力内容が反映される<br />
+<img src="/images/20120422/mocketch4.png" /></p>
+
+<p>５）もう一回繰り返してみた<br />
+<img src="/images/20120422/mocketch5.png" /></p>
+
+<p>というものでした。</p>
+
+<p>リスト表示のところに form を用意すると、掲示板のレスのような感じを表現出来たり、入力に対して必須項目や文字列長などのバリデートを入れたり、ページングを入れられたりもします。githubに上がってるものは少し古くて色々上手く動いていないですが。</p>
+
+<p>内部的にはHTMLに属性として meta:table meta:column を書くとkey-valueで解釈して HashMap で保存、表示しているだけです。wicketがよしなにやってくれてます。</p>
+
+<h3>ということで</h3>
+
+<p>酷い修論の製作物でした。ほんとごめんなさい。</p>
+
+<p class="post-footer"><span class="date">2012-04-22</span></p>
 <h2><a href="/2012/04/14/20120414/" title="">Capture::Tiny</a></h2>
 <p>前回pixivブログは github pages のコピーだから大丈夫とか書いたけど、github pages で書き始める前のpixivブログはバックアップ取ってなかったのでほんとは大丈夫じゃなかった mix3 です。SSH+LDAP とか keepalived を試してみた記事が消えたのはちょっともったいなかったかな。まあ、Google検索でキャッシュ漁ればある程度は発掘出来そうではあるけれども。</p>
 
@@ -514,240 +561,6 @@ object Application extends Controller {
 <p>Play frameworkですが面白そうではあるもののやはりテンプレート周りが気に入らないですね。テンプレートの中にコードを埋め込んだり、独自の構文でロジックを埋め込んだりというのはどうしても慣れないです。どんなに簡単な構文でそれが可能だとしてもデザイナーとの連携の時にはやはり困ると思うのです。「ここは動的な情報が入るのでこういう書き方をして下さい」なんて絶対混乱します。テンプレートをHTMLで書くならそのテンプレートはプレーンなHTMLであるべきだと自分は思います。</p>
 
 <p class="post-footer"><span class="date">2011-07-24</span></p>
-<h2><a href="/2011/07/22/20110722/" title="">blessとMouse</a></h2>
-<h3>健康診断</h3>
-
-<p>健康診断へ行って血を取ってきました。前回はチューブ通して採血の容器に取ってたのが今回は針から直結するようになって、それのおかげか何なのかは分りませんが採血スピードが向上して地味に嬉しかったです。痛いのは嫌いなのです…</p>
-
-<h3>blessとMouseの速度比較</h3>
-
-<p>すこし気になってblessとMouse、その他の速度比較。いろんなところでやられてるので今更自分でする事でもないでしょうが。なおblessで作るクラスは手を抜いて型制限などの実装はせずアクセサを用意して値を操作するだけにしました。適当適当。</p>
-
-<p><a href="http://blog.livedoor.jp/sasata299/archives/51281496.html">いまさら聞けない「Moose」超入門</a>を参考にblessとMouseのコードを書き足しました。以下の処理の速度を比較しています。</p>
-
-<ol>
-<li>hoge/fugaのアクセサを持ったクラスをnew
-<ul>
-<li>初期値はfugaに1</li>
-</ul></li>
-<li>hogeに'bbb'を代入</li>
-<li>fugaの値を取得</li>
-<li>hogeの値を取得</li>
-</ol>
-
-<h4>cost.pl</h4>
-
-<pre><code># おまじないしない場合
-package MooseTest;
-use Moose;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-no Moose;
-
-1;
-
-# おまじないする場合
-package MooseTest_mi;
-use Moose;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-__PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
-
-no Moose;
-
-1;
-
-# おまじないしない場合
-package MouseTest;
-use Mouse;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-no Mouse;
-
-1;
-
-# おまじないする場合
-package MouseTest_mi;
-use Mouse;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-__PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
-
-no Mouse;
-
-1;
-
-# Class::Accessor を使った場合
-package ClassAccessorTest;
-use strict;
-use warnings;
-use base 'Class::Accessor';
-
-__PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
-
-1;
-
-# Class::Accessor::Fast を使った場合
-package ClassAccessorFastTest;
-use strict;
-use warnings;
-use base 'Class::Accessor::Fast';
-
-__PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
-
-1;
-
-# perl5 OOP の場合
-package Bless;
-use strict;
-use warnings;
-
-sub new {
-    my $class = shift;
-    my $self  = shift || {};
-    return bless $self, $class;
-}
-
-sub hoge {
-    my $self = shift;
-    if (@_) {
-        $self-&gt;{hoge} = shift;
-    } else {
-        $self-&gt;{hoge};
-    }
-}
-
-sub fuga {
-    my $self = shift;
-    if (@_) {
-        $self-&gt;{fuga} = shift;
-    } else {
-        $self-&gt;{fuga};
-    }
-}
-
-1;
-
-package main;
-use strict;
-use warnings;
-use Benchmark qw(cmpthese timethese);
-
-cmpthese timethese(100000, {
-    moose =&gt; sub {
-        my $moose = MooseTest-&gt;new( fuga =&gt; 1 );
-        $moose-&gt;hoge('bbb');
-        $moose-&gt;fuga;
-        $moose-&gt;hoge;
-    },
-    moose_mi =&gt; sub {
-        my $moose = MooseTest_mi-&gt;new( fuga =&gt; 1 );
-        $moose-&gt;hoge('bbb');
-        $moose-&gt;fuga;
-        $moose-&gt;hoge;
-    },
-    mouse =&gt; sub {
-        my $mouse = MouseTest-&gt;new( fuga =&gt; 1 );
-        $mouse-&gt;hoge('bbb');
-        $mouse-&gt;fuga;
-        $mouse-&gt;hoge;
-    },
-    mouse_mi =&gt; sub {
-        my $mouse = MouseTest_mi-&gt;new( fuga =&gt; 1 );
-        $mouse-&gt;hoge('bbb');
-        $mouse-&gt;fuga;
-        $mouse-&gt;hoge;
-    },
-    accessor =&gt; sub {
-        my $class = ClassAccessorTest-&gt;new({ fuga =&gt; 1 });
-        $class-&gt;hoge('bbb');
-        $class-&gt;fuga;
-        $class-&gt;hoge;
-    },
-    accessor_fast =&gt; sub {
-        my $class = ClassAccessorFastTest-&gt;new({ fuga =&gt; 1 });
-        $class-&gt;hoge('bbb');
-        $class-&gt;fuga;
-        $class-&gt;hoge;
-    },
-    bless =&gt; sub {
-        my $class = Bless-&gt;new({ fuga =&gt; 1 });
-        $class-&gt;hoge('bbb');
-        $class-&gt;fuga;
-        $class-&gt;hoge;
-    },
-});
-</code></pre>
-
-<p>結果はこんな感じになりました。何回か実行するとばらつくので３つほど結果を書き出しています。</p>
-
-<pre><code>Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-  accessor:  2 wallclock secs ( 1.19 usr +  0.00 sys =  1.19 CPU) @ 84033.61/s (n=100000)
-accessor_fast:  0 wallclock secs ( 0.58 usr +  0.00 sys =  0.58 CPU) @ 172413.79/s (n=100000)
-     bless:  1 wallclock secs ( 0.41 usr +  0.00 sys =  0.41 CPU) @ 243902.44/s (n=100000)
-     moose: 21 wallclock secs (21.26 usr +  0.02 sys = 21.28 CPU) @ 4699.25/s (n=100000)
-  moose_mi:  2 wallclock secs ( 1.67 usr +  0.00 sys =  1.67 CPU) @ 59880.24/s (n=100000)
-     mouse:  0 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
-  mouse_mi: -1 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
-                  Rate moose moose_mi accessor accessor_fast mouse_mi mouse bless
-moose           4699/s    --     -92%     -94%          -97%     -98%  -98%  -98%
-moose_mi       59880/s 1174%       --     -29%          -65%     -69%  -69%  -75%
-accessor       84034/s 1688%      40%       --          -51%     -57%  -57%  -66%
-accessor_fast 172414/s 3569%     188%     105%            --     -12%  -12%  -29%
-mouse_mi      196078/s 4073%     227%     133%           14%       --    0%  -20%
-mouse         196078/s 4073%     227%     133%           14%       0%    --  -20%
-bless         243902/s 5090%     307%     190%           41%      24%   24%    --
-
-Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-  accessor:  1 wallclock secs ( 0.87 usr +  0.00 sys =  0.87 CPU) @ 114942.53/s (n=100000)
-accessor_fast:  0 wallclock secs ( 0.56 usr +  0.00 sys =  0.56 CPU) @ 178571.43/s (n=100000)
-     bless:  1 wallclock secs ( 0.43 usr +  0.00 sys =  0.43 CPU) @ 232558.14/s (n=100000)
-     moose: 18 wallclock secs (18.30 usr +  0.00 sys = 18.30 CPU) @ 5464.48/s (n=100000)
-  moose_mi:  2 wallclock secs ( 1.57 usr +  0.00 sys =  1.57 CPU) @ 63694.27/s (n=100000)
-     mouse:  0 wallclock secs ( 0.55 usr +  0.00 sys =  0.55 CPU) @ 181818.18/s (n=100000)
-  mouse_mi:  1 wallclock secs ( 0.65 usr +  0.00 sys =  0.65 CPU) @ 153846.15/s (n=100000)
-                  Rate moose moose_mi accessor mouse_mi accessor_fast mouse bless
-moose           5464/s    --     -91%     -95%     -96%          -97%  -97%  -98%
-moose_mi       63694/s 1066%       --     -45%     -59%          -64%  -65%  -73%
-accessor      114943/s 2003%      80%       --     -25%          -36%  -37%  -51%
-mouse_mi      153846/s 2715%     142%      34%       --          -14%  -15%  -34%
-accessor_fast 178571/s 3168%     180%      55%      16%            --   -2%  -23%
-mouse         181818/s 3227%     185%      58%      18%            2%    --  -22%
-bless         232558/s 4156%     265%     102%      51%           30%   28%    --
-
-Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-  accessor:  1 wallclock secs ( 0.90 usr +  0.00 sys =  0.90 CPU) @ 111111.11/s (n=100000)
-accessor_fast:  0 wallclock secs ( 0.75 usr +  0.00 sys =  0.75 CPU) @ 133333.33/s (n=100000)
-     bless:  1 wallclock secs ( 0.47 usr +  0.00 sys =  0.47 CPU) @ 212765.96/s (n=100000)
-     moose: 22 wallclock secs (21.62 usr +  0.01 sys = 21.63 CPU) @ 4623.21/s (n=100000)
-  moose_mi:  1 wallclock secs ( 1.61 usr +  0.00 sys =  1.61 CPU) @ 62111.80/s (n=100000)
-     mouse:  1 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
-  mouse_mi:  0 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
-                  Rate moose moose_mi accessor accessor_fast bless mouse_mi mouse
-moose           4623/s    --     -93%     -96%          -97%  -98%     -98%  -98%
-moose_mi       62112/s 1243%       --     -44%          -53%  -71%     -72%  -72%
-accessor      111111/s 2303%      79%       --          -17%  -48%     -50%  -50%
-accessor_fast 133333/s 2784%     115%      20%            --  -37%     -40%  -40%
-bless         212766/s 4502%     243%      91%           60%    --      -4%   -4%
-mouse_mi      222222/s 4707%     258%     100%           67%    4%       --    0%
-mouse         222222/s 4707%     258%     100%           67%    4%       0%    --
-</code></pre>
-
-<p>Mouseが爆速でblessより速いこともあるようです。にわかに信じられないのですが。何か最適化されているものでもあるのでしょうか？ちゃんと中身を見ないといけませんね。</p>
-
-<h3>思う事</h3>
-
-<p>速度というのは最近気にしているテーマで、Webアプリの１リクエストのレスポンスタイムが10msと100msとあったとして、それの時間差が90msと何となく微々たる物のように思う物でも分間10リクエストとして合計100msと1000msになり差が900msとどんどん大きくなっていくのが恐ろしいなぁと思ったりしています。もしもこれが分間じゃなくて秒間だったら？10リクエストじゃなくて100リクエストだったら？1000リクエストだったら？…まだ実感の伴わない話なのでアレですが今後直面する問題だろうなと感じています。モダンだ流行だと色々なものに飛びつくのも勉強になって良いですが、ただ実際それが実用に堪えうるのかどうかちゃんと検証することも覚えないといけないなと。そんなことを考えています。</p>
-
-<p class="post-footer"><span class="date">2011-07-22</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -760,8 +573,10 @@ mouse         222222/s 4707%     258%     100%           67%    4%       0%    -
 <a href="/page/3/">3</a>
  | 
 <a href="/page/4/">4</a>
+ | 
+<a href="/page/5/">5</a>
 <a href="/page/3/" rel="next">&gt;</a>
-<a href="/page/4/">&gt;&gt;</a>
+<a href="/page/5/">&gt;&gt;</a>
 </div>
       </div>
       <div class="autopagerize_insert_before"></div>
@@ -775,6 +590,7 @@ mouse         222222/s 4707%     258%     100%           67%    4%       0%    -
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/01/">2013年01月</a></li>
   <li><a href="/archives/2012/12/">2012年12月</a></li>
   <li><a href="/archives/2012/11/">2012年11月</a></li>
   <li><a href="/archives/2012/08/">2012年08月</a></li>

@@ -57,6 +57,82 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2011/06/22/20110622/" title="">MobaSiFを弄ってみた</a></h2>
+<p>MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。</p>
+
+<ul>
+<li>アプリケーションロジックを記述</li>
+<li>レスポンスの値を生成＆セット</li>
+</ul>
+
+<p>具体的に書くと以下のような感じ。</p>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = (
+    'test' =&gt; [0,0,0, 'Page::Sample', 'pageMain'],
+);
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<pre><code>package Page::Sample;
+sub pageMain {
+    my $func = shift;
+    # レスポンスの生成
+    my $html = HTMLTemplate::insert('sample/index', $rhData);
+    # レスポンスヘッダに値をセット
+    Response::output(¥$html);
+}
+</code></pre>
+
+<h4>template/_system/sample/index.html</h4>
+
+<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;$CON:title$&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    test
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>普段触るフレームワークだと「レスポンスの生成」も「レスポンスヘッダへの値のセット」も自分ですることはまず無くて。テンプレートに渡す値をハッシュで用意して、テンプレート自体はクエリパスなどから自動で判断するかもしくは明示的に指定するかする場合が多い。</p>
+
+<p>ということでこの辺り結構違和感が大きいのでちょっとそれっぽくなるように手を入れてみた。</p>
+
+<h4>pm/Context.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Context.pm"></script>
+
+<h4>pm/Page/Main.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Main.pm"></script>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = (
+        .
+        .
+        .
+    'test'  =&gt; [0,0,0, 'Page::Sample', 'test'],
+    'test1' =&gt; [0,0,0, 'Page::Sample', 'test1'],
+    'test2' =&gt; [0,0,0, 'Page::Sample', 'test2'],
+);
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Sample.pm"></script>
+
+<h4>template/_system/sample/test.html</h4>
+
+<script src="https://gist.github.com/1038137.js?file=test.html"></script>
+
+<h3>次回はDB周りを触ってみる</h3>
+
+<p>commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。</p>
+
+<p class="post-footer"><span class="date">2011-06-22</span></p>
 <h2><a href="/2011/06/21/20110621/" title="">MobaSiFを触ってみた</a></h2>
 <h3>インストール</h3>
 
@@ -501,16 +577,6 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 <p>どうでも良いですがnekokakさん曰くQudoは「駆動」らしいですが「弓道」の方が良いと思います＾＾</p>
 
 <p class="post-footer"><span class="date">2011-05-04</span></p>
-<h2><a href="/2011/04/30/20110430/" title="">Hadoopを触ってみた</a></h2>
-<p>具体的にはgistに書いた。</p>
-
-<p>完全分散モードが結構癖が強い感じなので気をつけたい。</p>
-
-<script src="https://gist.github.com/944255.js"> </script>
-
-<script src="https://gist.github.com/944342.js"> </script>
-
-<p class="post-footer"><span class="date">2011-04-30</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -523,8 +589,10 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 <a href="/page/3/">3</a>
  | 
 4
-&gt;
-&gt;&gt;
+ | 
+<a href="/page/5/">5</a>
+<a href="/page/5/" rel="next">&gt;</a>
+<a href="/page/5/">&gt;&gt;</a>
 </div>
       </div>
       <div class="autopagerize_insert_before"></div>
@@ -538,6 +606,7 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/01/">2013年01月</a></li>
   <li><a href="/archives/2012/12/">2012年12月</a></li>
   <li><a href="/archives/2012/11/">2012年11月</a></li>
   <li><a href="/archives/2012/08/">2012年08月</a></li>
