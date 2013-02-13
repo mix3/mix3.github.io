@@ -57,6 +57,37 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2011/07/03/20110703/" title="">Markdownブログ</a></h2>
+<h3>Markdownブログ</h3>
+
+<p>Markdownでブログが書きたかった。githubのページ公開機能なら何でも良かった。今は反省している。</p>
+
+<p><a href="https://github.com/mix3/mix3.github.com">https://github.com/mix3/mix3.github.com</a></p>
+
+<h4>使い方</h4>
+
+<ol>
+<li>resource以下に.mdでMarkdownの文書を作成する。</li>
+<li>script/generate.plを実行する</li>
+<li>githubにコミットする</li>
+<li><a href="http://mix3.github.com/">こんな感じになる</a></li>
+</ol>
+
+<h4>ちなみに</h4>
+
+<p>pixivブログでjsを使ってごにょごにょしようとしてみたがムリっぽい。HTMLの中にMarkdownを埋め込んだり別サーバに置いてみたり色々してみたがどうにも上手く行かず。</p>
+
+<ul>
+<li>別ドメインにならざるを得ずセキュリティ制限が掛かる</li>
+<li>JSONPだとヒアドキュメントが使えないのでキモイ</li>
+<li>２重エスケープなどで上手く表示出来ない</li>
+</ul>
+
+<p>などなど。</p>
+
+<p>ということでpixivブログで割と満足している現状全く使いどころが無いMarkdownブログだけどまあいっか。</p>
+
+<p class="post-footer"><span class="date">2011-07-03</span></p>
 <h2><a href="/2011/06/22/20110622/" title="">MobaSiFを弄ってみた</a></h2>
 <p>MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。</p>
 
@@ -531,52 +562,6 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 <script src="https://gist.github.com/953572.js"> </script>
 
 <p class="post-footer"><span class="date">2011-05-04</span></p>
-<h2><a href="/2011/05/04/20110504_02/" title="">Qudoでログ回収</a></h2>
-<ul>
-<li>SCPやrsyncやらで各アプリケーションサーバから回収
-<ul>
-<li>自由が利く</li>
-</ul></li>
-<li>各アプリケーションサーバから解析サーバへ投げてもらう
-<ul>
-<li>HDFSなどHadoopが扱うファイルシステムに直接入れる事が可能</li>
-<li>※ただし、各アプリケーションサーバがそのファイルシステムを扱えるように色々セットアップが必要</li>
-</ul></li>
-</ul>
-
-<p>後者のアプリから投げてもらう方だと各サーバでファイルシステムを扱えるようセットアップが必要になるので、そこまでアプリ側に負担を掛けられないかなということで今考えているのは前者の方法となります。</p>
-
-<h3>コード</h3>
-
-<p>Hadoopが扱うファイルシステムはHDFSという前提で前回構築した環境でサンプルを作ってみました。</p>
-
-<h3>シェルスクリプトで並列回収</h3>
-
-<p>まず最初にシェルスクリプトで書いてみました。「これだと回収先のアプリが100万個ある場合は100万個同時にダウンロードしちゃうってことだよね？」というもっともな指摘で没になりました。まったくもってその通りだと思います。</p>
-
-<script src="https://gist.github.com/954830.js"> </script>
-
-<h3>Qudoで並列回収</h3>
-
-<ul>
-<li>ジョブ／キューを使いたい
-<ul>
-<li>なんとなくジョブは消えてほしく無い</li>
-<li>失敗したらリトライしてほしい</li>
-</ul></li>
-<li>回収は並列
-<ul>
-<li>でも同時実行数は上限あり</li>
-</ul></li>
-</ul>
-
-<p>以上の要件で最初はTheSchwartz＆Parallel::Preforkで考えていましたが何やらGearmanでもDBを使って動作させられるという話があったりQudoを見つけてみたりで、でもやりたいことって別にそんなに複雑な事でもないので結局何使っても良いかなと思ってQudoを選びました。後々機能を増やしたい時にフックポイントが色々用意されているので悪くないかなと。</p>
-
-<script src="https://gist.github.com/951476.js"> </script>
-
-<p>どうでも良いですがnekokakさん曰くQudoは「駆動」らしいですが「弓道」の方が良いと思います＾＾</p>
-
-<p class="post-footer"><span class="date">2011-05-04</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -606,6 +591,7 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/02/">2013年02月</a></li>
   <li><a href="/archives/2013/01/">2013年01月</a></li>
   <li><a href="/archives/2012/12/">2012年12月</a></li>
   <li><a href="/archives/2012/11/">2012年11月</a></li>
