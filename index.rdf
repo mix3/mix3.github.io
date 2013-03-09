@@ -10,6 +10,27 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>p5-JQueryPresentationHelper作ってみた</title>
+<description>
+<![CDATA[
+<p>やりたかったこと。</p>
+
+<ul>
+<li>use Hoge でメソッドが生えるモジュールの習作が作りたかった</li>
+<li><a href="http://code.google.com/p/jquery-presentation/">jquery-presentation</a>:<a href="http://dl.dropbox.com/u/268240/googleCode/jquery-presentation/index.html">demo</a>をmarkdownで書けるようにしたかった</li>
+</ul>
+
+<p>結果、良くわからないものが中途半端に出来てしまって、でも放置してもあれなのでとりあえずgithubにアップ。</p>
+
+<p>git clone を前提としたもっとゆるい感じで作った方が良い感じにおさまった気がしてます。</p>
+
+<p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.com/2013/03/09/20120309/</guid>
+<pubDate>Sat, 09 Mar 2013 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>すぐにpixivのランキングイラストを見れるGoogleChromeの拡張を作った。</title>
 <description>
 <![CDATA[
@@ -475,38 +496,6 @@ exit 0
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2012/04/10/20120410/</guid>
 <pubDate>Tue, 10 Apr 2012 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>bonding設定で死んだ</title>
-<description>
-<![CDATA[
-<h3>bondingとは</h3>
-
-<p>bondingというのはNICを冗長化するもののことのようです。ラウンドロビンで負荷分散したりマスタースレーブ構成にして片方が死んでも大丈夫なように出来るようです。</p>
-
-<p>参考<a href="http://d.hatena.ne.jp/sen-u/20061002/p1">意外と知らない？NICを冗長化するボンディング（bonding）Add Star</a></p>
-
-<h3>ネットワークが遅延？</h3>
-
-<p>ネットワークの知識なんてほぼ０なのでbondingなんて当然知らなかったのですが、でも設定しないといけないということなのでWebを漁ってとりあえずラウンドロビンで設定したのですが、これがいけなかった。</p>
-
-<p>並列(最大100プロセス)でアクセス掛ける負荷試験を行ってると、MySQLの接続でtimeoutが結構出る。</p>
-
-<p>根本的な問題として負荷試験のシナリオにミスがあったりはするのですが、それとは別にネットワークに遅延が発生する模様。</p>
-
-<p>インフラのプロフェッショナル<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんや<a href="https://twitter.com/#!/shin1rosei">@shin1rosei</a>さんに調べてもらって自分の設定したbondingの設定がラウンドロビンなのがマズいという事が判明。並列度が上がると、NICの切り替わりで問題が顕在化するみたいです。</p>
-
-<p>正直分った瞬間回線切って首吊って死にたい気分になりました...</p>
-
-<script src="http://togetter.com/js/parts.js"></script>
-
-<script>tgtr.ListWidget({id:'222670',url:'http://togetter.com/',width:'320px',height:'240px'});</script>
-
-<p>自分のした設定にどんな意味があるのか、ちゃんと考える様にします...</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.com/2011/11/23/2011123/</guid>
-<pubDate>Wed, 23 Nov 2011 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>

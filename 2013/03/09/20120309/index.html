@@ -33,7 +33,7 @@
   
   </script>
 
-  <title>萌えキャラとは何だったのか - bonding設定で死んだ
+  <title>萌えキャラとは何だったのか - p5-JQueryPresentationHelper作ってみた
 </title>
 </head>
 <body>
@@ -58,32 +58,21 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
-<h2><a href="/2011/11/23/2011123/" title="">bonding設定で死んだ</a></h2>
-<h3>bondingとは</h3>
+<h2><a href="/2013/03/09/20120309/" title="">p5-JQueryPresentationHelper作ってみた</a></h2>
+<p>やりたかったこと。</p>
 
-<p>bondingというのはNICを冗長化するもののことのようです。ラウンドロビンで負荷分散したりマスタースレーブ構成にして片方が死んでも大丈夫なように出来るようです。</p>
+<ul>
+<li>use Hoge でメソッドが生えるモジュールの習作が作りたかった</li>
+<li><a href="http://code.google.com/p/jquery-presentation/">jquery-presentation</a>:<a href="http://dl.dropbox.com/u/268240/googleCode/jquery-presentation/index.html">demo</a>をmarkdownで書けるようにしたかった</li>
+</ul>
 
-<p>参考<a href="http://d.hatena.ne.jp/sen-u/20061002/p1">意外と知らない？NICを冗長化するボンディング（bonding）Add Star</a></p>
+<p>結果、良くわからないものが中途半端に出来てしまって、でも放置してもあれなのでとりあえずgithubにアップ。</p>
 
-<h3>ネットワークが遅延？</h3>
+<p>git clone を前提としたもっとゆるい感じで作った方が良い感じにおさまった気がしてます。</p>
 
-<p>ネットワークの知識なんてほぼ０なのでbondingなんて当然知らなかったのですが、でも設定しないといけないということなのでWebを漁ってとりあえずラウンドロビンで設定したのですが、これがいけなかった。</p>
+<p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
 
-<p>並列(最大100プロセス)でアクセス掛ける負荷試験を行ってると、MySQLの接続でtimeoutが結構出る。</p>
-
-<p>根本的な問題として負荷試験のシナリオにミスがあったりはするのですが、それとは別にネットワークに遅延が発生する模様。</p>
-
-<p>インフラのプロフェッショナル<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんや<a href="https://twitter.com/#!/shin1rosei">@shin1rosei</a>さんに調べてもらって自分の設定したbondingの設定がラウンドロビンなのがマズいという事が判明。並列度が上がると、NICの切り替わりで問題が顕在化するみたいです。</p>
-
-<p>正直分った瞬間回線切って首吊って死にたい気分になりました...</p>
-
-<script src="http://togetter.com/js/parts.js"></script>
-
-<script>tgtr.ListWidget({id:'222670',url:'http://togetter.com/',width:'320px',height:'240px'});</script>
-
-<p>自分のした設定にどんな意味があるのか、ちゃんと考える様にします...</p>
-
-<p class="post-footer"><span class="date">2011-11-23</span></p>
+<p class="post-footer"><span class="date">2013-03-09</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
       </div>
       <div class="autopagerize_insert_before"></div>
