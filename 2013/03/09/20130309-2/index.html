@@ -33,7 +33,8 @@
   
   </script>
 
-  <title>萌えキャラとは何だったのか</title>
+  <title>萌えキャラとは何だったのか - Plack::App::Directoryで画像を展開する
+</title>
 </head>
 <body>
 <div id="wrap">
@@ -81,152 +82,7 @@
 <p>ちなみにswfobject.jsは2.2でもまだ微妙にセキュリティリスクがあるらしい <a href="http://t-ashula.hateblo.jp/entry/2012/01/11/233156">ほむらちゃほむほむ - swfobject.js がアレな話</a> ので外から見えるところで使うのは止めた方が良いかなと思います。</p>
 
 <p class="post-footer"><span class="date">2013-03-09</span></p>
-<h2><a href="/2013/03/09/20130309-1/" title="">p5-JQueryPresentationHelper作ってみた</a></h2>
-<p>やりたかったこと。</p>
-
-<ul>
-<li>use Hoge でメソッドが生えるモジュールの習作が作りたかった</li>
-<li><a href="http://code.google.com/p/jquery-presentation/">jquery-presentation</a>:<a href="http://dl.dropbox.com/u/268240/googleCode/jquery-presentation/index.html">demo</a>をmarkdownで書けるようにしたかった</li>
-</ul>
-
-<p>結果、良くわからないものが中途半端に出来てしまって、でも放置してもあれなのでとりあえずgithubにアップ。</p>
-
-<p>git clone を前提としたもっとゆるい感じで作った方が良い感じにおさまった気がしてます。</p>
-
-<p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
-
-<p class="post-footer"><span class="date">2013-03-09</span></p>
-<h2><a href="/2013/02/14/20130214/" title="">すぐにpixivのランキングイラストを見れるGoogleChromeの拡張を作った。</a></h2>
-<p>生きていればつらいことがある。
-しかし、つらいからと言って簡単に投げ出す事は出来ないということも多い。</p>
-
-<p>みなさんもつらまってる時、よくpixivを見ると思う。
-当然のごとく僕もそうである。</p>
-
-<p>最近つらい事がよくある。
-そんな時のために、pixivのランキングイラストを素早く表示する必要があった。
-なので、pixivのランキングイラストをすぐ見れるGoogle Chromeの拡張を作った。</p>
-
-<p><a href="https://github.com/mix3/chrome-pixiv-illust-daily-ranking-redirect">mix3/chrome-pixiv-illust-daily-ranking-redirect - GitHub</a></p>
-
-<p>「だめだ。もうやってらねー」って時は、空のtabを表示すればすぐpixivのランキングイラストが見れる。最高。自分も絵描きたい。</p>
-
-<p><a href="/images/20130214/pixiv-illust-daily-ranking-redirect.png"><img src="/images/20130214/pixiv-illust-daily-ranking-redirect.png" width="300" /></a></p>
-
-<p>参考</p>
-
-<ul>
-<li><a href="http://blog.hisaichi5518.com/entry/2013/02/01/003820">すぐに吉高由里子を見れるGoogle Chromeの拡張作った。 - パルカワ2</a></li>
-<li><a href="http://soh335.hatenablog.com/entry/2013/02/10/011039">すぐに宮崎あおいを見れるGoogle Chromeの拡張作っ>た。 - soh335 memo</a></li>
-<li><a href="http://mizzy.org/blog/2013/02/11/1/">すぐにハッブル宇宙望遠鏡撮影画像を見れるGoogle Chromeの拡張作った。 - Gosuke Miyashita</a></li>
-</ul>
-
-<p class="post-footer"><span class="date">2013-02-14</span></p>
-<h2><a href="/2013/01/06/20130106/" title="">あけおめ</a></h2>
-<p>ことよろ。なんか本当に久しぶりに落書きしたmix3です。</p>
-
-<script src="http://source.pixiv.net/source/embed.js" data-id="32685756_6064c2b2416178ec058c322de47db89e" data-size="medium" data-border="on" charset="utf-8"></script>
-
-<noscript><p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=32685756" target="_blank">あけおめ</a> by <a href="http://www.pixiv.net/member.php?id=88339" target="_blank">mix3</a> on <a href="http://www.pixiv.net/" target="_blank">pixiv</a></p></noscript>
-
-<p>年に1回の年賀絵ぐらい継続して描きたいものですね…</p>
-
-<p class="post-footer"><span class="date">2013-01-06</span></p>
-<h2><a href="/2012/12/30/20121230/" title="">トランザクション</a></h2>
-<p>トランザクションってなーに？mix3です</p>
-
-<h3>同時更新処理</h3>
-
-<p><a href="http://mix3.github.com/2012/11/03/20121103/">スレーブ遅延</a>のときにSELECT > UPDATEで古い情報をもとにUPDATEしてしまうと不整合が発生すると書きましたが、</p>
-
-<p>たとえば同じ行を複数で同時にSELECT > UPDATEすると同じように不整合が発生することがあります。</p>
-
-<ol>
-<li>AがT1からSELECT</li>
-<li>BがT1からSELECT</li>
-<li>AがT1をUPDATE</li>
-<li>BがT1をUPDATE</li>
-</ol>
-
-<p>このような順序で更新がかかると、BがAの更新を上書きしてしまうため、実質Aの更新が無かった事になってしまいます。</p>
-
-<p>これも更新がアトミックであれば発生しないので可能であればアトミックな更新にするのが良いですが、更新が複数ある場合はそういった変更も出来ません。</p>
-
-<h3>そんなときこそトランザクション。そんなふうに考えていた時期が僕にもありました。</h3>
-
-<p>で、そういうときはトランザクションを使う物だと思っていました。トランザクションは複数の処理を一つの処理としてまとめて成功するか失敗するか、どちらかを保証してくれます。</p>
-
-<p>なので、SELECT > UPDATEをトランザクションでまとめてしまえば大丈夫だよね！と思っていたので、以下のようなコードを書いて確認しました。</p>
-
-<script src="https://gist.github.com/4411441.js"></script>
-
-<script src="https://gist.github.com/4411446.js"></script>
-
-<p>scoreが更新回数になるので、'v' => '&lt;更新回数>' と揃えば不整合無く更新出来たことになるのですが、</p>
-
-<p>見ての通りトランザクションを使った方は残念な結果になっています。で、すこしググッた結果トランザクションとロックは別で考えないと行けないことを知りました。</p>
-
-<p><strong>トランザクションを使ったからといって勝手に行読み込みなどをロックして整合性を保証してくれるとかでは全然無いんですね。</strong></p>
-
-<p>当たり前だろダラズ！と言われても仕方ないような勘違いですが、いやトランザクションを使わない世界でしばらく生きていたので…</p>
-
-<p>で、SELECTにテーブルロックや行ロックが掛かってないためにSELECT > UPDATEの不整合が防げていないようなので、SELECT文にFOR UPDATE を付けてそれを防いでみました</p>
-
-<script src="https://gist.github.com/4411474.js"></script>
-
-<p>結果またしても残念な結果になりました…</p>
-
-<h3>ちゃんとストレージエンジンを指定しましょう</h3>
-
-<p>結果から言うとストレージエンジンを指定していなかったのでトランザクションの使えないMyISAMでテーブルが作られていたからでした。</p>
-
-<script src="https://gist.github.com/4411511.js"></script>
-
-<p>こんな感じでInnoDBを指定する事で期待通り、不整合なく更新されるようになりました。めでたしめでたし。</p>
-
-<p>ちなみにSELECTのロックには共有ロックと排他ロックとあり、FOR UPDATEは排他ロックになります。LOCK IN SHARE MODEだと共有ロックになります。</p>
-
-<p>今回の場合にLOCK IN SHARE MODEを使うと10ものプロセスが共有ロックを取り合って凄い勢いでデッドロックしました。</p>
-
-<script src="https://gist.github.com/4411540.js"></script>
-
-<p>ロックするということは同時にデッドロックする可能性もあるということなので、適切なロックを選択して使い、デッドロックの可能性を減らしながら上手く付き合っていきたいですね。</p>
-
-<h3>まとめ</h3>
-
-<ul>
-<li>トランザクションはロックとはまた別問題
-<ul>
-<li>不整合を防ぎたいならちゃんとロックのことを考えてSQLを書く</li>
-</ul></li>
-<li>MySQLのデフォルトストレージエンジンはMyISAMだけど、それトランザクション使えないからね？</li>
-<li>ロックにも種類はあり、デッドロックには気をつける</li>
-</ul>
-
-<h3>今年のブログはこれが最後な気がするので。</h3>
-
-<p>来年はもっとブログをコードを書いてアウトプットを増やして行きたいです。</p>
-
-<h3>それでは良いお年を！</h3>
-
-<p class="post-footer"><span class="date">2012-12-30</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
-<div styel="center" align="center">
-&lt;&lt;
-&lt;
-
-1
- | 
-<a href="/page/2/">2</a>
- | 
-<a href="/page/3/">3</a>
- | 
-<a href="/page/4/">4</a>
- | 
-<a href="/page/5/">5</a>
-<a href="/page/2/" rel="next">&gt;</a>
-<a href="/page/5/">&gt;&gt;</a>
-</div>
       </div>
       <div class="autopagerize_insert_before"></div>
     </div>

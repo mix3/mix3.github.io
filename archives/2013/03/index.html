@@ -57,7 +57,31 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
-<h2><a href="/2013/03/09/20120309/" title="">p5-JQueryPresentationHelper作ってみた</a></h2>
+<h2><a href="/2013/03/09/20130309-2/" title="">Plack::App::Directoryで画像を展開する</a></h2>
+<p>Perlのネガティブキャンペーンが流行ってる今日この頃ですが私は元気です（震え声）</p>
+
+<p>p5-JQueryPresentationHelperなんてなかったんや</p>
+
+<h3>Plack::App::Directoryで画像とかは展開してほしい</h3>
+
+<p>Plack::App::Directoryでカレントディレクトリ以下を見えるようにするワンライナーをbashrcとかでエイリアスにしておくとか良くあると思います。凄く便利なのでそれはそれとして良いのですが、画像とかは出来れば展開してそのまま見えてほしいかなと思う事もあります。</p>
+
+<p>なので、どうすれば良いかなとPlack::App::Directoryの中見てたのですが、もりもりっとtrタグを羅列してるだけっぽかったので、HTML出力を正規表現でちょちょっと弄ればそれっぽくなりそうだと思ったのでやってみました。</p>
+
+<script src="https://gist.github.com/mix3/5109843.js"></script>
+
+<p>ファイルを出力するときはPlack::Util::IOWithPathのオブジェクトを返してるようなので、そうでないときだけ正規表現でちょちょっと弄る感じですると良い感じに画像表示してくれました。</p>
+
+<p>swfも見えてほしいなぁという声が聞こえてきたのでswfobject.jsで見えるようにしてみました。</p>
+
+<script src="https://gist.github.com/mix3/5116797.js"></script>
+
+<p>タイルで見えるともっと良いね！という声が聞こえてきましたが、Plack::App::Directoryを使う限り無理なので、それは新規で別モジュール作った方が良いなと思いました。</p>
+
+<p>ちなみにswfobject.jsは2.2でもまだ微妙にセキュリティリスクがあるらしい <a href="http://t-ashula.hateblo.jp/entry/2012/01/11/233156">ほむらちゃほむほむ - swfobject.js がアレな話</a> ので外から見えるところで使うのは止めた方が良いかなと思います。</p>
+
+<p class="post-footer"><span class="date">2013-03-09</span></p>
+<h2><a href="/2013/03/09/20130309-1/" title="">p5-JQueryPresentationHelper作ってみた</a></h2>
 <p>やりたかったこと。</p>
 
 <ul>
