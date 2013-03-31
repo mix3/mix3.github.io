@@ -37,7 +37,8 @@
   <link href="http://coderwall.com/stylesheets/jquery.coderwall.css" media="all" rel="stylesheet" type="text/css" />
   <script src="http://coderwall.com/javascripts/jquery.coderwall.js"></script>
 
-  <title>萌えキャラとは何だったのか</title>
+  <title>萌えキャラとは何だったのか - おれおれWebフレームワーク - Chaco
+</title>
 </head>
 <body>
 <div id="wrap">
@@ -61,249 +62,41 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
-<h2><a href="/2011/06/22/20110622/" title="">MobaSiFを弄ってみた</a></h2>
-<p>MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。</p>
+<h2><a href="/2013/03/16/20130316/" title="">おれおれWebフレームワーク - Chaco</a></h2>
+<p>これ書くタイミング間違えてる気がするけどまあいいや</p>
 
-<ul>
-<li>アプリケーションロジックを記述</li>
-<li>レスポンスの値を生成＆セット</li>
-</ul>
+<p>なんとなく作ってみるなど。別に他フレームワークと差別化して使うようなものでもなく習作的な感じ。</p>
 
-<p>具体的に書くと以下のような感じ。</p>
+<p>*::LiteとかDancerとか使えばワンソースでお手軽にWebアプリ書けるわけですが、実際に簡単なアプリ書くとなると、Liteなんだけどなんとなく仰々しい気がしてきたり。（Liteと言っても結局各フレームワークが持つ色々な機能は提供されているのでそう感じるのかな？）</p>
 
-<h4>conf/pages.conf</h4>
+<p>でもだからといって</p>
 
-<pre><code>our %PAGE = (
-    'test' =&gt; [0,0,0, 'Page::Sample', 'pageMain'],
-);
-</code></pre>
-
-<h4>pm/Page/Sample.pm</h4>
-
-<pre><code>package Page::Sample;
-sub pageMain {
-    my $func = shift;
-    # レスポンスの生成
-    my $html = HTMLTemplate::insert('sample/index', $rhData);
-    # レスポンスヘッダに値をセット
-    Response::output(¥$html);
-}
-</code></pre>
-
-<h4>template/_system/sample/index.html</h4>
-
-<pre><code>&lt;html&gt;
-&lt;head&gt;&lt;title&gt;$CON:title$&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;
-    test
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-<p>普段触るフレームワークだと「レスポンスの生成」も「レスポンスヘッダへの値のセット」も自分ですることはまず無くて。テンプレートに渡す値をハッシュで用意して、テンプレート自体はクエリパスなどから自動で判断するかもしくは明示的に指定するかする場合が多い。</p>
-
-<p>ということでこの辺り結構違和感が大きいのでちょっとそれっぽくなるように手を入れてみた。</p>
-
-<h4>pm/Context.pm</h4>
-
-<script src="https://gist.github.com/1038137.js?file=Context.pm"></script>
-
-<h4>pm/Page/Main.pm</h4>
-
-<script src="https://gist.github.com/1038137.js?file=Main.pm"></script>
-
-<h4>conf/pages.conf</h4>
-
-<pre><code>our %PAGE = (
-        .
-        .
-        .
-    'test'  =&gt; [0,0,0, 'Page::Sample', 'test'],
-    'test1' =&gt; [0,0,0, 'Page::Sample', 'test1'],
-    'test2' =&gt; [0,0,0, 'Page::Sample', 'test2'],
-);
-</code></pre>
-
-<h4>pm/Page/Sample.pm</h4>
-
-<script src="https://gist.github.com/1038137.js?file=Sample.pm"></script>
-
-<h4>template/_system/sample/test.html</h4>
-
-<script src="https://gist.github.com/1038137.js?file=test.html"></script>
-
-<h3>次回はDB周りを触ってみる</h3>
-
-<p>commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。</p>
-
-<p class="post-footer"><span class="date">2011-06-22</span></p>
-<h2><a href="/2011/06/21/20110621/" title="">MobaSiFを触ってみた</a></h2>
-<h3>インストール</h3>
-
-<p>環境はCentOS5.6で極力yumで対処してみた。</p>
-
-<ul>
-<li>CentOS 5.6</li>
-<li>Apache 2.2.3 (yum install)</li>
-<li>fastcgi 2.4.0 (yum install)</li>
-<li>mod_fastcgi 2.4.2 (source install)</li>
-<li>mysql 5.1.57 (rpm install)</li>
-<li>perl 5.8.8 (yum install)</li>
-</ul>
-
-<p>ちなみにMobaSiFのdocsに記載されている対応環境の内容は以下の通り</p>
-
-<pre><code>           要求       確認環境
-CentOS     4.x / 5.x  4.5 (i386)
-Apache     1.3.x      1.3.41
-MySQL      5.0.x      5.0.51a
-perl       5.8.x      5.8.0
-fastcgi    2.4.x      2.4.6
-</code></pre>
-
-<h3>詰まった所、注意点</h3>
-
-<ul>
-<li>MobaSiF
-<ul>
-<li>mod_fastcgiとmod_fcgidがあるがMobaSiFはmod_fastcgi</li>
-<li>yumで入れたApacheのバージョンが2.2だったが、mod_fastcgiは2.0までしか対応していない。</li>
-<li>パッチを当てれば2.2にmod_fastcgiを入れるられる⇒'Apache2.2＋fastcgiで Ruby on Rails'</li>
-</ul></li>
-<li>perl
-<ul>
-<li>FastCGIがシステム標準のperlを使うのでperlbrewを使うと混乱する。</li>
-<li>素直にシステム標準のperlを使うのが楽</li>
-</ul></li>
-<li>Apache
-<ul>
-<li>MobaSiFとは全然関係ないがバーチャルホストでDocumentRootの設定に変な癖がある⇒VirtualHost環境化でのPermission Denied</li>
-</ul></li>
-</ul>
-
-<h3>MobaSiFのミニマムサ</h3>
-
-<p>ンプル</p>
-
-<p>MobaSiFでのページとURLの対応は以下のようになる</p>
-
-<ul>
-<li>ルート
-<ul>
-<li>http://[domain]/</li>
-</ul></li>
-<li>各ページ（アンダースコア＋ページ名）
-<ul>
-<li>http://[domain]/[_ページ名前]</li>
-</ul></li>
-</ul>
-
-<h3>ページを追加してみる</h3>
-
-<h4>conf/pages.conf</h4>
-
-<pre><code>our %PAGE = {
-        .
-        .
-        .
-    'sample' =&gt; [0,    package Page::Sample;
-
-use strict;
-use HTMLTemplate;
-use Response;
-
-sub pageMain {
-    my $func = shift;
-    my $rhData = {};
-
-    my $html = HTMLTemplate::insert("sample/top", $rhData);
-    Response::output(\$html);
-}
-
-1;0,0, 'Page::Sample', 'pageMain'],
-    # http://[domain]/_sample にアクセスすると Page::SampleモジュールのpageMainの処理が走る
+<pre><code>my $app = sub {
+    my $env = shift;
+    [200, ['Content-Type' =&gt; 'text/plain'] ['Hello World'] ];
 };
+
+$app;
 </code></pre>
 
-<h4>pm/Page/Sample.pm</h4>
+<p>とかをモリモリ書いちゃうのもどう考えたって違う。</p>
 
-<pre><code>package Page::Sample;
+<p>ということで、Plack::*,Router::Simple(Router::Simple::Sinatraish),Text::Xslate,Data::Section::Simpleでそれっぽく書けるようなものを作ってみた。あまりにも決め打ちすぎるので、設定を渡せるようにしたりして融通効くようにしたいかな。あんまり迷惑にならなそうなところで使ってみてます。</p>
 
-use strict;
-use HTMLTemplate;
-use Response;
+<p>「劣化<a href="https://github.com/tokuhirom/MojaMoja">MojaMoja</a>」とか「劣化<a href="https://github.com/yusukebe/Hitagi">Hitagi</a>」とか「劣化<a href="http://blog.nomadscafe.jp/2010/07/nopastesinatrawaf.html">Shirahata</a>」とか思いつつ、劣化ということすらおこがましい状態。そりゃ大半コピーアンドペーストだもの仕方ないね。</p>
 
-sub pageMain {
-    my $func = shift;
-    my $rhData = {};
+<p>強いて特徴を上げるならフォワードっぽいこと出来るようにしてみた（$ENV{PATH_INFO}をlocalで書き換える力技なので問題あるとは思う）けどSinatra的ルーティングでフォワードは用途を勘違いしてる感が否めないので正直いらないと思います。マル。</p>
 
-    my $html = HTMLTemplate::insert("sample/top", $rhData);
-    Response::output(\$html);
-}
+<p>ちなみに<a href="https://github.com/mix3/Chaco">Chaco</a>はチャコと読みます。以前実家にいた、今は亡き黒のラブラドールレトリーバーの名前です。</p>
 
-1;
+<pre><code>use Chaco;
+# ...
+run;
 </code></pre>
 
-<h3>テンプレートのコンパイル</h3>
+<p>で、元気に走り回るチャコの姿を思い浮かべながら書いてました。<a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=4507497">以前書いた絵</a>の日付みてもう４年近くも経ってるんですね…</p>
 
-<p>MobaSiFでは速度を出すためにアプリで機種毎に出し分けなどの処理をしないよう最初からテンプレートを機種別に生成したりするようです。（変なバイナリデータをテンプレートに埋め込んでいたり他にも色々やってそうな感じ）</p>
-
-<pre><code>$ perl script/tool/compile_template
-</code></pre>
-
-<h4>conf/pages.confの数字の意味</h4>
-
-<pre><code>'ページ名' =&gt; [ UID_ST, USER_ST, SERV_ST, モジュール, サブルーチン ]
-</code></pre>
-
-<ul>
-<li>UID_ST
-<ul>
-<li>0:情報なし</li>
-<li>2:serial/uid あり</li>
-</ul></li>
-<li>USER_ST
-<ul>
-<li>0:非会員でもOK</li>
-<li>1:会員（メアド未登録でもOK）</li>
-<li>2:会員（メアド登録済）</li>
-</ul></li>
-<li>SERV_ST (以下を足したもの)
-<ul>
-<li>1:自主退会だと不能</li>
-<li>2:運用退会だと不能</li>
-<li>4:PENALTYだと不能</li>
-<li>8:メール不達だと不能</li>
-</ul></li>
-</ul>
-
-<h3>まとめ</h3>
-
-<ul>
-<li>機能は非常にミニマム
-<ul>
-<li>文字コードはテンプレートやコード等でsjis,utf8,eucが入り交じる</li>
-<li>テンプレートの中に絵文字のバイナリを直接書く</li>
-<li>ロジックの所でレスポンスにテンプレートと引数を合成したものの返り値を渡す処理を自分で書く。</li>
-</ul></li>
-</ul>
-
-<p>⇒多分拡張して使われる事が前提と思ってよい。</p>
-
-<ul>
-<li>古いのでPlackに対応していないため、動作確認までの環境構築が非常に面倒。
-<ul>
-<li>開発段階でわざわざApacheとFastCGIを入れないといけない</li>
-</ul></li>
-</ul>
-
-<p>⇒今時Plack対応して欲しいかも。開発段階でFastCGIがどうのとかあんまり考えたく無い。</p>
-
-<p>以下で説明されている通りモダンじゃないのは確かかもしれませんね。 </p>
-
-<p><a href="http://www.slideshare.net/bobpp/42php-mobasif-1351953">第42回PHP勉強会 MobaSiF 発表資料</a></p>
-
-<p class="post-footer"><span class="date">2011-06-21</span></p>
+<p class="post-footer"><span class="date">2013-03-16</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
       </div>
       <div class="autopagerize_insert_before"></div>

@@ -10,6 +10,47 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>おれおれWebフレームワーク - Chaco</title>
+<description>
+<![CDATA[
+<p>これ書くタイミング間違えてる気がするけどまあいいや</p>
+
+<p>なんとなく作ってみるなど。別に他フレームワークと差別化して使うようなものでもなく習作的な感じ。</p>
+
+<p>*::LiteとかDancerとか使えばワンソースでお手軽にWebアプリ書けるわけですが、実際に簡単なアプリ書くとなると、Liteなんだけどなんとなく仰々しい気がしてきたり。（Liteと言っても結局各フレームワークが持つ色々な機能は提供されているのでそう感じるのかな？）</p>
+
+<p>でもだからといって</p>
+
+<pre><code>my $app = sub {
+    my $env = shift;
+    [200, ['Content-Type' =&gt; 'text/plain'] ['Hello World'] ];
+};
+
+$app;
+</code></pre>
+
+<p>とかをモリモリ書いちゃうのもどう考えたって違う。</p>
+
+<p>ということで、Plack::*,Router::Simple(Router::Simple::Sinatraish),Text::Xslate,Data::Section::Simpleでそれっぽく書けるようなものを作ってみた。あまりにも決め打ちすぎるので、設定を渡せるようにしたりして融通効くようにしたいかな。あんまり迷惑にならなそうなところで使ってみてます。</p>
+
+<p>「劣化<a href="https://github.com/tokuhirom/MojaMoja">MojaMoja</a>」とか「劣化<a href="https://github.com/yusukebe/Hitagi">Hitagi</a>」とか「劣化<a href="http://blog.nomadscafe.jp/2010/07/nopastesinatrawaf.html">Shirahata</a>」とか思いつつ、劣化ということすらおこがましい状態。そりゃ大半コピーアンドペーストだもの仕方ないね。</p>
+
+<p>強いて特徴を上げるならフォワードっぽいこと出来るようにしてみた（$ENV{PATH_INFO}をlocalで書き換える力技なので問題あるとは思う）けどSinatra的ルーティングでフォワードは用途を勘違いしてる感が否めないので正直いらないと思います。マル。</p>
+
+<p>ちなみに<a href="https://github.com/mix3/Chaco">Chaco</a>はチャコと読みます。以前実家にいた、今は亡き黒のラブラドールレトリーバーの名前です。</p>
+
+<pre><code>use Chaco;
+# ...
+run;
+</code></pre>
+
+<p>で、元気に走り回るチャコの姿を思い浮かべながら書いてました。<a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=4507497">以前書いた絵</a>の日付みてもう４年近くも経ってるんですね…</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.com/2013/03/16/20130316/</guid>
+<pubDate>Sat, 16 Mar 2013 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>Plack::App::Directoryで画像を展開する</title>
 <description>
 <![CDATA[
@@ -473,28 +514,6 @@ exit 0
 </description>
 <guid isPermaLink="true">http://mix3.github.com/2012/04/22/20120422/</guid>
 <pubDate>Sun, 22 Apr 2012 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>Capture::Tiny</title>
-<description>
-<![CDATA[
-<p>前回pixivブログは github pages のコピーだから大丈夫とか書いたけど、github pages で書き始める前のpixivブログはバックアップ取ってなかったのでほんとは大丈夫じゃなかった mix3 です。SSH+LDAP とか keepalived を試してみた記事が消えたのはちょっともったいなかったかな。まあ、Google検索でキャッシュ漁ればある程度は発掘出来そうではあるけれども。</p>
-
-<h3>p5-SWFEditor</h3>
-
-<p>アウトプットが無さ過ぎて良くないなぁということでひねり出してみる。</p>
-
-<p>前の記事に書いたp5-SWFEditorですが、swf_info と print_tag_data はCが標準出力をしていて、これをテストしようとすると標準出力をキャプチャしないといけなくてちょっと困ってしまいました。Capture::Tiny というものを使うとキャプチャ出来るというのは<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんから教わって試してみたけれどなぜか上手く行かず。言われて試してみたときは途中までしかキャプチャ出来ませんでした。</p>
-
-<p>ただ、途中までしかキャプチャできないという時点で出力がバッファされているというのはピンと来ていて、実際その通りだったのですが、Perlでこれをどうこうする方法が分からず結局今もどうすれば良いのかというのは分かっていません。今はXSのほうでfflushするようにしてテストが出来るようにしています。</p>
-
-<p>以下標準出力を捕まえる方法を探っていたときに書いたサンプルです。fflushしたときの標準出力とPerlIO_stdoutfを使った標準出力はキャプチャできていますが、素直にprintfしたときはキャプチャできず遅れてバッファに溜まっていたものが標準出力されてしまっています。</p>
-
-<script src="https://gist.github.com/2384966.js"> </script>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.com/2012/04/14/20120414/</guid>
-<pubDate>Sat, 14 Apr 2012 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>

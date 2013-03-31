@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <link href="/css/style.css" rel="stylesheet" type="text/css">
+  <link href="/css/style.css" rel="stylesheet" type="text/css" />
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
   <link href="/css/prettify/prettify.css" rel="stylesheet" type="text/css" media="screen" />
   <script src="/js/prettify/prettify.js" type="text/javascript"></script>
@@ -33,6 +33,10 @@
   
   </script>
 
+  <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
+  <link href="http://coderwall.com/stylesheets/jquery.coderwall.css" media="all" rel="stylesheet" type="text/css" />
+  <script src="http://coderwall.com/javascripts/jquery.coderwall.js"></script>
+
   <title>萌えキャラとは何だったのか</title>
 </head>
 <body>
@@ -57,6 +61,41 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/03/16/20130316/" title="">おれおれWebフレームワーク - Chaco</a></h2>
+<p>これ書くタイミング間違えてる気がするけどまあいいや</p>
+
+<p>なんとなく作ってみるなど。別に他フレームワークと差別化して使うようなものでもなく習作的な感じ。</p>
+
+<p>*::LiteとかDancerとか使えばワンソースでお手軽にWebアプリ書けるわけですが、実際に簡単なアプリ書くとなると、Liteなんだけどなんとなく仰々しい気がしてきたり。（Liteと言っても結局各フレームワークが持つ色々な機能は提供されているのでそう感じるのかな？）</p>
+
+<p>でもだからといって</p>
+
+<pre><code>my $app = sub {
+    my $env = shift;
+    [200, ['Content-Type' =&gt; 'text/plain'] ['Hello World'] ];
+};
+
+$app;
+</code></pre>
+
+<p>とかをモリモリ書いちゃうのもどう考えたって違う。</p>
+
+<p>ということで、Plack::*,Router::Simple(Router::Simple::Sinatraish),Text::Xslate,Data::Section::Simpleでそれっぽく書けるようなものを作ってみた。あまりにも決め打ちすぎるので、設定を渡せるようにしたりして融通効くようにしたいかな。あんまり迷惑にならなそうなところで使ってみてます。</p>
+
+<p>「劣化<a href="https://github.com/tokuhirom/MojaMoja">MojaMoja</a>」とか「劣化<a href="https://github.com/yusukebe/Hitagi">Hitagi</a>」とか「劣化<a href="http://blog.nomadscafe.jp/2010/07/nopastesinatrawaf.html">Shirahata</a>」とか思いつつ、劣化ということすらおこがましい状態。そりゃ大半コピーアンドペーストだもの仕方ないね。</p>
+
+<p>強いて特徴を上げるならフォワードっぽいこと出来るようにしてみた（$ENV{PATH_INFO}をlocalで書き換える力技なので問題あるとは思う）けどSinatra的ルーティングでフォワードは用途を勘違いしてる感が否めないので正直いらないと思います。マル。</p>
+
+<p>ちなみに<a href="https://github.com/mix3/Chaco">Chaco</a>はチャコと読みます。以前実家にいた、今は亡き黒のラブラドールレトリーバーの名前です。</p>
+
+<pre><code>use Chaco;
+# ...
+run;
+</code></pre>
+
+<p>で、元気に走り回るチャコの姿を思い浮かべながら書いてました。<a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=4507497">以前書いた絵</a>の日付みてもう４年近くも経ってるんですね…</p>
+
+<p class="post-footer"><span class="date">2013-03-16</span></p>
 <h2><a href="/2013/03/09/20130309-2/" title="">Plack::App::Directoryで画像を展開する</a></h2>
 <p>Perlのネガティブキャンペーンが流行ってる今日この頃ですが私は元気です（震え声）</p>
 
@@ -132,84 +171,6 @@
 <p>年に1回の年賀絵ぐらい継続して描きたいものですね…</p>
 
 <p class="post-footer"><span class="date">2013-01-06</span></p>
-<h2><a href="/2012/12/30/20121230/" title="">トランザクション</a></h2>
-<p>トランザクションってなーに？mix3です</p>
-
-<h3>同時更新処理</h3>
-
-<p><a href="http://mix3.github.com/2012/11/03/20121103/">スレーブ遅延</a>のときにSELECT > UPDATEで古い情報をもとにUPDATEしてしまうと不整合が発生すると書きましたが、</p>
-
-<p>たとえば同じ行を複数で同時にSELECT > UPDATEすると同じように不整合が発生することがあります。</p>
-
-<ol>
-<li>AがT1からSELECT</li>
-<li>BがT1からSELECT</li>
-<li>AがT1をUPDATE</li>
-<li>BがT1をUPDATE</li>
-</ol>
-
-<p>このような順序で更新がかかると、BがAの更新を上書きしてしまうため、実質Aの更新が無かった事になってしまいます。</p>
-
-<p>これも更新がアトミックであれば発生しないので可能であればアトミックな更新にするのが良いですが、更新が複数ある場合はそういった変更も出来ません。</p>
-
-<h3>そんなときこそトランザクション。そんなふうに考えていた時期が僕にもありました。</h3>
-
-<p>で、そういうときはトランザクションを使う物だと思っていました。トランザクションは複数の処理を一つの処理としてまとめて成功するか失敗するか、どちらかを保証してくれます。</p>
-
-<p>なので、SELECT > UPDATEをトランザクションでまとめてしまえば大丈夫だよね！と思っていたので、以下のようなコードを書いて確認しました。</p>
-
-<script src="https://gist.github.com/4411441.js"></script>
-
-<script src="https://gist.github.com/4411446.js"></script>
-
-<p>scoreが更新回数になるので、'v' => '&lt;更新回数>' と揃えば不整合無く更新出来たことになるのですが、</p>
-
-<p>見ての通りトランザクションを使った方は残念な結果になっています。で、すこしググッた結果トランザクションとロックは別で考えないと行けないことを知りました。</p>
-
-<p><strong>トランザクションを使ったからといって勝手に行読み込みなどをロックして整合性を保証してくれるとかでは全然無いんですね。</strong></p>
-
-<p>当たり前だろダラズ！と言われても仕方ないような勘違いですが、いやトランザクションを使わない世界でしばらく生きていたので…</p>
-
-<p>で、SELECTにテーブルロックや行ロックが掛かってないためにSELECT > UPDATEの不整合が防げていないようなので、SELECT文にFOR UPDATE を付けてそれを防いでみました</p>
-
-<script src="https://gist.github.com/4411474.js"></script>
-
-<p>結果またしても残念な結果になりました…</p>
-
-<h3>ちゃんとストレージエンジンを指定しましょう</h3>
-
-<p>結果から言うとストレージエンジンを指定していなかったのでトランザクションの使えないMyISAMでテーブルが作られていたからでした。</p>
-
-<script src="https://gist.github.com/4411511.js"></script>
-
-<p>こんな感じでInnoDBを指定する事で期待通り、不整合なく更新されるようになりました。めでたしめでたし。</p>
-
-<p>ちなみにSELECTのロックには共有ロックと排他ロックとあり、FOR UPDATEは排他ロックになります。LOCK IN SHARE MODEだと共有ロックになります。</p>
-
-<p>今回の場合にLOCK IN SHARE MODEを使うと10ものプロセスが共有ロックを取り合って凄い勢いでデッドロックしました。</p>
-
-<script src="https://gist.github.com/4411540.js"></script>
-
-<p>ロックするということは同時にデッドロックする可能性もあるということなので、適切なロックを選択して使い、デッドロックの可能性を減らしながら上手く付き合っていきたいですね。</p>
-
-<h3>まとめ</h3>
-
-<ul>
-<li>トランザクションはロックとはまた別問題
-<ul>
-<li>不整合を防ぎたいならちゃんとロックのことを考えてSQLを書く</li>
-</ul></li>
-<li>MySQLのデフォルトストレージエンジンはMyISAMだけど、それトランザクション使えないからね？</li>
-<li>ロックにも種類はあり、デッドロックには気をつける</li>
-</ul>
-
-<h3>今年のブログはこれが最後な気がするので。</h3>
-
-<p>来年はもっとブログをコードを書いてアウトプットを増やして行きたいです。</p>
-
-<h3>それでは良いお年を！</h3>
-
-<p class="post-footer"><span class="date">2012-12-30</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 &lt;&lt;
@@ -252,6 +213,10 @@
   <li><a href="/archives/2011/05/">2011年05月</a></li>
   <li><a href="/archives/2011/04/">2011年04月</a></li>
 </ul>
+<h3>coderwall</h3>
+<p>
+<section class="coderwall" data-coderwall-username="mix3" data-coderwall-orientation="horizontal"></section>
+</p>
 <h3>TagCloud</h3>
 <p><style type="text/css">
 
