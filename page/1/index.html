@@ -61,6 +61,118 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/04/13/20130413/" title="">phantomjsで遊ぶ</a></h2>
+<p>うわっ…私のチーム、レベル低すぎ…？ mix3です。リードエンジニアとしてどうにかしろって話ですが、コミュ
+障の自分には荷が重いです…</p>
+
+<h3><a href="http://d.hatena.ne.jp/karasuyamatengu/20110126/1296066287">PhantomJS: 最小限なheadlessのWebKitベースのJavaScriptツール</a></h3>
+
+<p>だそうです。正直良くわかりませんが、nodeのようにサーバーサイドで書けるイメージ。</p>
+
+<p>$ cat hello.js</p>
+
+<pre><code>console.log('Hello, world!');
+phantom.exit();
+</code></pre>
+
+<p>$ phantomjs hello.js</p>
+
+<pre><code>Hello, world!
+</code></pre>
+
+<p>とか</p>
+
+<p>$ cat google_capture.js</p>
+
+<pre><code>var page = require('webpage').create();
+page.open('http://www.google.com', function (status) {
+    page.render('google_capture.png');
+    phantom.exit();
+});
+</code></pre>
+
+<p><a href="/images/20130413/google_capture.png"><img src="/images/20130413/google_capture.png" width="200" /></a><br /></p>
+
+<p>とか</p>
+
+<p>$ cat hello_server.js</p>
+
+<pre><code>var system = require('system');
+
+if (system.args.length !== 2) {
+    console.log('Usage: hello_server.js &lt;portnumber&gt;');
+    phantom.exit(1);
+} else {
+    port = system.args[1];
+    server = require('webserver').create();
+
+    service = server.listen(port, function (request, response) {
+        response.statusCode = 200;
+        response.write('&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;');
+        response.close();
+    });
+
+    if (!service) {
+        console.log('Error: Could not create web server listening on port ' + port);
+        phantom.exit();
+    }
+}
+</code></pre>
+
+<p>$ phantomjs hello_server.js</p>
+
+<p>$ curl http://localhost:2525</p>
+
+<pre><code>&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+
+<p>などなど。単純なCLIプログラムや、Webページにアクセスしてキャプチャ取ったり、サーバプログラムも書けたりします。</p>
+
+<p>ローカルファイルも扱えるので、例えばあるディレクトリ以下の画像を並べて表示するサーバを立てつつ、それを</p>
+
+<pre><code>page.open('http://localhost:[port]', function () {
+    page.render(...);
+});
+</code></pre>
+
+<p>とかするとあら不思議。コマンド一発で複数画像を１枚画像に出来たりします。</p>
+
+<h3>なんでこんなもん触ってるかというと</h3>
+
+<p>ソーシャルゲームに携わっていて思う事なのですが、イベント中だと特にそうですが時間で文言が変わるということは良くあることです。そしてこういうものは当然リリース前にスケジュールはきっちり決まっていて（もちろん差し込みで仕込み直すこともありますが）がっつりテストすることになります。が、開発段階でも当然自分で目視チェックすることになるのですがこれが非常に面倒くさい。なぜ面倒くさいかというとモジュールの単体テストとは違いローカルプロキシ越しにブラウザで確認したり実機で確認したりすることになり、自動テストになかなか上手く落とし込めないからです。（見た目の部分は特に変更が出易いのでそういう意味でもテストに落としづらいというのはあると思います）他のプロジェクトだと一部定型的な部分はモデルに落とし込んでテスト出来るようにしていたりするようですが、当然限界もあり。</p>
+
+<p>ということで、今のところ画像、文言など見た目の部分をテストに落とし込むのは無理だろうなぁと思っておりますが、そうは言ってもチェックが面倒なことは面倒なのでチェックすること自体はいくらか楽にはしたい。特に時間で文言が切り替わるのを見比べられる状態にしたい。</p>
+
+<p>ということでphantomjsでしこしこ以下のようなスクリプト書いてました</p>
+
+<ul>
+<li>指定ページを時間別にキャプチャしてpngで吐き出すスクリプト</li>
+<li>フォルダ以下の*.png画像を横に並べて表示するサーバを立ててそれをキャプチャするスクリプト</li>
+</ul>
+
+<p>参考: <a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">PhantomJS でログインが必要なページでも自由自在にスクレイピング - 凹みTips</a></p>
+
+<p>ほぼほぼキャプチャの部分は<a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">参考</a>をそのまま使わせてもらっているのですが、参考のままだと画像などがキャプチャされないことがあったので、setTimeoutを使ってキャプチャのタイミングを遅らせるなどの簡単な工夫をしています。</p>
+
+<p>後、サーバがバイナリを出力するときは、ローカルからファイルを読み込む時に 'b' を指定するのとresponse.writeするまえにresponse.setEncoding('binary')しないといけないようなので注意が必要です。</p>
+
+<pre><code>var image = fs.read(file_path, 'b');
+response.headers = {
+    'Accept-Ranges': 'bytes',
+    'Content-Type': 'image/png',
+    'Content-Length': image.length
+};
+response.setEncoding('binary');
+response.write(image);
+</code></pre>
+
+<p>こうすることで横並び画像にして文言チェック出来るようになり捗りそうな気配がしています。（まだ作ったばかりで実際に活用するのはこれから）</p>
+
+<p>ちなみに一枚画像にしてしまうのは社内gyazoにあげてディレクターなど他の方にも見てもらえるようにしたかったからですが、今にして思えば別に一枚画像にする必要はなく、画像一括アップロード出来るフォームと横並びにして表示出来る簡単なサーバアプリを書くだけで良いことに気づいたので、ここは今後やりやすい方にシフトする感じで行きたい。</p>
+
+<p>ということでphantomjs便利なんじゃないかなというお話でした。</p>
+
+<p class="post-footer"><span class="date">2013-04-13</span></p>
 <h2><a href="/2013/03/16/20130316/" title="">おれおれWebフレームワーク - Chaco</a></h2>
 <p>これ書くタイミング間違えてる気がするけどまあいいや</p>
 
@@ -161,16 +273,6 @@ run;
 </ul>
 
 <p class="post-footer"><span class="date">2013-02-14</span></p>
-<h2><a href="/2013/01/06/20130106/" title="">あけおめ</a></h2>
-<p>ことよろ。なんか本当に久しぶりに落書きしたmix3です。</p>
-
-<script src="http://source.pixiv.net/source/embed.js" data-id="32685756_6064c2b2416178ec058c322de47db89e" data-size="medium" data-border="on" charset="utf-8"></script>
-
-<noscript><p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=32685756" target="_blank">あけおめ</a> by <a href="http://www.pixiv.net/member.php?id=88339" target="_blank">mix3</a> on <a href="http://www.pixiv.net/" target="_blank">pixiv</a></p></noscript>
-
-<p>年に1回の年賀絵ぐらい継続して描きたいものですね…</p>
-
-<p class="post-footer"><span class="date">2013-01-06</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 &lt;&lt;
@@ -186,7 +288,7 @@ run;
  | 
 <a href="/page/5/">5</a>
 <a href="/page/2/" rel="next">&gt;</a>
-<a href="/page/5/">&gt;&gt;</a>
+<a href="/page/6/">&gt;&gt;</a>
 </div>
       </div>
       <div class="autopagerize_insert_before"></div>
@@ -200,6 +302,7 @@ run;
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/04/">2013年04月</a></li>
   <li><a href="/archives/2013/03/">2013年03月</a></li>
   <li><a href="/archives/2013/02/">2013年02月</a></li>
   <li><a href="/archives/2013/01/">2013年01月</a></li>

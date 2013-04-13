@@ -37,8 +37,7 @@
   <link href="http://coderwall.com/stylesheets/jquery.coderwall.css" media="all" rel="stylesheet" type="text/css" />
   <script src="http://coderwall.com/javascripts/jquery.coderwall.js"></script>
 
-  <title>萌えキャラとは何だったのか - そろそろ自分は本当に死んだ方が良い気がする件について
-</title>
+  <title>萌えキャラとは何だったのか</title>
 </head>
 <body>
 <div id="wrap">
@@ -62,58 +61,118 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
-<h2><a href="/2012/08/12/20120812/" title="">そろそろ自分は本当に死んだ方が良い気がする件について</a></h2>
-<p>「バカジャネーノ」と言われてぐぅの根も出ないmix3です。</p>
+<h2><a href="/2013/04/13/20130413/" title="">phantomjsで遊ぶ</a></h2>
+<p>うわっ…私のチーム、レベル低すぎ…？ mix3です。リードエンジニアとしてどうにかしろって話ですが、コミュ
+障の自分には荷が重いです…</p>
 
-<h3>死んだ方が良い事の概要その１</h3>
+<h3><a href="http://d.hatena.ne.jp/karasuyamatengu/20110126/1296066287">PhantomJS: 最小限なheadlessのWebKitベースのJavaScriptツール</a></h3>
 
-<p>今やってるサービスに諸事情により一つ機能を追加しなければならない必要に迫られ、その対応を自分がすることになったのですが、結果は盛大に燃やし散々な糞クオリティで納期に間に合わないという目も当てられない自体になってしまいました。
-設計段階で詰んでいて（DB設計の時点で要件を満たせない）どう尻拭いしても物理的に納期に間に合わないということで、結局お尻を先延ばしにしてもらって先輩にヘルプ入ってもらい設計からやり直しとなりました。</p>
+<p>だそうです。正直良くわかりませんが、nodeのようにサーバーサイドで書けるイメージ。</p>
 
-<h3>死んだ方が良い事の概要その２</h3>
+<p>$ cat hello.js</p>
 
-<p>スケジュール再編からは先輩の手によって設計が組み直され、画面仕様から必要な機能を洗い出してコントローラとモデルのインタフェースを決めて行く（勝手にIDD[インタフェースドリブンデベロップメント]などと呼んでいる）やりかたで、仕様認識の齟齬を減らしつつ必要充分な機能を決めて行きました。このやり方は関わるプログラマ全員の時間を使ってしまうのでなかなか面倒ですが、仕様認識齟齬が減るのと機能の洗い出しで全員がチェックするので抜けが減るので危険な香りがする時は積極的にするようにしています。またインタフェースを決めてしまうので、分業しやすいというのも利点です。Javaのインタフェースベースの作り方を思い出してとても気分良く作れます。</p>
+<pre><code>console.log('Hello, world!');
+phantom.exit();
+</code></pre>
 
-<p>ここまでは良いのですが、分業で自分がモデルを作って最後にコントローラと結合すると自分の糞クオリティを発揮して色々問題を起こしていました</p>
+<p>$ phantomjs hello.js</p>
+
+<pre><code>Hello, world!
+</code></pre>
+
+<p>とか</p>
+
+<p>$ cat google_capture.js</p>
+
+<pre><code>var page = require('webpage').create();
+page.open('http://www.google.com', function (status) {
+    page.render('google_capture.png');
+    phantom.exit();
+});
+</code></pre>
+
+<p><a href="/images/20130413/google_capture.png"><img src="/images/20130413/google_capture.png" width="200" /></a><br /></p>
+
+<p>とか</p>
+
+<p>$ cat hello_server.js</p>
+
+<pre><code>var system = require('system');
+
+if (system.args.length !== 2) {
+    console.log('Usage: hello_server.js &lt;portnumber&gt;');
+    phantom.exit(1);
+} else {
+    port = system.args[1];
+    server = require('webserver').create();
+
+    service = server.listen(port, function (request, response) {
+        response.statusCode = 200;
+        response.write('&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;');
+        response.close();
+    });
+
+    if (!service) {
+        console.log('Error: Could not create web server listening on port ' + port);
+        phantom.exit();
+    }
+}
+</code></pre>
+
+<p>$ phantomjs hello_server.js</p>
+
+<p>$ curl http://localhost:2525</p>
+
+<pre><code>&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+
+<p>などなど。単純なCLIプログラムや、Webページにアクセスしてキャプチャ取ったり、サーバプログラムも書けたりします。</p>
+
+<p>ローカルファイルも扱えるので、例えばあるディレクトリ以下の画像を並べて表示するサーバを立てつつ、それを</p>
+
+<pre><code>page.open('http://localhost:[port]', function () {
+    page.render(...);
+});
+</code></pre>
+
+<p>とかするとあら不思議。コマンド一発で複数画像を１枚画像に出来たりします。</p>
+
+<h3>なんでこんなもん触ってるかというと</h3>
+
+<p>ソーシャルゲームに携わっていて思う事なのですが、イベント中だと特にそうですが時間で文言が変わるということは良くあることです。そしてこういうものは当然リリース前にスケジュールはきっちり決まっていて（もちろん差し込みで仕込み直すこともありますが）がっつりテストすることになります。が、開発段階でも当然自分で目視チェックすることになるのですがこれが非常に面倒くさい。なぜ面倒くさいかというとモジュールの単体テストとは違いローカルプロキシ越しにブラウザで確認したり実機で確認したりすることになり、自動テストになかなか上手く落とし込めないからです。（見た目の部分は特に変更が出易いのでそういう意味でもテストに落としづらいというのはあると思います）他のプロジェクトだと一部定型的な部分はモデルに落とし込んでテスト出来るようにしていたりするようですが、当然限界もあり。</p>
+
+<p>ということで、今のところ画像、文言など見た目の部分をテストに落とし込むのは無理だろうなぁと思っておりますが、そうは言ってもチェックが面倒なことは面倒なのでチェックすること自体はいくらか楽にはしたい。特に時間で文言が切り替わるのを見比べられる状態にしたい。</p>
+
+<p>ということでphantomjsでしこしこ以下のようなスクリプト書いてました</p>
 
 <ul>
-<li>バリデート関数はエラーを返すだけというルールで決めたはずなのになぜかExceptionを投げてる</li>
-<li>関数の返り値の形を変えてしまった</li>
-<li>明らかにコピペしてる</li>
-<li>関数名、変数名の意味が分からない</li>
-<li>テスト書けていない（間に合ってない）</li>
+<li>指定ページを時間別にキャプチャしてpngで吐き出すスクリプト</li>
+<li>フォルダ以下の*.png画像を横に並べて表示するサーバを立ててそれをキャプチャするスクリプト</li>
 </ul>
 
-<p>時間も無いのに色々やらかして最終的に「バカジャネーノ」と言われて何も言えないmix3の姿がそこにはありました。</p>
+<p>参考: <a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">PhantomJS でログインが必要なページでも自由自在にスクレイピング - 凹みTips</a></p>
 
-<h3>こういう怒られ方はずっと前から続いている 今回は集中しただけで</h3>
+<p>ほぼほぼキャプチャの部分は<a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">参考</a>をそのまま使わせてもらっているのですが、参考のままだと画像などがキャプチャされないことがあったので、setTimeoutを使ってキャプチャのタイミングを遅らせるなどの簡単な工夫をしています。</p>
 
-<p>要するにプログラマとしては致命的なほど人から見て意味の通じるコードが書けないのだと思います。視野狭窄で自分しか見えてなくて、平気で他人から見て意味の分からないコードを書いてしまう。他人のコードを見て何がどう優れているか、このコードの何がだめか。変数、関数の意味は。怒られるたびに考えるようにしても、結局怒られる。良し悪しの判断がいつまでたっても改善されない。</p>
+<p>後、サーバがバイナリを出力するときは、ローカルからファイルを読み込む時に 'b' を指定するのとresponse.writeするまえにresponse.setEncoding('binary')しないといけないようなので注意が必要です。</p>
 
-<p>自分は成長していないといつも感じているしいつも言っているけど、こういったことの成長が無いことも多く含んでいる。</p>
+<pre><code>var image = fs.read(file_path, 'b');
+response.headers = {
+    'Accept-Ranges': 'bytes',
+    'Content-Type': 'image/png',
+    'Content-Length': image.length
+};
+response.setEncoding('binary');
+response.write(image);
+</code></pre>
 
-<h3>結局どうすれば良いのかは分からない</h3>
+<p>こうすることで横並び画像にして文言チェック出来るようになり捗りそうな気配がしています。（まだ作ったばかりで実際に活用するのはこれから）</p>
 
-<p>これだけ怒られて改善しないといけないと思っていて、でもどうすれば良いのかは良くわからない。</p>
+<p>ちなみに一枚画像にしてしまうのは社内gyazoにあげてディレクターなど他の方にも見てもらえるようにしたかったからですが、今にして思えば別に一枚画像にする必要はなく、画像一括アップロード出来るフォームと横並びにして表示出来る簡単なサーバアプリを書くだけで良いことに気づいたので、ここは今後やりやすい方にシフトする感じで行きたい。</p>
 
-<p>ただ「他人が理解出来るコードを書けば良い」だけではあるけれども、それだけの事が出来ないということは、自分にはそれをするための何かが欠けてるということで、でもその何かを「何か」としか書けないということは全くその「何か」を理解していない。つまりどうしたら良いのか分からない。</p>
+<p>ということでphantomjs便利なんじゃないかなというお話でした。</p>
 
-<p>いっぱいコード書いて怒られて判断出来るようになる以外にもう方法が思いつかないが、でもそのやり方をするには既に時間を使いすぎてる感があるし、そのせいで関わるいろんなひとに迷惑をかけていて、今回は特に他のスケージュルに大きく影響を与え、お金を消費している。大きさ的に自分が取れる責任を大きく上回っている。</p>
-
-<p>だから最近はタイトルのようなことを良く考えている。自分が何かやらかすことで与える色々なな迷惑が大きすぎて、本音の本音では今すぐ逃げ出したい（逃げて人が減る事の方がとんでもない迷惑なのでしないけど）</p>
-
-<h3>ということで</h3>
-
-<ul>
-<li>mix3は今すぐ死ぬべきである。</li>
-<li>死なないのであれば迷惑を掛けないように生きるべきである</li>
-</ul>
-
-<p>どっちかを満たすためにmix3は頑張らなければならない。</p>
-
-<p>そしてそんな事とは関係なく<a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a>を更新してますYO。大本の<a href="http://d.hatena.ne.jp/yoya/20120808/swfed">swfed</a>のバージョンアップに追従しています。<a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a>は可愛いね。イイコイイコ。</p>
-
-<p class="post-footer"><span class="date">2012-08-12</span></p>
+<p class="post-footer"><span class="date">2013-04-13</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.com&nsid=96368406281861426%3A%3A97485858524947259&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
       </div>
       <div class="autopagerize_insert_before"></div>
