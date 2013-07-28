@@ -13,4 +13,4 @@ pixivブログで使っていたCSSテンプレートはお気に入りなので
 1. .resource以下に.mdでMarkdownの文書を作成する。
 2. bin/blog.plを実行する
 3. githubにコミットする
-4. [こんな感じになる](http://mix3.github.com/)
+4. [こんな感じになる](http://mix3.github.io/)

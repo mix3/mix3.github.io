@@ -1,6 +1,6 @@
 use utf8;
 return {
-	url         => 'http://mix3.github.com',
+	url         => 'http://mix3.github.io',
 	title       => '萌えキャラとは何だったのか',
 	description => 'ギークにも絵描きにもなれない者の末路',
 	resource    => '.resource',

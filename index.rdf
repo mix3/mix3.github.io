@@ -6,9 +6,58 @@
 
 <channel>
 <title>萌えキャラとは何だったのか</title>
-<link>http://mix3.github.com</link>
+<link>http://mix3.github.io</link>
 <description>ギークにも絵描きにもなれない者の末路</description>
 
+<item>
+<title>テスト書くのって難しい</title>
+<description>
+<![CDATA[
+<p>布都ちゃんが可愛すぎて生きるのが辛い。mix3です。</p>
+
+<p><img src="/images/20130728/futo.png" /></p>
+
+<h3>テスト書くのって難しい</h3>
+
+<p>なんの意味も無い以下のような糞コードがあったとして、各subについてテストを書いたりなんかしてみるとこんな感じだろうか？</p>
+
+<script src="https://gist.github.com/mix3/6097116.js"></script>
+
+<p>なんでこんな糞コード書いたかというと</p>
+
+<ul>
+<li>type_a, type_b
+<ul>
+<li>まあ良い</li>
+</ul></li>
+<li>type_to_execute
+<ul>
+<li>type増えたらやだなぁと思うけどまあ良い</li>
+</ul></li>
+<li>calc_type
+<ul>
+<li>計算複雑になったらやだなぁと思うけどまあ良い</li>
+</ul></li>
+<li>execute
+<ul>
+<li>type_a,type_b,type_to_execute,calc_typeが総じて複雑になった時、全部と通るテスト書くの考えたくないんだけど…</li>
+</ul></li>
+</ul>
+
+<p>普通にアプリ書いてると、色々複雑になった上でexecuteみたいにいくつも関数経由して結果を返すやんちゃな関数が出てきてしまうのですが、そういうののテストは正直書いていて死にたくなります。そして後で機能拡張しようとしてやっぱり死んだりする。</p>
+
+<p>「そもそも設計が悪いよ」「それ◯◯で出来るよ」「糞コードに何を求めてるの」etc… ということなんでしょうか。テスト大事なのは分かるのですが、正しくて網羅的なテストというのはきちんとスキルを身につけてないと出来ないよなぁと思う事が多いです。「書かないよりはずっと良い」と心の中で言い訳しながら書いてますが。</p>
+
+<p>ただ、以下のような事もあるのでやっぱりただ書くだけでもダメなんだなと思いつつ、もやもやする今日この頃です。</p>
+
+<blockquote class="twitter-tweet"><p>リファクタリングに使えないテストのことをレガシーカバーと呼ぶ。結局リファクタリングできないんだからレガシーコードのまま。</p>&mdash; いろふ(成分無調整) (@irof) <a href="https://twitter.com/irof/statuses/346946470890573824">June 18, 2013</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/2013/07/28/20130728/</guid>
+<pubDate>Sun, 28 Jul 2013 00:00:00 +0900</pubDate>
+</item>
 <item>
 <title>phantomjsで遊ぶ</title>
 <description>
@@ -124,7 +173,7 @@ response.write(image);
 <p>ということでphantomjs便利なんじゃないかなというお話でした。</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.com/2013/04/13/20130413/</guid>
+<guid isPermaLink="true">http://mix3.github.io/2013/04/13/20130413/</guid>
 <pubDate>Sat, 13 Apr 2013 00:00:00 +0900</pubDate>
 </item>
 <item>
@@ -165,7 +214,7 @@ run;
 <p>で、元気に走り回るチャコの姿を思い浮かべながら書いてました。<a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=4507497">以前書いた絵</a>の日付みてもう４年近くも経ってるんですね…</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.com/2013/03/16/20130316/</guid>
+<guid isPermaLink="true">http://mix3.github.io/2013/03/16/20130316/</guid>
 <pubDate>Sat, 16 Mar 2013 00:00:00 +0900</pubDate>
 </item>
 <item>
@@ -195,7 +244,7 @@ run;
 <p>ちなみにswfobject.jsは2.2でもまだ微妙にセキュリティリスクがあるらしい <a href="http://t-ashula.hateblo.jp/entry/2012/01/11/233156">ほむらちゃほむほむ - swfobject.js がアレな話</a> ので外から見えるところで使うのは止めた方が良いかなと思います。</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.com/2013/03/09/20130309-2/</guid>
+<guid isPermaLink="true">http://mix3.github.io/2013/03/09/20130309-2/</guid>
 <pubDate>Sat, 09 Mar 2013 00:00:01 +0900</pubDate>
 </item>
 <item>
@@ -216,7 +265,7 @@ run;
 <p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.com/2013/03/09/20130309-1/</guid>
+<guid isPermaLink="true">http://mix3.github.io/2013/03/09/20130309-1/</guid>
 <pubDate>Sat, 09 Mar 2013 00:00:00 +0900</pubDate>
 </item>
 <item>
@@ -248,7 +297,7 @@ run;
 </ul>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.com/2013/02/14/20130214/</guid>
+<guid isPermaLink="true">http://mix3.github.io/2013/02/14/20130214/</guid>
 <pubDate>Thu, 14 Feb 2013 00:00:00 +0900</pubDate>
 </item>
 <item>
@@ -264,7 +313,7 @@ run;
 <p>年に1回の年賀絵ぐらい継続して描きたいものですね…</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.com/2013/01/06/20130106/</guid>
+<guid isPermaLink="true">http://mix3.github.io/2013/01/06/20130106/</guid>
 <pubDate>Sun, 06 Jan 2013 00:00:00 +0900</pubDate>
 </item>
 <item>
@@ -275,7 +324,7 @@ run;
 
 <h3>同時更新処理</h3>
 
-<p><a href="http://mix3.github.com/2012/11/03/20121103/">スレーブ遅延</a>のときにSELECT > UPDATEで古い情報をもとにUPDATEしてしまうと不整合が発生すると書きましたが、</p>
+<p><a href="http://mix3.github.io/2012/11/03/20121103/">スレーブ遅延</a>のときにSELECT > UPDATEで古い情報をもとにUPDATEしてしまうと不整合が発生すると書きましたが、</p>
 
 <p>たとえば同じ行を複数で同時にSELECT > UPDATEすると同じように不整合が発生することがあります。</p>
 
@@ -348,7 +397,7 @@ run;
 <h3>それでは良いお年を！</h3>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.com/2012/12/30/20121230/</guid>
+<guid isPermaLink="true">http://mix3.github.io/2012/12/30/20121230/</guid>
 <pubDate>Sun, 30 Dec 2012 00:00:00 +0900</pubDate>
 </item>
 <item>
@@ -384,7 +433,7 @@ run;
 <p>他のやり方だとまた違ってくるのでしょうか？</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.com/2012/11/07/20121107/</guid>
+<guid isPermaLink="true">http://mix3.github.io/2012/11/07/20121107/</guid>
 <pubDate>Wed, 07 Nov 2012 00:00:00 +0900</pubDate>
 </item>
 <item>
@@ -519,66 +568,8 @@ exit 0
 </ul>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.com/2012/11/03/20121103/</guid>
+<guid isPermaLink="true">http://mix3.github.io/2012/11/03/20121103/</guid>
 <pubDate>Sat, 03 Nov 2012 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>そろそろ自分は本当に死んだ方が良い気がする件について</title>
-<description>
-<![CDATA[
-<p>「バカジャネーノ」と言われてぐぅの根も出ないmix3です。</p>
-
-<h3>死んだ方が良い事の概要その１</h3>
-
-<p>今やってるサービスに諸事情により一つ機能を追加しなければならない必要に迫られ、その対応を自分がすることになったのですが、結果は盛大に燃やし散々な糞クオリティで納期に間に合わないという目も当てられない自体になってしまいました。
-設計段階で詰んでいて（DB設計の時点で要件を満たせない）どう尻拭いしても物理的に納期に間に合わないということで、結局お尻を先延ばしにしてもらって先輩にヘルプ入ってもらい設計からやり直しとなりました。</p>
-
-<h3>死んだ方が良い事の概要その２</h3>
-
-<p>スケジュール再編からは先輩の手によって設計が組み直され、画面仕様から必要な機能を洗い出してコントローラとモデルのインタフェースを決めて行く（勝手にIDD[インタフェースドリブンデベロップメント]などと呼んでいる）やりかたで、仕様認識の齟齬を減らしつつ必要充分な機能を決めて行きました。このやり方は関わるプログラマ全員の時間を使ってしまうのでなかなか面倒ですが、仕様認識齟齬が減るのと機能の洗い出しで全員がチェックするので抜けが減るので危険な香りがする時は積極的にするようにしています。またインタフェースを決めてしまうので、分業しやすいというのも利点です。Javaのインタフェースベースの作り方を思い出してとても気分良く作れます。</p>
-
-<p>ここまでは良いのですが、分業で自分がモデルを作って最後にコントローラと結合すると自分の糞クオリティを発揮して色々問題を起こしていました</p>
-
-<ul>
-<li>バリデート関数はエラーを返すだけというルールで決めたはずなのになぜかExceptionを投げてる</li>
-<li>関数の返り値の形を変えてしまった</li>
-<li>明らかにコピペしてる</li>
-<li>関数名、変数名の意味が分からない</li>
-<li>テスト書けていない（間に合ってない）</li>
-</ul>
-
-<p>時間も無いのに色々やらかして最終的に「バカジャネーノ」と言われて何も言えないmix3の姿がそこにはありました。</p>
-
-<h3>こういう怒られ方はずっと前から続いている 今回は集中しただけで</h3>
-
-<p>要するにプログラマとしては致命的なほど人から見て意味の通じるコードが書けないのだと思います。視野狭窄で自分しか見えてなくて、平気で他人から見て意味の分からないコードを書いてしまう。他人のコードを見て何がどう優れているか、このコードの何がだめか。変数、関数の意味は。怒られるたびに考えるようにしても、結局怒られる。良し悪しの判断がいつまでたっても改善されない。</p>
-
-<p>自分は成長していないといつも感じているしいつも言っているけど、こういったことの成長が無いことも多く含んでいる。</p>
-
-<h3>結局どうすれば良いのかは分からない</h3>
-
-<p>これだけ怒られて改善しないといけないと思っていて、でもどうすれば良いのかは良くわからない。</p>
-
-<p>ただ「他人が理解出来るコードを書けば良い」だけではあるけれども、それだけの事が出来ないということは、自分にはそれをするための何かが欠けてるということで、でもその何かを「何か」としか書けないということは全くその「何か」を理解していない。つまりどうしたら良いのか分からない。</p>
-
-<p>いっぱいコード書いて怒られて判断出来るようになる以外にもう方法が思いつかないが、でもそのやり方をするには既に時間を使いすぎてる感があるし、そのせいで関わるいろんなひとに迷惑をかけていて、今回は特に他のスケージュルに大きく影響を与え、お金を消費している。大きさ的に自分が取れる責任を大きく上回っている。</p>
-
-<p>だから最近はタイトルのようなことを良く考えている。自分が何かやらかすことで与える色々なな迷惑が大きすぎて、本音の本音では今すぐ逃げ出したい（逃げて人が減る事の方がとんでもない迷惑なのでしないけど）</p>
-
-<h3>ということで</h3>
-
-<ul>
-<li>mix3は今すぐ死ぬべきである。</li>
-<li>死なないのであれば迷惑を掛けないように生きるべきである</li>
-</ul>
-
-<p>どっちかを満たすためにmix3は頑張らなければならない。</p>
-
-<p>そしてそんな事とは関係なく<a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a>を更新してますYO。大本の<a href="http://d.hatena.ne.jp/yoya/20120808/swfed">swfed</a>のバージョンアップに追従しています。<a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a>は可愛いね。イイコイイコ。</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.com/2012/08/12/20120812/</guid>
-<pubDate>Sun, 12 Aug 2012 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>
