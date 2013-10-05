@@ -10,6 +10,151 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>自分がもしIRCボットっぽいもの作ったとしたら</title>
+<description>
+<![CDATA[
+<p>こうなるなぁというメモ</p>
+
+<h3>ただ世の中にはボット用のモジュールやらなんやらは既にある</h3>
+
+<p>IRCボットとか誰もが考えるし適当に作って捨てて行くので当然そのうちフレームワークっぽいものも出てくる 例えば<a href="http://www.songmu.jp/riji/entry/2013-09-09-unazusan.html">UnazuSan</a>とか</p>
+
+<p>こういうは用途に合っていれば良いし、正規表現だしグループで捕まえたのを後方参照出来るしで大体がカバー出来そうだけど、</p>
+
+<p>例えば「開発環境で使ってるバッチスクリプトをオプション指定しつつ実行するをIRCからやりたい」とか糞みたいな要求には向かなそうだなぁとか思ったり</p>
+
+<h3>無ければ作れば良いじゃない</h3>
+
+<pre><code>#!/usr/bin/env perl
+
+use Ikusan
+  'server url',
+    port       =&gt; &lt;port&gt;,
+    enable_ssl =&gt; 1,
+    password   =&gt; &lt;password&gt;,
+    nickname   =&gt; &lt;nickname&gt;,
+    channels   =&gt; { '#channel_name' =&gt; {} };
+
+# undef_message "およよ…";
+
+register qr/regexp?/ =&gt; sub {
+    my (%opts) = @_;
+    return $opts{error} ? (1, "エラー") : (0, "オッケー");
+} =&gt; qw/
+    error
+/;
+
+register simple =&gt; sub {
+    my (%opts) = @_;
+    return $opts{error} ? 1 : 0;
+} =&gt; qw/
+    error
+/;
+
+register "die" =&gt; sub { die "ぱっつんぱっつん" };
+
+use LWP::UserAgent;
+
+register pixiv =&gt; sub {
+    my $ua  = LWP::UserAgent-&gt;new;
+    my $res = $ua-&gt;get("http://www.pixiv.net/");
+    my @url = ($res-&gt;content =~ /"(member_illust\.php.+?)"/g);
+    my $ret = "http://www.pixiv.net/" . $url[int(rand(scalar(@url)))];
+    return 0, $ret;
+};
+
+register qr/サタデーナイト/ =&gt; sub {
+    return 0, "フィーバー!!";
+};
+
+fever;
+</code></pre>
+
+<p>こんな感じで AnySan に渡すオプションを指定しつつ use Ikusan して regsiter で sub 登録して最後に fever すれば</p>
+
+<pre><code>mix3 &gt; iku: regex
+ iku &gt; [OK] オッケー
+mix3 &gt; iku: regexp
+ iku &gt; [OK] オッケー
+mix3 &gt; iku: regex --error
+ iku &gt; [ERR] エラー
+mix3 &gt; iku: regexp --error
+ iku &gt; [ERR] エラー
+mix3 &gt; iku: simple
+ iku &gt; [OK]
+mix3 &gt; iku: simple --error
+ iku &gt; [ERR]
+mix3 &gt; iku: die
+ iku &gt; [ERR] ぱっつんぱっつん at bin/ikusan.pl line 27.
+mix3 &gt; iku: pixiv
+ iku &gt; [OK] http://www.pixiv.net/member_illust.php?mode=medium&amp;amp;illust_id=38896869
+mix3 &gt; iku: サタデーナイト
+ iku &gt; [OK] フィーバー!!
+mix3 &gt; iku: ふぁ！？
+ iku &gt; およよ…
+</code></pre>
+
+<p>という感じになるみたいな？ regsiter で3つ目以降の引数は配列でGetOptionsに渡すようにして、sub に渡ってくるみたいな？</p>
+
+<p>実際には my $ret = &#8245;perl path/to/script.pl --option $opts{option}&#8245;; とかしてバッチスクリプトに右から左へオプション流すだけなのを想像してる</p>
+
+<p><a href="https://gist.github.com/mix3/74d53023818899d49d48">gist</a></p>
+
+<h3>熱は出る、咳は出る、鼻水は出る</h3>
+
+<p>と悲惨な最近なので、現実逃避してたら衣玖さんボットを作りたくなったのでしたマル</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/2013/10/05/20131005/</guid>
+<pubDate>Sat, 05 Oct 2013 00:00:00 +0900</pubDate>
+</item>
+<item>
+<title>信じて送り出したfcgiプロセスがulimitの設定によって次々と殺されて行く話</title>
+<description>
+<![CDATA[
+<p>ではありません。</p>
+
+<p><a href="http://lestrrat.ldblog.jp/archives/25360109.html">livedoorブログ</a>がpsgiに移行したりなんかするこのご時世になぜかmod_rewriteとfcgiを使って頑張っているmix3です。</p>
+
+<h3>ulimitの話</h3>
+
+<p>とある事情でapacheのinit.dにulimitを設定していて、メモリを使いすぎる、とかCPU使いすぎるとfcgiプロセスを殺してもらうようにしていたのですが、</p>
+
+<p>「それ子(fcgi process)だけじゃなくて親(httpd)まで殺しちゃわない？」</p>
+
+<p>と <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんの有り難いお言葉が飛び出して大慌てでulimitを外すということが発生しました。</p>
+
+<p>しかもgracefulだと設定変更効かないからロードバランサから外して一台ずつリスタート掛けて行かなければならず…</p>
+
+<h3>再度設定する場合にどうするのか</h3>
+
+<p>とある事情は変わらないのでulimitの設定を戻さないと行けないが、どうすれば良いのか思いつかないので <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんに考えて頂いたところ、</p>
+
+<ul>
+<li>index.fcgiをindex.fcgi.plとか適当に変える</li>
+<li>index.fcgiは中身shスクリプトにしてそこにulimitを書く</li>
+</ul>
+
+<p>というのはどうか？と提案を頂きまして、いけそうな感じなのでそれで行こうかなぁとなっています。 <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんありがとうございました。</p>
+
+<h3>ulimitの設定どうやって確認するの？</h3>
+
+<p>と、ロードバランサから1台外してinit.d からulimitを消してリスタートしたところでふと思い聞いたところ</p>
+
+<pre><code>cat /proc/$(cat /var/run/httpd.pid)/limits
+</code></pre>
+
+<p>「こういう感じかな」と教えていただきました。備忘録。</p>
+
+<hr />
+
+<p>という記事を8月中ぐらいに書いていて放置プレイしてたので改めて残しておく</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/2013/08/30/20130830/</guid>
+<pubDate>Fri, 30 Aug 2013 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>テスト書くのって難しい</title>
 <description>
 <![CDATA[
@@ -399,177 +544,6 @@ run;
 </description>
 <guid isPermaLink="true">http://mix3.github.io/2012/12/30/20121230/</guid>
 <pubDate>Sun, 30 Dec 2012 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>巨大ファイルの削除</title>
-<description>
-<![CDATA[
-<p>DBサーバのslow_queryログがローテートされておらず単一ファイルで100G超えしていて辛いmix3です。</p>
-
-<h3>巨大なファイルを rm するのは危険</h3>
-
-<p>実際に試していないのでどうなるのか分からないですが、おそらく消し終わるまで間IOが占有されてDBのパフォーマンスに影響が出ちゃうのでしょう。</p>
-
-<p>rm はやらないほうが良いねとなりました。</p>
-
-<h3>: > /path/to/file</h3>
-
-<p>じゃあどうすればという事で調べていたら</p>
-
-<pre><code>
-: > /path/to/file
-</code></pre>
-
-<p>を使ってはどうか？というようなものを見かけました</p>
-
-<p><a href="http://serverfault.com/questions/336917/is-there-a-way-to-delete-100gb-file-on-linux-without-thrashing-io-load">Is there a way to delete 100GB file on Linux without thrashing IO / load?</a></p>
-
-<p>容量に余裕のある別サーバで $ dd if=/dev/zero of=tempfile bs=1024000 count=100000 とかしてファイルを作って試したところ、readが発生するもののパフォーマンスにはあまり影響は無い感じで使えそうということに。</p>
-
-<h3>ちなみに</h3>
-
-<p>: > /path/to/file は空ファイルを作るときの方法のようで、<a href="http://d.hatena.ne.jp/japanrock_pg/20100212/1265972572">Linuxでファイルを空にする5つの方法</a> とかで見かけました</p>
-
-<p>他のやり方だとまた違ってくるのでしょうか？</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/2012/11/07/20121107/</guid>
-<pubDate>Wed, 07 Nov 2012 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>スレーブ遅延</title>
-<description>
-<![CDATA[
-<p>今の案件に触れてからの自分の低能ぶりの凄まじさに自ら恐怖を禁じ得ず、椅子から転げ落ちて失禁しそうなmix3です。</p>
-
-<h3>レプリケーション</h3>
-
-<p>今の案件ではDBにMySQLを使いレプリケーションを使って負荷分散しております。（レプリケーション必要無いぐらいの負荷だよね、とかインフラの方に言われてまた失禁しそうです）</p>
-
-<p>レプリケーションというのはリアルタイムに複製する技術のこと？上手く説明出来ませんが、まあWebサービスなんかだと書き込みより読み込みの方が圧倒的に割合が大きいらしく、マスターとその複製のスレーブにDBを分けて、書き込みはマスターへ、読み込みは複製のスレーブへ処理を振り分ける事で負荷を分散したりします。</p>
-
-<h3>スレーブ遅延</h3>
-
-<p>レプリケーションというのはリアルタイムな複製技術なので、基本的にはマスターとスレーブは同期が取れているハズですが、サーバの負荷状況によっては同期がとれていない状態になったりします。スレーブ遅延というものです。</p>
-
-<h3>レプリケーション下での更新処理</h3>
-
-<p>たとえばインクリメント的なアトミックな更新であればスレーブは関わらないので問題ないと思います。</p>
-
-<pre><code>
-UPDATE table SET column + 1 WHERE id = ?
-</code></pre>
-
-<p>そうではなくスレーブから読み込みをし、マスターに書き込みをするような処理をしてしまうと、スレーブが遅延していた場合に古い情報をもとに更新をしてしまい不整合が発生するなどあまりよろしくない状態になります</p>
-
-<pre><code>
-SELECT hoge FROM table_1 WHERE id = ?
-スレーブから取ってきたhogeが古いものだと、その後のUPDATEでそのhogeを使うのは当然よろしくない
-
-×UPDATE table_2 SET column = <hoge> WHERE id = ?
-</code></pre>
-
-<p>なので、そういったSELECT>UPDATEのような更新処理の場合は、SELECTもスレーブからではなくマスターからするようにしないといけせん。</p>
-
-<h3>ようするにスレーブ遅延による不整合が発生したということ</h3>
-
-<p>です。気をつけましょう。</p>
-
-<h3>MySQL::Sandbox と Percona Toolkit(旧Maatkit)のpt-slave-delay</h3>
-
-<p>こういうスレーブ遅延によるバグは開発環境では気づきにくかったりします。負荷の掛かっていない開発環境ではスレーブ遅延は発生しづらいでしょうし、そもそもDB構成が本番と違っていてレプリケーションされてなかったりすることも多いでしょう。</p>
-
-<p>が、最近は便利になった物で、cpanに上がっているMySQL::SandboxとPercona Toolkit(旧Maatkit)なるツールを使うと割と簡単にレプリケーション環境とスレーブ遅延を再現出来ます。というかMySQL::SandboxもPercona Toolkit(旧Maatkit)結構前からあるので最初から使っておけという感じですね。（正月にデータが吹っ飛ぶ前は実は使ってたりしてたんですけどね...）</p>
-
-<h3>MySQL::Sandbox</h3>
-
-<ul>
-<li><p>Install</p>
-
-<ul>
-<li>cpanm MySQL::Sandbox</li>
-</ul></li>
-<li><p>How to use</p>
-
-<ul>
-<li>SANDBOX_AS_ROOT=1 make_replication_sandbox -r master_data --how_many_slaves 1 --sandbox_base_port 11111 download/mysql-5.1.66-linux-x86_64-glibc23.tar.gz</li>
-<li>rootで作業するとSANDBOX_AS_ROOT=1を使わないと怒られるけどそもそもrootで作業するなという話</li>
-<li>sandboxes/master_data/以下にマスター(port: 11111, socket: /tmp/mysql_sandbox11111.sock)スレーブ(port: 11112, socket: /tmp/mysql_sandbox11112.sock)が出来る</li>
-<li>perl -MDBI -e 'DBI->connect("dbi:mysql:test:mysql_socket=/tmp/mysql_sandbox11111.sock", "msandbox", "msandbox")'</li>
-<li>port指定での接続方法は分からなかった。できなくは無いと思うけど</li>
-</ul></li>
-<li><p>init script</p>
-
-<ul>
-<li>以下のような感じで書いてみたがうまくいかん</li>
-<li>落とし忘れるとsocketファイルが残って次回起動時に残念な事になるので出来ればなんとかしたい</li>
-</ul></li>
-</ul>
-
-<pre><code>
-#!/bin/sh
-
-# chkconfig: 2345 65 35
-# description: sandbox_action
-
-# Source function library.
-. /etc/rc.d/init.d/functions
-
-# Get config.
-. /etc/sysconfig/network
-
-# Check that networking is up.
-if [ ${NETWORKING} = "no" ]
-then
-  exit 0
-fi
-
-prog="sandbox_action"
-
-case "$1" in
-  start)
-    echo -n "Starting $prog: "
-    sandbox_action start
-    success
-    echo
-  ;;
-  stop)
-    echo -n "Stopping $prog: "
-    sandbox_action stop
-    success
-    echo
-  ;;
-  status)
-    sandbox_action status
-  ;;
-  *)
-    echo $"Usage: $prog {start|stop|status}"
-    exit 1
-esac
-
-exit 0
-</code></pre>
-
-<h3>Percona Toolkit(旧Maatkit)</h3>
-
-<ul>
-<li><p>Install</p>
-
-<ul>
-<li>Perconaからtarを落としてきて、perl Makefile.PL, make &amp;&amp; make install</li>
-<li>rpmは依存関係がうるさいのでtarからのほうが良いと思う</li>
-</ul></li>
-<li><p>How to use</p>
-
-<ul>
-<li>pt-slave-delay -u msandbox -p msandbox --socket /tmp/mysql_sandbox11112.sock</li>
-<li>--daemonize オプションもある</li>
-</ul></li>
-</ul>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/2012/11/03/20121103/</guid>
-<pubDate>Sat, 03 Nov 2012 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>

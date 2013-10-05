@@ -61,6 +61,57 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2012/04/10/20120410/" title="">やったー cpan auhor になったよー＼(^o^)／</a></h2>
+<p>今年入ってからミスが多すぎてそろそろ本当に首になるか、潔く自分から辞めるかした方が良いんじゃないかと真剣に考えるmix3です。</p>
+
+<h3><a href="http://pixiv.cc/mix3">pixivブログ消滅</a></h3>
+
+<p>pixivブログで書いていた事は github の pages のコピーだったので、pixivブログのサービス終了には特にどうということは無かったのですが、本当にサービスが終了して見れなくなってしまったので、ようやっと github の方に完全に移行しました。</p>
+
+<p>移行にあたって、ブログ生成スクリプトを改修（リファクタリング的には今も相当酷いが）して、Octpressのような感じでURLがそれっぽくなるようにしてみました。後はカテゴリかタグに対応してページング出来れば良いかなと思っています。</p>
+
+<p>それにしても 元 pixiv ユーザ（本当は今もpixivユーザのつもりだけど今となってはまともに描いてないので…）として pixiv ブログ自体は気に入ってたのでちょっと残念です。</p>
+
+<h3><a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a></h3>
+
+<p>タイトルに書いた通り、<a href="http://search.cpan.org/~himachoco/">cpan author</a> になりました。p5-SWFEditorという swf の画像置換やMovieClipの置換など、swf を perl から色々弄れるライブラリを作成してアップしました。</p>
+
+<p>p5-SWFEditorの中身は <a href="https://twitter.com/#!/yoya">@yoya</a> さんの好意により <a href="https://twitter.com/#!/yoya">@yoya</a> さん作 <a href="http://sourceforge.jp/projects/swfed/">SWFEditor for PHP</a> をまるっとそのまま使わせてもらっています。自分がしたのは C で書かれている SWFEditor の機能を使うためのインタフェースを XS で書いた形になります。
+（そもそも SWFEdito for PHP が移植性などを考慮してSWF操作のコア部分とそれを使うインタフェースに分離して作られているので非常に移植しやすくなっています。素晴らしいですね！）</p>
+
+<p>SWFEditor の Perl バインディングの作成を快く許可して下さった <a href="https://twitter.com/#!/yoya">@yoya</a> さんに心から感謝致します。</p>
+
+<h3>ということで</h3>
+
+<p>ブログ移行にともないpixivブログからCSSを持ってきてそれっぽくしたのでそれのお知らせと、p5-SWFEditor を cpan にアップして cpan author になったよー というお知らせでした。</p>
+
+<p class="post-footer"><span class="date">2012-04-10</span></p>
+<h2><a href="/2011/11/23/2011123/" title="">bonding設定で死んだ</a></h2>
+<h3>bondingとは</h3>
+
+<p>bondingというのはNICを冗長化するもののことのようです。ラウンドロビンで負荷分散したりマスタースレーブ構成にして片方が死んでも大丈夫なように出来るようです。</p>
+
+<p>参考<a href="http://d.hatena.ne.jp/sen-u/20061002/p1">意外と知らない？NICを冗長化するボンディング（bonding）Add Star</a></p>
+
+<h3>ネットワークが遅延？</h3>
+
+<p>ネットワークの知識なんてほぼ０なのでbondingなんて当然知らなかったのですが、でも設定しないといけないということなのでWebを漁ってとりあえずラウンドロビンで設定したのですが、これがいけなかった。</p>
+
+<p>並列(最大100プロセス)でアクセス掛ける負荷試験を行ってると、MySQLの接続でtimeoutが結構出る。</p>
+
+<p>根本的な問題として負荷試験のシナリオにミスがあったりはするのですが、それとは別にネットワークに遅延が発生する模様。</p>
+
+<p>インフラのプロフェッショナル<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんや<a href="https://twitter.com/#!/shin1rosei">@shin1rosei</a>さんに調べてもらって自分の設定したbondingの設定がラウンドロビンなのがマズいという事が判明。並列度が上がると、NICの切り替わりで問題が顕在化するみたいです。</p>
+
+<p>正直分った瞬間回線切って首吊って死にたい気分になりました...</p>
+
+<script src="http://togetter.com/js/parts.js"></script>
+
+<script>tgtr.ListWidget({id:'222670',url:'http://togetter.com/',width:'320px',height:'240px'});</script>
+
+<p>自分のした設定にどんな意味があるのか、ちゃんと考える様にします...</p>
+
+<p class="post-footer"><span class="date">2011-11-23</span></p>
 <h2><a href="/2011/07/24/20110724/" title="">Play framework + Scala に入門してみる</a></h2>
 <h3>Scalaクラスタの怒りが聞こえる…</h3>
 
@@ -792,167 +843,6 @@ mysql&gt; explain partitions select * from partition where created_at &lt; '2011
 <p>削除のコストは思いの外大きくて、レプリケーション環境下でしこしこ古いデータを削除するだけのバッチを走らせたときに削除間隔を大きく取らないと同期ズレがずんどこずんどこ溜まっていく、というのを経験したことがあります。パーティションを使うとそういう苦労はせずに済みそうなので有効活用したいですね。</p>
 
 <p class="post-footer"><span class="date">2011-07-20</span></p>
-<h2><a href="/2011/07/17/20110717/" title="">さくらVPSをちょこちょこ触ってみる</a></h2>
-<p>と言っても特に何かしたとかは無かったり。</p>
-
-<ul>
-<li>sshのポートを変えた</li>
-<li>iptablesを設定した</li>
-<li>logwatchを導入した</li>
-<li>pacoを導入した</li>
-</ul>
-
-<h3>sshのポート変更</h3>
-
-<p>セキュリティ的にはsshを公開鍵認証にしておくだけで基本大丈夫だとは思うのですが、アタックされることには変わりなく気持ち悪い物は気持ち悪いので一応変えておきました。</p>
-
-<h3>iptablesの設定</h3>
-
-<p>何処でも見かける設定ですが以下のような基準でiptablesを設定するスクリプトを組みました。</p>
-
-<ul>
-<li>内から外への通信以外は拒否
-<ul>
-<li>ただし内から外への通信の応答は通す</li>
-</ul></li>
-<li>SSH用の穴は用意する</li>
-</ul>
-
-<h4>iptables-init.sh</h4>
-
-<pre><code>#!/bin/sh
-
-# ルールクリア
-iptables -F
-iptables -X
-
-# 内から外への通信以外は破棄
-iptables -P INPUT   DROP
-iptables -P OUTPUT  ACCEPT
-iptables -P FORWARD DROP
-
-# ループバックは全て許可
-iptables -A INPUT  -i lo -j ACCEPT
-iptables -A OUTPUT -o lo -j ACCEPT
-
-# プライベートネットワークなんて無かったんや…
-iptables -A INPUT -s 10.0.0.0/8     -j DROP
-iptables -A INPUT -s 127.16.0.0/12  -j DROP
-iptables -A INPUT -s 192.168.0.0/16 -j DROP
-
-# SSH用の穴
-iptables -A INPUT -p tcp --dport {SSHのポート} -j ACCEPT
-
-# 内から外への通信の応答は通す
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-</code></pre>
-
-<h3>logwatchの導入</h3>
-
-<p>ログも監視しないと意味ないのでlogwatchなるログを定期的に（デフォルトはcron.dailyを利用した毎日）メールで知らせるプログラムを導入してみました。yumで入れるとバージョンが結構古かったりするので<a href="http://sourceforge.net/projects/logwatch/files/">sourceforge</a>から落としてインストールしました。rpmで入れるとデフォルトの設定ファイルが/usr/share/logwatch/default.conf以下となるようです。/etc/logwatch/conf以下に設定ファイルを置くと設定を上書きするようです。</p>
-
-<p>とりあえずSSHのログとDiskスペースのログを監視するようにしました。デフォルトではService = Allで全部を監視するようにしてその後除外を設定しているのでその設定をコメントアウトしてSSHのログとDiskスペースのログに決め打ちしました。</p>
-
-<h4>/usr/share/logwatch/default.conf/logwatch.conf</h4>
-
-<pre><code>#Service = All
-#Service = "-zz-network" 
-#Service = "-zz-sys" 
-#Service = "-eximstats"
-</code></pre>
-
-<h4>/etc/logwatch/conf/logwatch.conf</h4>
-
-<pre><code>MailTo = 送信先メールアドレス
-MailFrom = 送信元メールアドレス
-Service = sshd
-Service = zz-disk_space
-</code></pre>
-
-<p>rpmで入れているならばおそらく/etc/cron.daily/0logwatchにlogwatchスクリプトへのシンボリックリンクが貼られているので毎日定期的に実行されメールが届くようになるハズです。ただしデフォルトでは前日のログを送信する設定（Range = yesterday）になっていてログが記録されていなければ送信されません。</p>
-
-<h3>pacoの導入</h3>
-
-<p>pacoはmake installしたソフトを管理するものです。yumなどのパッケージ管理ソフトで管理されている以外のものについてもきちっと管理したい場合は導入するととても幸せになれそうです。</p>
-
-<ul>
-<li>参考
-<ul>
-<li><a href="http://paco.sourceforge.net/">paco</a></li>
-<li><a href="http://d.hatena.ne.jp/rx7/20081011/p2">make install"したソフトウェアを管理できる超便利ツール「Paco」</a></li>
-</ul></li>
-</ul>
-
-<p>pacoのインストール自体はconfigure make make installで出来ます。またpaco自身をpacoで管理するためにmake installの後make logmeを実行します。これ以降make installするときはpaco -D make insatllというふうにすることでそのソフトをpacoの管理下に置いてくれます。</p>
-
-<h4>注意</h4>
-
-<p>pacoはデフォルトで/usr/local/bin以下にインストールされるのですがsudoで実行するとPATHが引き継がれずpacoが見つからないためmake logmeに失敗してしまいました。./configure prefix=/binなどインストール場所を設定してsudoでも実行出来るようにするか、sudo時の環境変数の引き継ぎをするなどして回避しましょう。</p>
-
-<p>なおsudo時の環境変数の引き継ぎ方法は色々あるようです。</p>
-
-<h4>bashrcで設定</h4>
-
-<pre><code>alias sudo="sudo env PATH=$PATH"
-</code></pre>
-
-<h4>visudoで設定</h4>
-
-<pre><code>Defaults:{run_user} !env_reset
-    or
-Defaults env_keep+="PATH"
-</code></pre>
-
-<h4>sudo -s で実行</h4>
-
-<h3>次回は</h3>
-
-<p>Nginx+plackでなんか適当に外から見れる環境を作りたいかな。</p>
-
-<p class="post-footer"><span class="date">2011-07-17</span></p>
-<h2><a href="/2011/07/05/20110705/" title="">さくらVPS借りてみた</a></h2>
-<h3>さくらVPS借りてみた</h3>
-
-<p>インフラエンジニアを目指す宣言したは良いものの、自分で管理する外部に晒されている環境すら持ってないのはどうかという話があるのでまずはさくらVPSを借りてみることに請求が来る前に試用出来るようですぐに使えるのは凄いですねぇ。さくら様様です。（ちなみに一応自宅サーバ用のマシンは手元にあるのですが外部ディスプレイ手に入れてからとか考えてたら結局こっち来てから起動することはありませんでした…）</p>
-
-<p>インフラやりたいと言いつつミドルウェアの知識はまったく０に近い状態なので、ミドルウェアの勉強用に使って行きたいかなと思います。</p>
-
-<h3>とりあえず入れて最初にやったこと</h3>
-
-<ul>
-<li>ユーザの設定
-<ul>
-<li>rootのパスを変更する</li>
-<li>一般ユーザを追加する(sudoで管理者の権限を得るためにグループはwheelに入れる)</li>
-<li>一般ユーザのパスを変更する</li>
-<li>visudoでwheelグループがsudoで管理者権限で実行できるように変更</li>
-</ul></li>
-<li>SSHのログインを公開鍵に変更
-<ul>
-<li>/etc/ssh/sshd_config を修正</li>
-<li>キーペアを作成してログイン</li>
-</ul></li>
-<li>system-config-securitylevel-tui でssh以外を閉じる</li>
-<li>git,perlbrew,cpanmを入れる</li>
-</ul>
-
-<p>大体こんな感じ。SSHは以下のような感じで設定。コメントアウト外したりyes,no変えたり。</p>
-
-<pre><code>PermitRootLogin no
-AuthorizedKeysFile      .ssh/authorized_keys
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-</code></pre>
-
-<p>「ChallengeResponseAuthentication no」はデフォルトでnoだけれどこれがyesになってると公開鍵の認証に失敗したらパスワード認証も試すといった挙動をするので、公開鍵に限定する場合はちゃんとnoになってることをチェック。</p>
-
-<p>ファイアーウォールの設定は一旦 system-config-securitylevel-tui 使ってやりましたが、細かく設定する場合は当然 iptables を使って設定しないといけないので、おいおいここは最適化していきたいです。</p>
-
-<p>他にもデーモンを止める話とかもあるので以下とか参考にしつつ最適化していきたいです。</p>
-
-<p><a href="http://sakura.off-soft.net/blog/sakura_vps_centos_first_setup.html">さくらVPSを使うときに最初にやっておきたいこと(CentOS編)</a></p>
-
-<p class="post-footer"><span class="date">2011-07-05</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -982,6 +872,8 @@ ChallengeResponseAuthentication no
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/10/">2013年10月</a></li>
+  <li><a href="/archives/2013/08/">2013年08月</a></li>
   <li><a href="/archives/2013/07/">2013年07月</a></li>
   <li><a href="/archives/2013/04/">2013年04月</a></li>
   <li><a href="/archives/2013/03/">2013年03月</a></li>

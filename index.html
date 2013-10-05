@@ -61,6 +61,139 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/10/05/20131005/" title="">自分がもしIRCボットっぽいもの作ったとしたら</a></h2>
+<p>こうなるなぁというメモ</p>
+
+<h3>ただ世の中にはボット用のモジュールやらなんやらは既にある</h3>
+
+<p>IRCボットとか誰もが考えるし適当に作って捨てて行くので当然そのうちフレームワークっぽいものも出てくる 例えば<a href="http://www.songmu.jp/riji/entry/2013-09-09-unazusan.html">UnazuSan</a>とか</p>
+
+<p>こういうは用途に合っていれば良いし、正規表現だしグループで捕まえたのを後方参照出来るしで大体がカバー出来そうだけど、</p>
+
+<p>例えば「開発環境で使ってるバッチスクリプトをオプション指定しつつ実行するをIRCからやりたい」とか糞みたいな要求には向かなそうだなぁとか思ったり</p>
+
+<h3>無ければ作れば良いじゃない</h3>
+
+<pre><code>#!/usr/bin/env perl
+
+use Ikusan
+  'server url',
+    port       =&gt; &lt;port&gt;,
+    enable_ssl =&gt; 1,
+    password   =&gt; &lt;password&gt;,
+    nickname   =&gt; &lt;nickname&gt;,
+    channels   =&gt; { '#channel_name' =&gt; {} };
+
+# undef_message "およよ…";
+
+register qr/regexp?/ =&gt; sub {
+    my (%opts) = @_;
+    return $opts{error} ? (1, "エラー") : (0, "オッケー");
+} =&gt; qw/
+    error
+/;
+
+register simple =&gt; sub {
+    my (%opts) = @_;
+    return $opts{error} ? 1 : 0;
+} =&gt; qw/
+    error
+/;
+
+register "die" =&gt; sub { die "ぱっつんぱっつん" };
+
+use LWP::UserAgent;
+
+register pixiv =&gt; sub {
+    my $ua  = LWP::UserAgent-&gt;new;
+    my $res = $ua-&gt;get("http://www.pixiv.net/");
+    my @url = ($res-&gt;content =~ /"(member_illust\.php.+?)"/g);
+    my $ret = "http://www.pixiv.net/" . $url[int(rand(scalar(@url)))];
+    return 0, $ret;
+};
+
+register qr/サタデーナイト/ =&gt; sub {
+    return 0, "フィーバー!!";
+};
+
+fever;
+</code></pre>
+
+<p>こんな感じで AnySan に渡すオプションを指定しつつ use Ikusan して regsiter で sub 登録して最後に fever すれば</p>
+
+<pre><code>mix3 &gt; iku: regex
+ iku &gt; [OK] オッケー
+mix3 &gt; iku: regexp
+ iku &gt; [OK] オッケー
+mix3 &gt; iku: regex --error
+ iku &gt; [ERR] エラー
+mix3 &gt; iku: regexp --error
+ iku &gt; [ERR] エラー
+mix3 &gt; iku: simple
+ iku &gt; [OK]
+mix3 &gt; iku: simple --error
+ iku &gt; [ERR]
+mix3 &gt; iku: die
+ iku &gt; [ERR] ぱっつんぱっつん at bin/ikusan.pl line 27.
+mix3 &gt; iku: pixiv
+ iku &gt; [OK] http://www.pixiv.net/member_illust.php?mode=medium&amp;amp;illust_id=38896869
+mix3 &gt; iku: サタデーナイト
+ iku &gt; [OK] フィーバー!!
+mix3 &gt; iku: ふぁ！？
+ iku &gt; およよ…
+</code></pre>
+
+<p>という感じになるみたいな？ regsiter で3つ目以降の引数は配列でGetOptionsに渡すようにして、sub に渡ってくるみたいな？</p>
+
+<p>実際には my $ret = &#8245;perl path/to/script.pl --option $opts{option}&#8245;; とかしてバッチスクリプトに右から左へオプション流すだけなのを想像してる</p>
+
+<p><a href="https://gist.github.com/mix3/74d53023818899d49d48">gist</a></p>
+
+<h3>熱は出る、咳は出る、鼻水は出る</h3>
+
+<p>と悲惨な最近なので、現実逃避してたら衣玖さんボットを作りたくなったのでしたマル</p>
+
+<p class="post-footer"><span class="date">2013-10-05</span></p>
+<h2><a href="/2013/08/30/20130830/" title="">信じて送り出したfcgiプロセスがulimitの設定によって次々と殺されて行く話</a></h2>
+<p>ではありません。</p>
+
+<p><a href="http://lestrrat.ldblog.jp/archives/25360109.html">livedoorブログ</a>がpsgiに移行したりなんかするこのご時世になぜかmod_rewriteとfcgiを使って頑張っているmix3です。</p>
+
+<h3>ulimitの話</h3>
+
+<p>とある事情でapacheのinit.dにulimitを設定していて、メモリを使いすぎる、とかCPU使いすぎるとfcgiプロセスを殺してもらうようにしていたのですが、</p>
+
+<p>「それ子(fcgi process)だけじゃなくて親(httpd)まで殺しちゃわない？」</p>
+
+<p>と <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんの有り難いお言葉が飛び出して大慌てでulimitを外すということが発生しました。</p>
+
+<p>しかもgracefulだと設定変更効かないからロードバランサから外して一台ずつリスタート掛けて行かなければならず…</p>
+
+<h3>再度設定する場合にどうするのか</h3>
+
+<p>とある事情は変わらないのでulimitの設定を戻さないと行けないが、どうすれば良いのか思いつかないので <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんに考えて頂いたところ、</p>
+
+<ul>
+<li>index.fcgiをindex.fcgi.plとか適当に変える</li>
+<li>index.fcgiは中身shスクリプトにしてそこにulimitを書く</li>
+</ul>
+
+<p>というのはどうか？と提案を頂きまして、いけそうな感じなのでそれで行こうかなぁとなっています。 <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんありがとうございました。</p>
+
+<h3>ulimitの設定どうやって確認するの？</h3>
+
+<p>と、ロードバランサから1台外してinit.d からulimitを消してリスタートしたところでふと思い聞いたところ</p>
+
+<pre><code>cat /proc/$(cat /var/run/httpd.pid)/limits
+</code></pre>
+
+<p>「こういう感じかな」と教えていただきました。備忘録。</p>
+
+<hr />
+
+<p>という記事を8月中ぐらいに書いていて放置プレイしてたので改めて残しておく</p>
+
+<p class="post-footer"><span class="date">2013-08-30</span></p>
 <h2><a href="/2013/07/28/20130728/" title="">テスト書くのって難しい</a></h2>
 <p>布都ちゃんが可愛すぎて生きるのが辛い。mix3です。</p>
 
@@ -251,45 +384,6 @@ run;
 <p>で、元気に走り回るチャコの姿を思い浮かべながら書いてました。<a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=4507497">以前書いた絵</a>の日付みてもう４年近くも経ってるんですね…</p>
 
 <p class="post-footer"><span class="date">2013-03-16</span></p>
-<h2><a href="/2013/03/09/20130309-2/" title="">Plack::App::Directoryで画像を展開する</a></h2>
-<p>Perlのネガティブキャンペーンが流行ってる今日この頃ですが私は元気です（震え声）</p>
-
-<p>p5-JQueryPresentationHelperなんてなかったんや</p>
-
-<h3>Plack::App::Directoryで画像とかは展開してほしい</h3>
-
-<p>Plack::App::Directoryでカレントディレクトリ以下を見えるようにするワンライナーをbashrcとかでエイリアスにしておくとか良くあると思います。凄く便利なのでそれはそれとして良いのですが、画像とかは出来れば展開してそのまま見えてほしいかなと思う事もあります。</p>
-
-<p>なので、どうすれば良いかなとPlack::App::Directoryの中見てたのですが、もりもりっとtrタグを羅列してるだけっぽかったので、HTML出力を正規表現でちょちょっと弄ればそれっぽくなりそうだと思ったのでやってみました。</p>
-
-<script src="https://gist.github.com/mix3/5109843.js"></script>
-
-<p>ファイルを出力するときはPlack::Util::IOWithPathのオブジェクトを返してるようなので、そうでないときだけ正規表現でちょちょっと弄る感じですると良い感じに画像表示してくれました。</p>
-
-<p>swfも見えてほしいなぁという声が聞こえてきたのでswfobject.jsで見えるようにしてみました。</p>
-
-<script src="https://gist.github.com/mix3/5116797.js"></script>
-
-<p>タイルで見えるともっと良いね！という声が聞こえてきましたが、Plack::App::Directoryを使う限り無理なので、それは新規で別モジュール作った方が良いなと思いました。</p>
-
-<p>ちなみにswfobject.jsは2.2でもまだ微妙にセキュリティリスクがあるらしい <a href="http://t-ashula.hateblo.jp/entry/2012/01/11/233156">ほむらちゃほむほむ - swfobject.js がアレな話</a> ので外から見えるところで使うのは止めた方が良いかなと思います。</p>
-
-<p class="post-footer"><span class="date">2013-03-09</span></p>
-<h2><a href="/2013/03/09/20130309-1/" title="">p5-JQueryPresentationHelper作ってみた</a></h2>
-<p>やりたかったこと。</p>
-
-<ul>
-<li>use Hoge でメソッドが生えるモジュールの習作が作りたかった</li>
-<li><a href="http://code.google.com/p/jquery-presentation/">jquery-presentation</a>:<a href="http://dl.dropbox.com/u/268240/googleCode/jquery-presentation/index.html">demo</a>をmarkdownで書けるようにしたかった</li>
-</ul>
-
-<p>結果、良くわからないものが中途半端に出来てしまって、でも放置してもあれなのでとりあえずgithubにアップ。</p>
-
-<p>git clone を前提としたもっとゆるい感じで作った方が良い感じにおさまった気がしてます。</p>
-
-<p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
-
-<p class="post-footer"><span class="date">2013-03-09</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 &lt;&lt;
@@ -319,6 +413,8 @@ run;
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/10/">2013年10月</a></li>
+  <li><a href="/archives/2013/08/">2013年08月</a></li>
   <li><a href="/archives/2013/07/">2013年07月</a></li>
   <li><a href="/archives/2013/04/">2013年04月</a></li>
   <li><a href="/archives/2013/03/">2013年03月</a></li>
