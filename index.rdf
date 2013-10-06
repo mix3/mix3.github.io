@@ -70,6 +70,8 @@ configure_option -R OPTION VALUE -- replace
 <p>5.5の最新は5.6でしたというオチがついたところでちゃうねんそうやないねん</p>
 
 <p>うちが本当にやりたかったのはAdminGeneratorって最近のどうなってるんかなって知りたかってんって</p>
+
+<p>【追記】php5.5-latestのほうはその前のインストールでダウンロードされたものが残っていてそのまま使われてしまったのが原因ぽかった でも5.5snapshotはやっぱり5.6だった</p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.io/2013/10/07/20131007/</guid>
