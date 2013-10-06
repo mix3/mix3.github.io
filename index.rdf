@@ -10,6 +10,72 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>phpenv+php-buildでphpをinstallしまくる</title>
+<description>
+<![CDATA[
+<p>正確にはfpmとnginxで複数バージョンでも幸せになれる開発環境作り mix3です</p>
+
+<p>phpenvとphp-buildは以下のサイトを見てインストールするための環境は出来てる前提のお話</p>
+
+<p><a href="http://d.hatena.ne.jp/hnw/20130626">php-buildで複数バージョンのPHP-FPMを用意する</a></p>
+
+<h3>tidyで怒られる</h3>
+
+<p>homebrewで入れた場所が見れてないっぽくてこんなとき --with-tidy オプションにパス指定したいわけですが</p>
+
+<p>php-buildでconfigureオプションを弄りたい場合は以下のファイルを弄る感じになるみたい</p>
+
+<ul>
+<li>~/.phpenv/plugins/php-build/share/php-build/default_configure_options
+<ul>
+<li>デフォルトのcongifureオプション設定</li>
+</ul></li>
+<li>~/.phpenv/plugins/php-build/share/php-build/definitions/*
+<ul>
+<li>バージョン別のインストール設定</li>
+</ul></li>
+</ul>
+
+<p>良く見かけるのは~/.phpenv/plugins/php-build/share/php-build/default_configure_optionsを書き換えちゃうというものですが</p>
+
+<p>オプションそんな知らないし他バージョンのインストールに影響するのとかどうなんだと思うので、だったらphp-buildが提供するdefaultを崩さない感じでやりたいなと</p>
+
+<p>そんなときは</p>
+
+<pre><code>configure_option    OPTION VALUE -- add
+configure_option -D OPTION       -- delete
+configure_option -R OPTION VALUE -- replace
+</code></pre>
+
+<p>こんな感じになってるっぽいので目的のバージョンのdefinitionsを別名でコピって configure_option -R "--with-tidy" "/usr/local" を追記すれば良いっぽかった</p>
+
+<h3>5.5snapshot入れようとするとbisonで怒られる</h3>
+
+<p>バージョンが古いっぽいとかな感じだったのでbrew install bisonして入れてもまだ古いと怒られてしまった</p>
+
+<p>これもまたhomebrewで入れたのが見えてない感じでそれもそのはず /usr/local/Celler/bison/{version} に入れられた後 /usr/local/opt/bison にリンクが貼られていた</p>
+
+<p>例のごとくMac標準と競合してトラブルのもとだからという奴で LDFLAGS:  -L/usr/local/opt/bison/lib 指定しろよ的な奴だが、</p>
+
+<p>php-buildでLDFLAGSの指定の仕方とかわからんちんだったので、トラブルとか知るかと /usr/local 以下にリンク貼ってしまってインストール</p>
+
+<p>brew で入れた bison 3.0 だとバージョン高すぎるようだったので <a href="http://blog.sarabande.jp/post/53780323365">homebrew で標準のバージョンよりも古い bison をインストールする</a> を見ながら 2.7 を入れると今度こそインストール完了</p>
+
+<p>バージョンを確認したら 5.6.0-dev だった なんでやねーん</p>
+
+<p>github の master から入れてたので <a href="http://snaps.php.net/php5.5-latest.tar.bz2">php5.5-latest</a> から直接入れてみたけどやっぱり 5.6.0-dev だった なんでやねーん</p>
+
+<h3>ということで</h3>
+
+<p>5.5の最新は5.6でしたというオチがついたところでちゃうねんそうやないねん</p>
+
+<p>うちが本当にやりたかったのはAdminGeneratorって最近のどうなってるんかなって知りたかってんって</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/2013/10/07/20131007/</guid>
+<pubDate>Mon, 07 Oct 2013 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>自分がもしIRCボットっぽいもの作ったとしたら</title>
 <description>
 <![CDATA[
@@ -460,90 +526,6 @@ run;
 </description>
 <guid isPermaLink="true">http://mix3.github.io/2013/01/06/20130106/</guid>
 <pubDate>Sun, 06 Jan 2013 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>トランザクション</title>
-<description>
-<![CDATA[
-<p>トランザクションってなーに？mix3です</p>
-
-<h3>同時更新処理</h3>
-
-<p><a href="http://mix3.github.io/2012/11/03/20121103/">スレーブ遅延</a>のときにSELECT > UPDATEで古い情報をもとにUPDATEしてしまうと不整合が発生すると書きましたが、</p>
-
-<p>たとえば同じ行を複数で同時にSELECT > UPDATEすると同じように不整合が発生することがあります。</p>
-
-<ol>
-<li>AがT1からSELECT</li>
-<li>BがT1からSELECT</li>
-<li>AがT1をUPDATE</li>
-<li>BがT1をUPDATE</li>
-</ol>
-
-<p>このような順序で更新がかかると、BがAの更新を上書きしてしまうため、実質Aの更新が無かった事になってしまいます。</p>
-
-<p>これも更新がアトミックであれば発生しないので可能であればアトミックな更新にするのが良いですが、更新が複数ある場合はそういった変更も出来ません。</p>
-
-<h3>そんなときこそトランザクション。そんなふうに考えていた時期が僕にもありました。</h3>
-
-<p>で、そういうときはトランザクションを使う物だと思っていました。トランザクションは複数の処理を一つの処理としてまとめて成功するか失敗するか、どちらかを保証してくれます。</p>
-
-<p>なので、SELECT > UPDATEをトランザクションでまとめてしまえば大丈夫だよね！と思っていたので、以下のようなコードを書いて確認しました。</p>
-
-<script src="https://gist.github.com/4411441.js"></script>
-
-<script src="https://gist.github.com/4411446.js"></script>
-
-<p>scoreが更新回数になるので、'v' => '&lt;更新回数>' と揃えば不整合無く更新出来たことになるのですが、</p>
-
-<p>見ての通りトランザクションを使った方は残念な結果になっています。で、すこしググッた結果トランザクションとロックは別で考えないと行けないことを知りました。</p>
-
-<p><strong>トランザクションを使ったからといって勝手に行読み込みなどをロックして整合性を保証してくれるとかでは全然無いんですね。</strong></p>
-
-<p>当たり前だろダラズ！と言われても仕方ないような勘違いですが、いやトランザクションを使わない世界でしばらく生きていたので…</p>
-
-<p>で、SELECTにテーブルロックや行ロックが掛かってないためにSELECT > UPDATEの不整合が防げていないようなので、SELECT文にFOR UPDATE を付けてそれを防いでみました</p>
-
-<script src="https://gist.github.com/4411474.js"></script>
-
-<p>結果またしても残念な結果になりました…</p>
-
-<h3>ちゃんとストレージエンジンを指定しましょう</h3>
-
-<p>結果から言うとストレージエンジンを指定していなかったのでトランザクションの使えないMyISAMでテーブルが作られていたからでした。</p>
-
-<script src="https://gist.github.com/4411511.js"></script>
-
-<p>こんな感じでInnoDBを指定する事で期待通り、不整合なく更新されるようになりました。めでたしめでたし。</p>
-
-<p>ちなみにSELECTのロックには共有ロックと排他ロックとあり、FOR UPDATEは排他ロックになります。LOCK IN SHARE MODEだと共有ロックになります。</p>
-
-<p>今回の場合にLOCK IN SHARE MODEを使うと10ものプロセスが共有ロックを取り合って凄い勢いでデッドロックしました。</p>
-
-<script src="https://gist.github.com/4411540.js"></script>
-
-<p>ロックするということは同時にデッドロックする可能性もあるということなので、適切なロックを選択して使い、デッドロックの可能性を減らしながら上手く付き合っていきたいですね。</p>
-
-<h3>まとめ</h3>
-
-<ul>
-<li>トランザクションはロックとはまた別問題
-<ul>
-<li>不整合を防ぎたいならちゃんとロックのことを考えてSQLを書く</li>
-</ul></li>
-<li>MySQLのデフォルトストレージエンジンはMyISAMだけど、それトランザクション使えないからね？</li>
-<li>ロックにも種類はあり、デッドロックには気をつける</li>
-</ul>
-
-<h3>今年のブログはこれが最後な気がするので。</h3>
-
-<p>来年はもっとブログをコードを書いてアウトプットを増やして行きたいです。</p>
-
-<h3>それでは良いお年を！</h3>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/2012/12/30/20121230/</guid>
-<pubDate>Sun, 30 Dec 2012 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>
