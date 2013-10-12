@@ -10,6 +10,103 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>続 phpenv+php-buildでphpをinstallしまくる</title>
+<description>
+<![CDATA[
+<h3>最終的には以下のような感じになりました</h3>
+
+<p>5.3</p>
+
+<pre><code>configure_option "--enable-intl"
+configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
+configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
+configure_option -R "--with-tidy" "/usr/local"
+install_package "http://snaps.php.net/php5.3-latest.tar.bz2"
+install_pyrus
+install_xdebug "2.2.0"
+install_apc "3.1.13"
+</code></pre>
+
+<p>5.4</p>
+
+<pre><code>configure_option "--enable-intl"
+configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
+configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
+configure_option -R "--with-tidy" "/usr/local"
+install_package "http://snaps.php.net/php5.4-latest.tar.bz2"
+install_pyrus
+install_xdebug "2.2.1"
+install_apc "3.1.13"
+</code></pre>
+
+<p>5.5</p>
+
+<pre><code>configure_option "--enable-intl"
+configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
+configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
+configure_option -R "--with-tidy" "/usr/local"
+install_package "http://www.php.net/distributions/php-5.5.4.tar.bz2"
+install_pyrus
+install_xdebug "2.2.3"
+enable_builtin_opcache
+</code></pre>
+
+<ul>
+<li>--enable-intl のために --with-icu-dir --with-libxml-dir が必要
+<ul>
+<li>あとさらに C++ でないとダメなときがあるっぽい <a href="https://gist.github.com/nojimage/6723904">nojimage / fixes-5.3.sh</a></li>
+<li>gistそのままだとシェバングがアレだったり、Macだからだと思うけど sed でだめなので <a href="https://gist.github.com/mix3/6904829">mix3 / fixes-5.3.sh</a></li>
+</ul></li>
+<li>--with-tidy のパス指定は相変わらず "/usr/local"
+<ul>
+<li>brew --prefix だとなぜか上手く行かない</li>
+</ul></li>
+<li>5.3 5.4 ではAPCを有効にするため install_apc を指定(pluginが最初から用意されてる)</li>
+<li>5.5 では 5.5用のAPC が無い(というか開発されてない？)らしいので apcは入れない
+<ul>
+<li>Zend OPcache なるものがあるらしく enable_builtin_opcache が 5.5.* の definitions で最初から指定されてる</li>
+</ul></li>
+<li>5.5 だけ latest 指定でないのはfpmを使うと謎のセグフォして困ったから バグなのかなんなのかは不明</li>
+</ul>
+
+<p>--enable-intl 少しハマってググってたら同じくハマってた人 --disable-intlしろとか言われてて「そうじゃねぇよ」ってなってて笑った</p>
+
+<blockquote class="twitter-tweet"><p>intlのために <a href="http://t.co/241ee9MM6R">http://t.co/241ee9MM6R</a> ここに来て <a href="https://t.co/TwSABxyxhU">https://t.co/TwSABxyxhU</a> ここに来た</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/387982384060051456">October 9, 2013</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<blockquote class="twitter-tweet"><p><a href="https://t.co/HeGEH3q3RL">https://t.co/HeGEH3q3RL</a> symfony2使ってるから --enable-intl してるのに --disable-intl しろ言われててワロタ</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/387984437742280704">October 9, 2013</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>php.ini の date.timezone を毎回インストール後に弄るのあれなので php-build のトリガー機能を使って、インストール後自動で $PREFIX/etc/conf.d/date.ini を作ってそこに date.timezone の記述してみた</p>
+
+<p>~/.phpenv/plugins/php-build/share/php-build/after-install.d/date.sh
+    #!/bin/bash</p>
+
+<pre><code>set -e
+
+if [ -n "$PHP_BUILD_DEBUG" ]; then
+    set -x
+fi
+
+date_ini="$PREFIX/etc/conf.d/date.ini"
+
+if [ ! -f "$date_ini" ]; then
+    echo "[Date]" &gt; $date_ini
+    echo "date.timezone = Asia/Tokyo" &gt;&gt; $date_ini
+fi
+</code></pre>
+
+<p>これでオラオラとインストールしまくった　めでたしめでたし</p>
+
+<p>phpはなんでこんなにインストールが面倒なんや…</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/2013/10/12/20131012/</guid>
+<pubDate>Sat, 12 Oct 2013 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>phpenv+php-buildでphpをinstallしまくる</title>
 <description>
 <![CDATA[
@@ -512,22 +609,6 @@ run;
 </description>
 <guid isPermaLink="true">http://mix3.github.io/2013/02/14/20130214/</guid>
 <pubDate>Thu, 14 Feb 2013 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>あけおめ</title>
-<description>
-<![CDATA[
-<p>ことよろ。なんか本当に久しぶりに落書きしたmix3です。</p>
-
-<script src="http://source.pixiv.net/source/embed.js" data-id="32685756_6064c2b2416178ec058c322de47db89e" data-size="medium" data-border="on" charset="utf-8"></script>
-
-<noscript><p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=32685756" target="_blank">あけおめ</a> by <a href="http://www.pixiv.net/member.php?id=88339" target="_blank">mix3</a> on <a href="http://www.pixiv.net/" target="_blank">pixiv</a></p></noscript>
-
-<p>年に1回の年賀絵ぐらい継続して描きたいものですね…</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/2013/01/06/20130106/</guid>
-<pubDate>Sun, 06 Jan 2013 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>
