@@ -61,6 +61,46 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/08/30/20130830/" title="">信じて送り出したfcgiプロセスがulimitの設定によって次々と殺されて行く話</a></h2>
+<p>ではありません。</p>
+
+<p><a href="http://lestrrat.ldblog.jp/archives/25360109.html">livedoorブログ</a>がpsgiに移行したりなんかするこのご時世になぜかmod_rewriteとfcgiを使って頑張っているmix3です。</p>
+
+<h3>ulimitの話</h3>
+
+<p>とある事情でapacheのinit.dにulimitを設定していて、メモリを使いすぎる、とかCPU使いすぎるとfcgiプロセスを殺してもらうようにしていたのですが、</p>
+
+<p>「それ子(fcgi process)だけじゃなくて親(httpd)まで殺しちゃわない？」</p>
+
+<p>と <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんの有り難いお言葉が飛び出して大慌てでulimitを外すということが発生しました。</p>
+
+<p>しかもgracefulだと設定変更効かないからロードバランサから外して一台ずつリスタート掛けて行かなければならず…</p>
+
+<h3>再度設定する場合にどうするのか</h3>
+
+<p>とある事情は変わらないのでulimitの設定を戻さないと行けないが、どうすれば良いのか思いつかないので <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんに考えて頂いたところ、</p>
+
+<ul>
+<li>index.fcgiをindex.fcgi.plとか適当に変える</li>
+<li>index.fcgiは中身shスクリプトにしてそこにulimitを書く</li>
+</ul>
+
+<p>というのはどうか？と提案を頂きまして、いけそうな感じなのでそれで行こうかなぁとなっています。 <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんありがとうございました。</p>
+
+<h3>ulimitの設定どうやって確認するの？</h3>
+
+<p>と、ロードバランサから1台外してinit.d からulimitを消してリスタートしたところでふと思い聞いたところ</p>
+
+<pre><code>cat /proc/$(cat /var/run/httpd.pid)/limits
+</code></pre>
+
+<p>「こういう感じかな」と教えていただきました。備忘録。</p>
+
+<hr />
+
+<p>という記事を8月中ぐらいに書いていて放置プレイしてたので改めて残しておく</p>
+
+<p class="post-footer"><span class="date">2013-08-30</span></p>
 <h2><a href="/2013/07/28/20130728/" title="">テスト書くのって難しい</a></h2>
 <p>布都ちゃんが可愛すぎて生きるのが辛い。mix3です。</p>
 
@@ -273,21 +313,6 @@ run;
 <p>タイルで見えるともっと良いね！という声が聞こえてきましたが、Plack::App::Directoryを使う限り無理なので、それは新規で別モジュール作った方が良いなと思いました。</p>
 
 <p>ちなみにswfobject.jsは2.2でもまだ微妙にセキュリティリスクがあるらしい <a href="http://t-ashula.hateblo.jp/entry/2012/01/11/233156">ほむらちゃほむほむ - swfobject.js がアレな話</a> ので外から見えるところで使うのは止めた方が良いかなと思います。</p>
-
-<p class="post-footer"><span class="date">2013-03-09</span></p>
-<h2><a href="/2013/03/09/20130309-1/" title="">p5-JQueryPresentationHelper作ってみた</a></h2>
-<p>やりたかったこと。</p>
-
-<ul>
-<li>use Hoge でメソッドが生えるモジュールの習作が作りたかった</li>
-<li><a href="http://code.google.com/p/jquery-presentation/">jquery-presentation</a>:<a href="http://dl.dropbox.com/u/268240/googleCode/jquery-presentation/index.html">demo</a>をmarkdownで書けるようにしたかった</li>
-</ul>
-
-<p>結果、良くわからないものが中途半端に出来てしまって、でも放置してもあれなのでとりあえずgithubにアップ。</p>
-
-<p>git clone を前提としたもっとゆるい感じで作った方が良い感じにおさまった気がしてます。</p>
-
-<p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
 
 <p class="post-footer"><span class="date">2013-03-09</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
