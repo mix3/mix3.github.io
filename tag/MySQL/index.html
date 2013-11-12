@@ -61,6 +61,213 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2012/12/30/20121230/" title="">トランザクション</a></h2>
+<p>トランザクションってなーに？mix3です</p>
+
+<h3>同時更新処理</h3>
+
+<p><a href="http://mix3.github.io/2012/11/03/20121103/">スレーブ遅延</a>のときにSELECT > UPDATEで古い情報をもとにUPDATEしてしまうと不整合が発生すると書きましたが、</p>
+
+<p>たとえば同じ行を複数で同時にSELECT > UPDATEすると同じように不整合が発生することがあります。</p>
+
+<ol>
+<li>AがT1からSELECT</li>
+<li>BがT1からSELECT</li>
+<li>AがT1をUPDATE</li>
+<li>BがT1をUPDATE</li>
+</ol>
+
+<p>このような順序で更新がかかると、BがAの更新を上書きしてしまうため、実質Aの更新が無かった事になってしまいます。</p>
+
+<p>これも更新がアトミックであれば発生しないので可能であればアトミックな更新にするのが良いですが、更新が複数ある場合はそういった変更も出来ません。</p>
+
+<h3>そんなときこそトランザクション。そんなふうに考えていた時期が僕にもありました。</h3>
+
+<p>で、そういうときはトランザクションを使う物だと思っていました。トランザクションは複数の処理を一つの処理としてまとめて成功するか失敗するか、どちらかを保証してくれます。</p>
+
+<p>なので、SELECT > UPDATEをトランザクションでまとめてしまえば大丈夫だよね！と思っていたので、以下のようなコードを書いて確認しました。</p>
+
+<script src="https://gist.github.com/4411441.js"></script>
+
+<script src="https://gist.github.com/4411446.js"></script>
+
+<p>scoreが更新回数になるので、'v' => '&lt;更新回数>' と揃えば不整合無く更新出来たことになるのですが、</p>
+
+<p>見ての通りトランザクションを使った方は残念な結果になっています。で、すこしググッた結果トランザクションとロックは別で考えないと行けないことを知りました。</p>
+
+<p><strong>トランザクションを使ったからといって勝手に行読み込みなどをロックして整合性を保証してくれるとかでは全然無いんですね。</strong></p>
+
+<p>当たり前だろダラズ！と言われても仕方ないような勘違いですが、いやトランザクションを使わない世界でしばらく生きていたので…</p>
+
+<p>で、SELECTにテーブルロックや行ロックが掛かってないためにSELECT > UPDATEの不整合が防げていないようなので、SELECT文にFOR UPDATE を付けてそれを防いでみました</p>
+
+<script src="https://gist.github.com/4411474.js"></script>
+
+<p>結果またしても残念な結果になりました…</p>
+
+<h3>ちゃんとストレージエンジンを指定しましょう</h3>
+
+<p>結果から言うとストレージエンジンを指定していなかったのでトランザクションの使えないMyISAMでテーブルが作られていたからでした。</p>
+
+<script src="https://gist.github.com/4411511.js"></script>
+
+<p>こんな感じでInnoDBを指定する事で期待通り、不整合なく更新されるようになりました。めでたしめでたし。</p>
+
+<p>ちなみにSELECTのロックには共有ロックと排他ロックとあり、FOR UPDATEは排他ロックになります。LOCK IN SHARE MODEだと共有ロックになります。</p>
+
+<p>今回の場合にLOCK IN SHARE MODEを使うと10ものプロセスが共有ロックを取り合って凄い勢いでデッドロックしました。</p>
+
+<script src="https://gist.github.com/4411540.js"></script>
+
+<p>ロックするということは同時にデッドロックする可能性もあるということなので、適切なロックを選択して使い、デッドロックの可能性を減らしながら上手く付き合っていきたいですね。</p>
+
+<h3>まとめ</h3>
+
+<ul>
+<li>トランザクションはロックとはまた別問題
+<ul>
+<li>不整合を防ぎたいならちゃんとロックのことを考えてSQLを書く</li>
+</ul></li>
+<li>MySQLのデフォルトストレージエンジンはMyISAMだけど、それトランザクション使えないからね？</li>
+<li>ロックにも種類はあり、デッドロックには気をつける</li>
+</ul>
+
+<h3>今年のブログはこれが最後な気がするので。</h3>
+
+<p>来年はもっとブログをコードを書いてアウトプットを増やして行きたいです。</p>
+
+<h3>それでは良いお年を！</h3>
+
+<p class="post-footer"><span class="date">2012-12-30</span></p>
+<h2><a href="/2012/11/03/20121103/" title="">スレーブ遅延</a></h2>
+<p>今の案件に触れてからの自分の低能ぶりの凄まじさに自ら恐怖を禁じ得ず、椅子から転げ落ちて失禁しそうなmix3です。</p>
+
+<h3>レプリケーション</h3>
+
+<p>今の案件ではDBにMySQLを使いレプリケーションを使って負荷分散しております。（レプリケーション必要無いぐらいの負荷だよね、とかインフラの方に言われてまた失禁しそうです）</p>
+
+<p>レプリケーションというのはリアルタイムに複製する技術のこと？上手く説明出来ませんが、まあWebサービスなんかだと書き込みより読み込みの方が圧倒的に割合が大きいらしく、マスターとその複製のスレーブにDBを分けて、書き込みはマスターへ、読み込みは複製のスレーブへ処理を振り分ける事で負荷を分散したりします。</p>
+
+<h3>スレーブ遅延</h3>
+
+<p>レプリケーションというのはリアルタイムな複製技術なので、基本的にはマスターとスレーブは同期が取れているハズですが、サーバの負荷状況によっては同期がとれていない状態になったりします。スレーブ遅延というものです。</p>
+
+<h3>レプリケーション下での更新処理</h3>
+
+<p>たとえばインクリメント的なアトミックな更新であればスレーブは関わらないので問題ないと思います。</p>
+
+<pre><code>
+UPDATE table SET column + 1 WHERE id = ?
+</code></pre>
+
+<p>そうではなくスレーブから読み込みをし、マスターに書き込みをするような処理をしてしまうと、スレーブが遅延していた場合に古い情報をもとに更新をしてしまい不整合が発生するなどあまりよろしくない状態になります</p>
+
+<pre><code>
+SELECT hoge FROM table_1 WHERE id = ?
+スレーブから取ってきたhogeが古いものだと、その後のUPDATEでそのhogeを使うのは当然よろしくない
+
+×UPDATE table_2 SET column = <hoge> WHERE id = ?
+</code></pre>
+
+<p>なので、そういったSELECT>UPDATEのような更新処理の場合は、SELECTもスレーブからではなくマスターからするようにしないといけせん。</p>
+
+<h3>ようするにスレーブ遅延による不整合が発生したということ</h3>
+
+<p>です。気をつけましょう。</p>
+
+<h3>MySQL::Sandbox と Percona Toolkit(旧Maatkit)のpt-slave-delay</h3>
+
+<p>こういうスレーブ遅延によるバグは開発環境では気づきにくかったりします。負荷の掛かっていない開発環境ではスレーブ遅延は発生しづらいでしょうし、そもそもDB構成が本番と違っていてレプリケーションされてなかったりすることも多いでしょう。</p>
+
+<p>が、最近は便利になった物で、cpanに上がっているMySQL::SandboxとPercona Toolkit(旧Maatkit)なるツールを使うと割と簡単にレプリケーション環境とスレーブ遅延を再現出来ます。というかMySQL::SandboxもPercona Toolkit(旧Maatkit)結構前からあるので最初から使っておけという感じですね。（正月にデータが吹っ飛ぶ前は実は使ってたりしてたんですけどね...）</p>
+
+<h3>MySQL::Sandbox</h3>
+
+<ul>
+<li><p>Install</p>
+
+<ul>
+<li>cpanm MySQL::Sandbox</li>
+</ul></li>
+<li><p>How to use</p>
+
+<ul>
+<li>SANDBOX_AS_ROOT=1 make_replication_sandbox -r master_data --how_many_slaves 1 --sandbox_base_port 11111 download/mysql-5.1.66-linux-x86_64-glibc23.tar.gz</li>
+<li>rootで作業するとSANDBOX_AS_ROOT=1を使わないと怒られるけどそもそもrootで作業するなという話</li>
+<li>sandboxes/master_data/以下にマスター(port: 11111, socket: /tmp/mysql_sandbox11111.sock)スレーブ(port: 11112, socket: /tmp/mysql_sandbox11112.sock)が出来る</li>
+<li>perl -MDBI -e 'DBI->connect("dbi:mysql:test:mysql_socket=/tmp/mysql_sandbox11111.sock", "msandbox", "msandbox")'</li>
+<li>port指定での接続方法は分からなかった。できなくは無いと思うけど</li>
+</ul></li>
+<li><p>init script</p>
+
+<ul>
+<li>以下のような感じで書いてみたがうまくいかん</li>
+<li>落とし忘れるとsocketファイルが残って次回起動時に残念な事になるので出来ればなんとかしたい</li>
+</ul></li>
+</ul>
+
+<pre><code>
+#!/bin/sh
+
+# chkconfig: 2345 65 35
+# description: sandbox_action
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Get config.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+if [ ${NETWORKING} = "no" ]
+then
+  exit 0
+fi
+
+prog="sandbox_action"
+
+case "$1" in
+  start)
+    echo -n "Starting $prog: "
+    sandbox_action start
+    success
+    echo
+  ;;
+  stop)
+    echo -n "Stopping $prog: "
+    sandbox_action stop
+    success
+    echo
+  ;;
+  status)
+    sandbox_action status
+  ;;
+  *)
+    echo $"Usage: $prog {start|stop|status}"
+    exit 1
+esac
+
+exit 0
+</code></pre>
+
+<h3>Percona Toolkit(旧Maatkit)</h3>
+
+<ul>
+<li><p>Install</p>
+
+<ul>
+<li>Perconaからtarを落としてきて、perl Makefile.PL, make &amp;&amp; make install</li>
+<li>rpmは依存関係がうるさいのでtarからのほうが良いと思う</li>
+</ul></li>
+<li><p>How to use</p>
+
+<ul>
+<li>pt-slave-delay -u msandbox -p msandbox --socket /tmp/mysql_sandbox11112.sock</li>
+<li>--daemonize オプションもある</li>
+</ul></li>
+</ul>
+
+<p class="post-footer"><span class="date">2012-11-03</span></p>
 <h2><a href="/2011/07/20/20110720/" title="">MySQLのパーティショニングを触ってみる</a></h2>
 <p>MySQLで大容量のデータを扱うと削除処理が重くて涙目になることがあるので残さないデータを扱うテーブルはパーティショニングしてあげるのが良いようです。ログデータは典型的かもしれませんね。メリットとしては以下のような感じだと思います。</p>
 
@@ -181,6 +388,7 @@ mysql&gt; explain partitions select * from partition where created_at &lt; '2011
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/11/">2013年11月</a></li>
   <li><a href="/archives/2013/10/">2013年10月</a></li>
   <li><a href="/archives/2013/08/">2013年08月</a></li>
   <li><a href="/archives/2013/07/">2013年07月</a></li>
@@ -260,15 +468,20 @@ span.tagcloud23 a {text-decoration: none;}
 span.tagcloud24 {font-size: 36px;}
 span.tagcloud24 a {text-decoration: none;}
 </style><div id="htmltagcloud">
+<span class="tagcloud0"><a href="/tag/Bot/">Bot</a></span>
 <span class="tagcloud0"><a href="/tag/CRUD/">CRUD</a></span>
 <span class="tagcloud0"><a href="/tag/Capture%3A%3ATiny/">Capture::Tiny</a></span>
+<span class="tagcloud0"><a href="/tag/Chrome/">Chrome</a></span>
 <span class="tagcloud0"><a href="/tag/Hadoop/">Hadoop</a></span>
+<span class="tagcloud0"><a href="/tag/IRC/">IRC</a></span>
+<span class="tagcloud8"><a href="/tag/Linux/">Linux</a></span>
 <span class="tagcloud0"><a href="/tag/Log/">Log</a></span>
 <span class="tagcloud0"><a href="/tag/Markdown/">Markdown</a></span>
-<span class="tagcloud15"><a href="/tag/MobaSiF/">MobaSiF</a></span>
+<span class="tagcloud8"><a href="/tag/MobaSiF/">MobaSiF</a></span>
 <span class="tagcloud0"><a href="/tag/Mojolicious/">Mojolicious</a></span>
 <span class="tagcloud0"><a href="/tag/Mouse/">Mouse</a></span>
-<span class="tagcloud0"><a href="/tag/MySQL/">MySQL</a></span>
+<span class="tagcloud13"><a href="/tag/MySQL/">MySQL</a></span>
+<span class="tagcloud0"><a href="/tag/PhotonCloud/">PhotonCloud</a></span>
 <span class="tagcloud0"><a href="/tag/Play/">Play</a></span>
 <span class="tagcloud0"><a href="/tag/Qudo/">Qudo</a></span>
 <span class="tagcloud0"><a href="/tag/SNBinder/">SNBinder</a></span>
@@ -280,20 +493,26 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>
 <span class="tagcloud0"><a href="/tag/cpan%20author/">cpan author</a></span>
 <span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
+<span class="tagcloud0"><a href="/tag/golang/">golang</a></span>
+<span class="tagcloud0"><a href="/tag/isucon/">isucon</a></span>
 <span class="tagcloud0"><a href="/tag/java/">java</a></span>
 <span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>
-<span class="tagcloud24"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
+<span class="tagcloud13"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
 <span class="tagcloud24"><a href="/tag/perl/">perl</a></span>
+<span class="tagcloud0"><a href="/tag/phantomjs/">phantomjs</a></span>
+<span class="tagcloud13"><a href="/tag/php/">php</a></span>
 <span class="tagcloud0"><a href="/tag/wicket/">wicket</a></span>
-<span class="tagcloud15"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
-<span class="tagcloud15"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
+<span class="tagcloud8"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
+<span class="tagcloud8"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91/">オブジェクト指向</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%82%B5%E3%83%BC%E3%83%90%E7%AE%A1%E7%90%86/">サーバ管理</a></span>
+<span class="tagcloud0"><a href="/tag/%E3%83%86%E3%82%B9%E3%83%88/">テスト</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%A8%AD%E5%AE%9A/">ネットワーク設定</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%8B%E3%83%B3%E3%82%B0/">パーティショニング</a></span>
-<span class="tagcloud24"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
+<span class="tagcloud13"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
+<span class="tagcloud0"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
 </div></p>
     </div>
   </div>

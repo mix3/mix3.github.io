@@ -61,6 +61,31 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2012/04/10/20120410/" title="">やったー cpan auhor になったよー＼(^o^)／</a></h2>
+<p>今年入ってからミスが多すぎてそろそろ本当に首になるか、潔く自分から辞めるかした方が良いんじゃないかと真剣に考えるmix3です。</p>
+
+<h3><a href="http://pixiv.cc/mix3">pixivブログ消滅</a></h3>
+
+<p>pixivブログで書いていた事は github の pages のコピーだったので、pixivブログのサービス終了には特にどうということは無かったのですが、本当にサービスが終了して見れなくなってしまったので、ようやっと github の方に完全に移行しました。</p>
+
+<p>移行にあたって、ブログ生成スクリプトを改修（リファクタリング的には今も相当酷いが）して、Octpressのような感じでURLがそれっぽくなるようにしてみました。後はカテゴリかタグに対応してページング出来れば良いかなと思っています。</p>
+
+<p>それにしても 元 pixiv ユーザ（本当は今もpixivユーザのつもりだけど今となってはまともに描いてないので…）として pixiv ブログ自体は気に入ってたのでちょっと残念です。</p>
+
+<h3><a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a></h3>
+
+<p>タイトルに書いた通り、<a href="http://search.cpan.org/~himachoco/">cpan author</a> になりました。p5-SWFEditorという swf の画像置換やMovieClipの置換など、swf を perl から色々弄れるライブラリを作成してアップしました。</p>
+
+<p>p5-SWFEditorの中身は <a href="https://twitter.com/#!/yoya">@yoya</a> さんの好意により <a href="https://twitter.com/#!/yoya">@yoya</a> さん作 <a href="http://sourceforge.jp/projects/swfed/">SWFEditor for PHP</a> をまるっとそのまま使わせてもらっています。自分がしたのは C で書かれている SWFEditor の機能を使うためのインタフェースを XS で書いた形になります。
+（そもそも SWFEdito for PHP が移植性などを考慮してSWF操作のコア部分とそれを使うインタフェースに分離して作られているので非常に移植しやすくなっています。素晴らしいですね！）</p>
+
+<p>SWFEditor の Perl バインディングの作成を快く許可して下さった <a href="https://twitter.com/#!/yoya">@yoya</a> さんに心から感謝致します。</p>
+
+<h3>ということで</h3>
+
+<p>ブログ移行にともないpixivブログからCSSを持ってきてそれっぽくしたのでそれのお知らせと、p5-SWFEditor を cpan にアップして cpan author になったよー というお知らせでした。</p>
+
+<p class="post-footer"><span class="date">2012-04-10</span></p>
 <h2><a href="/2011/11/23/2011123/" title="">bonding設定で死んだ</a></h2>
 <h3>bondingとは</h3>
 
@@ -818,124 +843,6 @@ mysql&gt; explain partitions select * from partition where created_at &lt; '2011
 <p>削除のコストは思いの外大きくて、レプリケーション環境下でしこしこ古いデータを削除するだけのバッチを走らせたときに削除間隔を大きく取らないと同期ズレがずんどこずんどこ溜まっていく、というのを経験したことがあります。パーティションを使うとそういう苦労はせずに済みそうなので有効活用したいですね。</p>
 
 <p class="post-footer"><span class="date">2011-07-20</span></p>
-<h2><a href="/2011/07/17/20110717/" title="">さくらVPSをちょこちょこ触ってみる</a></h2>
-<p>と言っても特に何かしたとかは無かったり。</p>
-
-<ul>
-<li>sshのポートを変えた</li>
-<li>iptablesを設定した</li>
-<li>logwatchを導入した</li>
-<li>pacoを導入した</li>
-</ul>
-
-<h3>sshのポート変更</h3>
-
-<p>セキュリティ的にはsshを公開鍵認証にしておくだけで基本大丈夫だとは思うのですが、アタックされることには変わりなく気持ち悪い物は気持ち悪いので一応変えておきました。</p>
-
-<h3>iptablesの設定</h3>
-
-<p>何処でも見かける設定ですが以下のような基準でiptablesを設定するスクリプトを組みました。</p>
-
-<ul>
-<li>内から外への通信以外は拒否
-<ul>
-<li>ただし内から外への通信の応答は通す</li>
-</ul></li>
-<li>SSH用の穴は用意する</li>
-</ul>
-
-<h4>iptables-init.sh</h4>
-
-<pre><code>#!/bin/sh
-
-# ルールクリア
-iptables -F
-iptables -X
-
-# 内から外への通信以外は破棄
-iptables -P INPUT   DROP
-iptables -P OUTPUT  ACCEPT
-iptables -P FORWARD DROP
-
-# ループバックは全て許可
-iptables -A INPUT  -i lo -j ACCEPT
-iptables -A OUTPUT -o lo -j ACCEPT
-
-# プライベートネットワークなんて無かったんや…
-iptables -A INPUT -s 10.0.0.0/8     -j DROP
-iptables -A INPUT -s 127.16.0.0/12  -j DROP
-iptables -A INPUT -s 192.168.0.0/16 -j DROP
-
-# SSH用の穴
-iptables -A INPUT -p tcp --dport {SSHのポート} -j ACCEPT
-
-# 内から外への通信の応答は通す
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-</code></pre>
-
-<h3>logwatchの導入</h3>
-
-<p>ログも監視しないと意味ないのでlogwatchなるログを定期的に（デフォルトはcron.dailyを利用した毎日）メールで知らせるプログラムを導入してみました。yumで入れるとバージョンが結構古かったりするので<a href="http://sourceforge.net/projects/logwatch/files/">sourceforge</a>から落としてインストールしました。rpmで入れるとデフォルトの設定ファイルが/usr/share/logwatch/default.conf以下となるようです。/etc/logwatch/conf以下に設定ファイルを置くと設定を上書きするようです。</p>
-
-<p>とりあえずSSHのログとDiskスペースのログを監視するようにしました。デフォルトではService = Allで全部を監視するようにしてその後除外を設定しているのでその設定をコメントアウトしてSSHのログとDiskスペースのログに決め打ちしました。</p>
-
-<h4>/usr/share/logwatch/default.conf/logwatch.conf</h4>
-
-<pre><code>#Service = All
-#Service = "-zz-network" 
-#Service = "-zz-sys" 
-#Service = "-eximstats"
-</code></pre>
-
-<h4>/etc/logwatch/conf/logwatch.conf</h4>
-
-<pre><code>MailTo = 送信先メールアドレス
-MailFrom = 送信元メールアドレス
-Service = sshd
-Service = zz-disk_space
-</code></pre>
-
-<p>rpmで入れているならばおそらく/etc/cron.daily/0logwatchにlogwatchスクリプトへのシンボリックリンクが貼られているので毎日定期的に実行されメールが届くようになるハズです。ただしデフォルトでは前日のログを送信する設定（Range = yesterday）になっていてログが記録されていなければ送信されません。</p>
-
-<h3>pacoの導入</h3>
-
-<p>pacoはmake installしたソフトを管理するものです。yumなどのパッケージ管理ソフトで管理されている以外のものについてもきちっと管理したい場合は導入するととても幸せになれそうです。</p>
-
-<ul>
-<li>参考
-<ul>
-<li><a href="http://paco.sourceforge.net/">paco</a></li>
-<li><a href="http://d.hatena.ne.jp/rx7/20081011/p2">make install"したソフトウェアを管理できる超便利ツール「Paco」</a></li>
-</ul></li>
-</ul>
-
-<p>pacoのインストール自体はconfigure make make installで出来ます。またpaco自身をpacoで管理するためにmake installの後make logmeを実行します。これ以降make installするときはpaco -D make insatllというふうにすることでそのソフトをpacoの管理下に置いてくれます。</p>
-
-<h4>注意</h4>
-
-<p>pacoはデフォルトで/usr/local/bin以下にインストールされるのですがsudoで実行するとPATHが引き継がれずpacoが見つからないためmake logmeに失敗してしまいました。./configure prefix=/binなどインストール場所を設定してsudoでも実行出来るようにするか、sudo時の環境変数の引き継ぎをするなどして回避しましょう。</p>
-
-<p>なおsudo時の環境変数の引き継ぎ方法は色々あるようです。</p>
-
-<h4>bashrcで設定</h4>
-
-<pre><code>alias sudo="sudo env PATH=$PATH"
-</code></pre>
-
-<h4>visudoで設定</h4>
-
-<pre><code>Defaults:{run_user} !env_reset
-    or
-Defaults env_keep+="PATH"
-</code></pre>
-
-<h4>sudo -s で実行</h4>
-
-<h3>次回は</h3>
-
-<p>Nginx+plackでなんか適当に外から見れる環境を作りたいかな。</p>
-
-<p class="post-footer"><span class="date">2011-07-17</span></p>
 <!-- X:S ZenBackWidget --><script type="text/javascript">document.write(unescape("%3Cscript")+" src='http://widget.zenback.jp/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+Math.ceil((new Date()*1)*Math.random())+"' type='text/javascript'"+unescape("%3E%3C/script%3E"));</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -965,6 +872,7 @@ Defaults env_keep+="PATH"
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/11/">2013年11月</a></li>
   <li><a href="/archives/2013/10/">2013年10月</a></li>
   <li><a href="/archives/2013/08/">2013年08月</a></li>
   <li><a href="/archives/2013/07/">2013年07月</a></li>
@@ -1044,15 +952,20 @@ span.tagcloud23 a {text-decoration: none;}
 span.tagcloud24 {font-size: 36px;}
 span.tagcloud24 a {text-decoration: none;}
 </style><div id="htmltagcloud">
+<span class="tagcloud0"><a href="/tag/Bot/">Bot</a></span>
 <span class="tagcloud0"><a href="/tag/CRUD/">CRUD</a></span>
 <span class="tagcloud0"><a href="/tag/Capture%3A%3ATiny/">Capture::Tiny</a></span>
+<span class="tagcloud0"><a href="/tag/Chrome/">Chrome</a></span>
 <span class="tagcloud0"><a href="/tag/Hadoop/">Hadoop</a></span>
+<span class="tagcloud0"><a href="/tag/IRC/">IRC</a></span>
+<span class="tagcloud8"><a href="/tag/Linux/">Linux</a></span>
 <span class="tagcloud0"><a href="/tag/Log/">Log</a></span>
 <span class="tagcloud0"><a href="/tag/Markdown/">Markdown</a></span>
-<span class="tagcloud15"><a href="/tag/MobaSiF/">MobaSiF</a></span>
+<span class="tagcloud8"><a href="/tag/MobaSiF/">MobaSiF</a></span>
 <span class="tagcloud0"><a href="/tag/Mojolicious/">Mojolicious</a></span>
 <span class="tagcloud0"><a href="/tag/Mouse/">Mouse</a></span>
-<span class="tagcloud0"><a href="/tag/MySQL/">MySQL</a></span>
+<span class="tagcloud13"><a href="/tag/MySQL/">MySQL</a></span>
+<span class="tagcloud0"><a href="/tag/PhotonCloud/">PhotonCloud</a></span>
 <span class="tagcloud0"><a href="/tag/Play/">Play</a></span>
 <span class="tagcloud0"><a href="/tag/Qudo/">Qudo</a></span>
 <span class="tagcloud0"><a href="/tag/SNBinder/">SNBinder</a></span>
@@ -1064,20 +977,26 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>
 <span class="tagcloud0"><a href="/tag/cpan%20author/">cpan author</a></span>
 <span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
+<span class="tagcloud0"><a href="/tag/golang/">golang</a></span>
+<span class="tagcloud0"><a href="/tag/isucon/">isucon</a></span>
 <span class="tagcloud0"><a href="/tag/java/">java</a></span>
 <span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>
-<span class="tagcloud24"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
+<span class="tagcloud13"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
 <span class="tagcloud24"><a href="/tag/perl/">perl</a></span>
+<span class="tagcloud0"><a href="/tag/phantomjs/">phantomjs</a></span>
+<span class="tagcloud13"><a href="/tag/php/">php</a></span>
 <span class="tagcloud0"><a href="/tag/wicket/">wicket</a></span>
-<span class="tagcloud15"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
-<span class="tagcloud15"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
+<span class="tagcloud8"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
+<span class="tagcloud8"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91/">オブジェクト指向</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%82%B5%E3%83%BC%E3%83%90%E7%AE%A1%E7%90%86/">サーバ管理</a></span>
+<span class="tagcloud0"><a href="/tag/%E3%83%86%E3%82%B9%E3%83%88/">テスト</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%A8%AD%E5%AE%9A/">ネットワーク設定</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%8B%E3%83%B3%E3%82%B0/">パーティショニング</a></span>
-<span class="tagcloud24"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
+<span class="tagcloud13"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
+<span class="tagcloud0"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
 </div></p>
     </div>
   </div>
