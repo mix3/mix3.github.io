@@ -61,6 +61,205 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/11/23/20131123/" title="">packerを使ってboxを作ってvagrant upしてansibleでprovisioningしてみるなど</a></h2>
+<p><a href="/2013/11/13/20131113/">前の記事</a>が <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんにブクマされた後もりもりっとブクマがのびてビビるなど。mix3です。</p>
+
+<p>vagrantやansibleが流行っぽいので、MBP13インチをRetinaモデルに新調してウキウキハイテンションの今のうちに触っておくことにしました。</p>
+
+<p>ちなみにpacker,vagrant,ansibleに対する自分の理解は以下のような感じ</p>
+
+<ul>
+<li>packer
+<ul>
+<li>vagrantのboxを作るためのツール</li>
+</ul></li>
+<li>vagrant
+<ul>
+<li>昔virtualboxのフロントエンドツールだったぽいけど今はvirtualboxに縛られなくなってるんだっけ？</li>
+</ul></li>
+<li>ansible
+<ul>
+<li>provisioningツール chefとかより軽量</li>
+</ul></li>
+</ul>
+
+<p>正しくないかもしれないけど、大きく外してないと思いたい。</p>
+
+<h4>インストール</h4>
+
+<p>packerはbrew install packerか、バージョンを気にする場合はgit clone > make</p>
+
+<p>vagrantは<a href="http://downloads.vagrantup.com/">Vagrant Downloads</a>からdmgを持ってきてインストールでサクっと完了。</p>
+
+<p>ansibleはbrew install ansibleで。なおpyenvを使ってsystemのpythonを使われないようにしました。</p>
+
+<h3>packerを試す</h3>
+
+<p>やったのはcentos5.6のboxを作ること <a href="https://github.com/hnakamur/my-packer-template-files/tree/895f40358ff38328d30a69727bceba5f4962c3e2/centos6.4">my-packer-template-files/centos6.4</a>を元に弄りました</p>
+
+<ul>
+<li>vmwareの項目を削った</li>
+<li>netinstallだと時間がかかるのでDVD1of2をローカルに持ってきておいてそれを使うようにした</li>
+<li>Virutalboxで実際にインストールした後に出来るanaconda.cfgををもとにks.cfgを弄った</li>
+<li>GuestAdditionsのせいで削ったyumが元に戻った</li>
+<li>etc...</li>
+</ul>
+
+<p>色々削れないかなぁと思って色々削った末に色々削れずに元に戻るということをpacker buildを打ちまくって繰り返してました。</p>
+
+<p>なお、最小構成でのOSインストールにしているとはいえboxがexportされるまでそれなりに時間が掛かるのでtry&amp;errorで試すのは結構面倒くさいです。</p>
+
+<ul>
+<li>box作成までの流れ
+<ul>
+<li>vmが立ち上がってkickstartでOSインストール</li>
+<li>vm再起動後、provisionersの設定が走ってyumやら色々インストール</li>
+<li>vm落とした後box作成</li>
+</ul></li>
+</ul>
+
+<p>ちなみにboxは <a href="http://www.vagrantbox.es/">Vagrantbox.es</a>に色々あるのでそれで問題ないのであればpacker使って自作する前にそっちを使うべきかと思います。</p>
+
+<p>centos5.6のboxもあります。</p>
+
+<ul>
+<li><a href="http://yum.mnxsolutions.com/vagrant/centos_56_32.box">CentOS 5.6 32</a></li>
+<li><a href="https://dl.dropbox.com/u/7196/vagrant/CentOS-56-x64-packages-puppet-2.6.10-chef-0.10.6.box">CentOS 5.6 64 Packages (puppet 2.6.10 &amp; chef 0.10.6 from RPM, VirtualBox 4.2.0)</a></li>
+</ul>
+
+<p>ということで自作したpacker templateはこちらになります <a href="https://github.com/mix3/my-packer-template-files/tree/master/centos5.6">my-packer-template-files/centos5.6</a></p>
+
+<p>json手書きとかケツカンマの関係でやりたくなかったのでperlで書いてjsonに直す感じになってます</p>
+
+<h3>vagrant upする</h3>
+
+<p>boxが出来たので起動するのですが、いまいちvagrantの使い方がわかっていないのでとりあえず以下の手順で起動してみた</p>
+
+<ul>
+<li>vagrant box add [box name] [box file]</li>
+<li>cd 適当な場所</li>
+<li>vagrant init [box name]</li>
+<li>vagrant up</li>
+</ul>
+
+<p>vagrant init でVagrantfileが作られるので設定が必要な場合はupするまえに弄る感じになるっぽい 例えばvirtualboxの設定を変えたいときは以下を弄ったりするんだと思われる</p>
+
+<p>packerの時点でGuestAdditionsインストールを削って使わない設定にするとかもここかな？</p>
+
+<pre><code># config.vm.provider :virtualbox do |vb|
+#   # Don't boot with headless mode
+#   vb.gui = true
+#
+#   # Use VBoxManage to customize the VM. For example to change memory:
+#   vb.customize ["modifyvm", :id, "--memory", "1024"]
+# end
+</code></pre>
+
+<p>sshで入るときは vagrant ssh すると入れる vagrant ssh-config で .ssh/config の設定が見えるので手動で何かしたいときはそっちを見ると良いかな</p>
+
+<h3>ansibleを試す</h3>
+
+<p>ansibleを動かすにはINVENTRY（サーバリスト）とplaybook（chefでいうレシピ）が必要になります。今回は配信先が一つなのでINVENTRYはシンプルに一行で良いのですが、意味も無くグルーピングしてみました</p>
+
+<pre><code>$ cat hosts 
+[vagrant]
+127.0.0.1 ansible_ssh_port=2222
+
+# きちんとグルーピング指定するならこんな感じかな？
+# [vagrant-app]
+# 127.0.0.1 ansible_ssh_port=2223
+# 127.0.0.1 ansible_ssh_port=2224
+# 127.0.0.1 ansible_ssh_port=2225
+# 127.0.0.1 ansible_ssh_port=2226
+
+# [vagrant-db]
+# 127.0.0.1 ansible_ssh_port=2227
+
+# [vagrant-app:vars]
+# ...
+# [vagrant-db:vars]
+# ...
+
+[vagrant:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+</code></pre>
+
+<p>ansible_*のオプションは<a href="http://yteraoka.github.io/ansible-tutorial/ansible-in-detail.html">Ansible in detail</a> で確認しました</p>
+
+<p>ひとまずはこれで配信が出来るか試したところ</p>
+
+<pre><code>$ ansible all -i hosts -m ping -s
+127.0.0.1 | FAILED &gt;&gt; {
+    "failed": true, 
+    "msg": "SUDO-SUCCESS-moxmhsptrmdnainrjekmubryetybkhrq\r\nError: ansible requires a json module, none found!", 
+    "parsed": false
+}
+</code></pre>
+
+<p>という感じで怒られてしまいました。配信先のpythonにjson moduleが別途必要なようです（python2.6からは不要）文言が違うけど以下参考</p>
+
+<ul>
+<li><a href="http://qiita.com/yamasaki-masahide/items/4485a438125e6b1748ce">Ansible CentOS5で出るImportError: No module named simplejson の対処</a></li>
+</ul>
+
+<p>これはに対して -m raw でjsonを使わず -a "..." で実行内容を直接指定して配信先に対してjson moduleを入れるのが定石のようなようです</p>
+
+<pre><code>$ ansible all -i hosts -m raw -a "yum -y install python-simplejson" -s
+$ ansible all -i hosts -m ping -s
+127.0.0.1 | success &gt;&gt; {
+    "changed": false, 
+    "ping": "pong"
+}
+</code></pre>
+
+<p>これでplaybookを作ってやれば配信できる状態になったと思われます。</p>
+
+<p>ちなみに ansible all -i hosts all -m ping -s のオプションの意味ですが以下のようになっています</p>
+
+<pre><code>$ ansible
+Usage: ansible &lt;host-pattern&gt; [options] # host-pattern は all指定で全グループへ、グループ名指定で特定のグループへ配信
+
+Options:
+  -i INVENTORY, --inventory-file=INVENTORY
+                        specify inventory host file            # ホストリストファイルの指定
+                        (default=/usr/local/etc/ansible/hosts)
+  -s, --sudo            run operations with sudo (nopasswd)    # 配信先での操作でnopassのsudoを使う
+</code></pre>
+
+<h4>playbook</h4>
+
+<p>playbookは以下をつまみ食いしたあと、後公式ドキュメン <a href="http://www.ansibleworks.com/docs/modules.html">Ansible Modules</a> をつまみ食いして作りました</p>
+
+<ul>
+<li><a href="http://d2.haro.jp/2013/08/ansible_start.html">[Ansible] 使いやすい Ansible 、みんな使おう Ansible (1)</a></li>
+<li><a href="http://d.hatena.ne.jp/akishin999/20130815/1376520672">Ansible の Playbook を使ってみる</a></li>
+<li><a href="http://open-groove.net/ansible/nginx-install/">Ansibleでnginxをソースインストール</a></li>
+</ul>
+
+<p>作ったplaybookの内容は以下の通り なにやら怪しい感じですが気にしてはいけません。</p>
+
+<ul>
+<li>apacheのyumインストール</li>
+<li>fcgiのyumインストール</li>
+<li>mod_fastcgi2.4.6のソースインストール</li>
+<li>mysqld5.1のrpmインストール</li>
+<li>memcachedのyumインストール</li>
+</ul>
+
+<p>ということで、具体的には<a href="https://gist.github.com/mix3/7611961">https://gist.github.com/mix3/7611961</a>のようになりました 意味も無くymlを分割したりしています。</p>
+
+<p>rpmモジュールは<a href="http://qiita.com/dayflower/items/21c64a6f5da155a5ade3">Ansible で RPM を扱う</a>から拝借させてもらいました</p>
+
+<p>本来必要の無いものなのですが、CentOS5だとyumモジュールでのrpmインストールがうまく行かないようなので使わせてもらいました</p>
+
+<h3>ということで</h3>
+
+<p>仮想化やらクラウドやらのおかげで複数台のサーバを気軽に扱えるような時代になってるので、気軽に扱えるなら扱えるなりに扱い方を覚えていかないとなぁとそんなこと思いながらpacker, vagrant, ansible とかを触ってみました。</p>
+
+<p>次はserverspecとか触りたいですね。確か今年の新卒たちはchefやらserverspecやらを研修で学んだと聞くのでそろそろ後輩に追いつかないといかんとですよ。</p>
+
+<p class="post-footer"><span class="date">2013-11-23</span></p>
 <h2><a href="/2013/11/13/20131113/" title="">isucon3のリファレンス実装をGoに移植した話</a></h2>
 <p>isucon3スタッフとして本選運営のお手伝いをしてきましたが、参加者ではないのでisuconについて特に書くことが見つからないmix3です。一つ言えるのはみんな凄すぎでそれに比べて自分は本当になにも出来ない無能なんだなぁと再認識させられました。死にたい。</p>
 
@@ -893,68 +1092,6 @@ fi
 <p>phpはなんでこんなにインストールが面倒なんや…</p>
 
 <p class="post-footer"><span class="date">2013-10-12</span></p>
-<h2><a href="/2013/10/07/20131007/" title="">phpenv+php-buildでphpをinstallしまくる</a></h2>
-<p>正確にはfpmとnginxで複数バージョンでも幸せになれる開発環境作り mix3です</p>
-
-<p>phpenvとphp-buildは以下のサイトを見てインストールするための環境は出来てる前提のお話</p>
-
-<p><a href="http://d.hatena.ne.jp/hnw/20130626">php-buildで複数バージョンのPHP-FPMを用意する</a></p>
-
-<h3>tidyで怒られる</h3>
-
-<p>homebrewで入れた場所が見れてないっぽくてこんなとき --with-tidy オプションにパス指定したいわけですが</p>
-
-<p>php-buildでconfigureオプションを弄りたい場合は以下のファイルを弄る感じになるみたい</p>
-
-<ul>
-<li>~/.phpenv/plugins/php-build/share/php-build/default_configure_options
-<ul>
-<li>デフォルトのcongifureオプション設定</li>
-</ul></li>
-<li>~/.phpenv/plugins/php-build/share/php-build/definitions/*
-<ul>
-<li>バージョン別のインストール設定</li>
-</ul></li>
-</ul>
-
-<p>良く見かけるのは~/.phpenv/plugins/php-build/share/php-build/default_configure_optionsを書き換えちゃうというものですが</p>
-
-<p>オプションそんな知らないし他バージョンのインストールに影響するのとかどうなんだと思うので、だったらphp-buildが提供するdefaultを崩さない感じでやりたいなと</p>
-
-<p>そんなときは</p>
-
-<pre><code>configure_option    OPTION VALUE -- add
-configure_option -D OPTION       -- delete
-configure_option -R OPTION VALUE -- replace
-</code></pre>
-
-<p>こんな感じになってるっぽいので目的のバージョンのdefinitionsを別名でコピって configure_option -R "--with-tidy" "/usr/local" を追記すれば良いっぽかった</p>
-
-<h3>5.5snapshot入れようとするとbisonで怒られる</h3>
-
-<p>バージョンが古いっぽいとかな感じだったのでbrew install bisonして入れてもまだ古いと怒られてしまった</p>
-
-<p>これもまたhomebrewで入れたのが見えてない感じでそれもそのはず /usr/local/Celler/bison/{version} に入れられた後 /usr/local/opt/bison にリンクが貼られていた</p>
-
-<p>例のごとくMac標準と競合してトラブルのもとだからという奴で LDFLAGS:  -L/usr/local/opt/bison/lib 指定しろよ的な奴だが、</p>
-
-<p>php-buildでLDFLAGSの指定の仕方とかわからんちんだったので、トラブルとか知るかと /usr/local 以下にリンク貼ってしまってインストール</p>
-
-<p>brew で入れた bison 3.0 だとバージョン高すぎるようだったので <a href="http://blog.sarabande.jp/post/53780323365">homebrew で標準のバージョンよりも古い bison をインストールする</a> を見ながら 2.7 を入れると今度こそインストール完了</p>
-
-<p>バージョンを確認したら 5.6.0-dev だった なんでやねーん</p>
-
-<p>github の master から入れてたので <a href="http://snaps.php.net/php5.5-latest.tar.bz2">php5.5-latest</a> から直接入れてみたけどやっぱり 5.6.0-dev だった なんでやねーん</p>
-
-<h3>ということで</h3>
-
-<p>5.5の最新は5.6でしたというオチがついたところでちゃうねんそうやないねん</p>
-
-<p>うちが本当にやりたかったのはAdminGeneratorって最近のどうなってるんかなって知りたかってんって</p>
-
-<p>【追記】php5.5-latestのほうはその前のインストールでダウンロードされたものが残っていてそのまま使われてしまったのが原因ぽかった でも5.5snapshotはやっぱり5.6だった</p>
-
-<p class="post-footer"><span class="date">2013-10-07</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 &lt;&lt;
@@ -1010,8 +1147,8 @@ configure_option -R OPTION VALUE -- replace
 <p><style type="text/css">
 
 #htmltagcloud {
-  text-align:  center; 
-  line-height: 1; 
+  text-align:  center;
+  line-height: 1;
 }
 span.tagcloud0 {font-size: 12px;}
 span.tagcloud0 a {text-decoration: none;}
@@ -1094,9 +1231,11 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/java/">java</a></span>
 <span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>
 <span class="tagcloud13"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
+<span class="tagcloud0"><a href="/tag/packer/">packer</a></span>
 <span class="tagcloud24"><a href="/tag/perl/">perl</a></span>
 <span class="tagcloud0"><a href="/tag/phantomjs/">phantomjs</a></span>
 <span class="tagcloud13"><a href="/tag/php/">php</a></span>
+<span class="tagcloud0"><a href="/tag/vagrant/">vagrant</a></span>
 <span class="tagcloud0"><a href="/tag/wicket/">wicket</a></span>
 <span class="tagcloud8"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
 <span class="tagcloud8"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>

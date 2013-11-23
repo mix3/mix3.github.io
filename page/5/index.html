@@ -61,6 +61,22 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2012/04/14/20120414/" title="">Capture::Tiny</a></h2>
+<p>前回pixivブログは github pages のコピーだから大丈夫とか書いたけど、github pages で書き始める前のpixivブログはバックアップ取ってなかったのでほんとは大丈夫じゃなかった mix3 です。SSH+LDAP とか keepalived を試してみた記事が消えたのはちょっともったいなかったかな。まあ、Google検索でキャッシュ漁ればある程度は発掘出来そうではあるけれども。</p>
+
+<h3>p5-SWFEditor</h3>
+
+<p>アウトプットが無さ過ぎて良くないなぁということでひねり出してみる。</p>
+
+<p>前の記事に書いたp5-SWFEditorですが、swf_info と print_tag_data はCが標準出力をしていて、これをテストしようとすると標準出力をキャプチャしないといけなくてちょっと困ってしまいました。Capture::Tiny というものを使うとキャプチャ出来るというのは<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんから教わって試してみたけれどなぜか上手く行かず。言われて試してみたときは途中までしかキャプチャ出来ませんでした。</p>
+
+<p>ただ、途中までしかキャプチャできないという時点で出力がバッファされているというのはピンと来ていて、実際その通りだったのですが、Perlでこれをどうこうする方法が分からず結局今もどうすれば良いのかというのは分かっていません。今はXSのほうでfflushするようにしてテストが出来るようにしています。</p>
+
+<p>以下標準出力を捕まえる方法を探っていたときに書いたサンプルです。fflushしたときの標準出力とPerlIO_stdoutfを使った標準出力はキャプチャできていますが、素直にprintfしたときはキャプチャできず遅れてバッファに溜まっていたものが標準出力されてしまっています。</p>
+
+<script src="https://gist.github.com/2384966.js"> </script>
+
+<p class="post-footer"><span class="date">2012-04-14</span></p>
 <h2><a href="/2012/04/10/20120410/" title="">やったー cpan auhor になったよー＼(^o^)／</a></h2>
 <p>今年入ってからミスが多すぎてそろそろ本当に首になるか、潔く自分から辞めるかした方が良いんじゃないかと真剣に考えるmix3です。</p>
 
@@ -736,113 +752,6 @@ mouse         222222/s 4707%     258%     100%           67%    4%       0%    -
 <p>速度というのは最近気にしているテーマで、Webアプリの１リクエストのレスポンスタイムが10msと100msとあったとして、それの時間差が90msと何となく微々たる物のように思う物でも分間10リクエストとして合計100msと1000msになり差が900msとどんどん大きくなっていくのが恐ろしいなぁと思ったりしています。もしもこれが分間じゃなくて秒間だったら？10リクエストじゃなくて100リクエストだったら？1000リクエストだったら？…まだ実感の伴わない話なのでアレですが今後直面する問題だろうなと感じています。モダンだ流行だと色々なものに飛びつくのも勉強になって良いですが、ただ実際それが実用に堪えうるのかどうかちゃんと検証することも覚えないといけないなと。そんなことを考えています。</p>
 
 <p class="post-footer"><span class="date">2011-07-22</span></p>
-<h2><a href="/2011/07/20/20110720/" title="">MySQLのパーティショニングを触ってみる</a></h2>
-<p>MySQLで大容量のデータを扱うと削除処理が重くて涙目になることがあるので残さないデータを扱うテーブルはパーティショニングしてあげるのが良いようです。ログデータは典型的かもしれませんね。メリットとしては以下のような感じだと思います。</p>
-
-<ul>
-<li>DROP TABLE のようにパーティションのデータをサクっと消せる</li>
-<li>刈り込みが出来る（検索範囲を限定出来る場合が有り、各クエリのパフォーマンスが良くなる可能性がある）</li>
-</ul>
-
-<p>使う場合の注意として<a href="http://nippondanji.blogspot.com/2009/04/1.html">漢のコンピュータ道</a>にてこんな感じに挙げられています。</p>
-
-<ul>
-<li>インデックスをつけるだけでカバー出来る場合が多い。</li>
-<li>パーショニングを使わずに、単にテーブルを分けてしまえばいい。</li>
-<li>テーブルが巨大にならないとあまり効果を実感できない。</li>
-<li>使い方を間違えると性能が落ちてしまう。</li>
-</ul>
-
-<p>以下、日別にパーティションを区切っていくサンプルになります。</p>
-
-<h3>テーブル作成</h3>
-
-<pre><code>DROP TABLE IF EXISTS partition;
-CREATE TABLE partition (
-    id         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    created_at DATETIME            NOT NULL,
-    PRIMARY KEY (id, created_at)
-) ENGINE=InnoDB;
-</code></pre>
-
-<h3>ベースとなるパーティションの作成</h3>
-
-<pre><code>ALTER TABLE partition PARTITION BY RANGE (TO_DAYS(created_at))
-    (PARTITION p20110720 VALUES LESS THAN (TO_DAYS('2011-07-21 00:00:00')) COMMENT = '2011-07-21 00:00:00');
-</code></pre>
-
-<h3>mysql_partition_cron.sh</h3>
-
-<p>cronで順次パーティションを追加していきます。以下では毎日次の日の１日分を追加していますが１週間毎に纏めて追加とかしても良いでしょう。実際に運用する際はログを取ってメールを投げる等監視しておく方が良いですね。</p>
-
-<pre><code>#!/bin/bash
-
-DAYSTR=`date --date '1 day' +"%Y%m%d"`
-DAY_2=`date --date '2 day' +"%Y-%m-%d 00:00:00"`
-
-QUERY="ALTER TABLE partition ADD PARTITION (PARTITION p$DAYSTR VALUES LESS THAN (TO_DAYS('$DAY_2')) COMMENT = '$DAY_2')"
-echo $QUERY
-echo $QUERY | mysql -u root partition
-</code></pre>
-
-<h3>確認</h3>
-
-<h4>INSERT</h4>
-
-<pre><code>mysql&gt; insert into partition value (null, '2011-07-20');
-Query OK, 1 row affected (0.00 sec)
-
-mysql&gt; insert into partition value (null, '2011-07-21');
-Query OK, 1 row affected (0.00 sec)
-
-mysql&gt; insert into partition value (null, '2011-07-22');
-ERROR 1526 (HY000): Table has no partition for value 734705
-</code></pre>
-
-<p>存在しないパーティションへのINSERTはエラーになるので、パーティションの追加忘れ、追加ミスには注意。</p>
-
-<pre><code>mysql&gt; insert into partition value (null, '2011-07-19');
-Query OK, 1 row affected (0.01 sec)
-</code></pre>
-
-<h4>パーティション分布</h4>
-
-<pre><code>mysql&gt; SELECT table_schema, table_name, partition_name, partition_ordinal_position, table_rows FROM information_schema.partitions WHERE table_name = 'partition';
-+--------------+------------+----------------+----------------------------+------------+
-| table_schema | table_name | partition_name | partition_ordinal_position | table_rows |
-+--------------+------------+----------------+----------------------------+------------+
-| partition    | partition  | p20110720      |                          1 |          2 |
-| partition    | partition  | p20110721      |                          2 |          1 |
-+--------------+------------+----------------+----------------------------+------------+
-2 rows in set (0.00 sec)
-</code></pre>
-
-<h4>刈り込み</h4>
-
-<pre><code>mysql&gt; explain partitions select * from partition where created_at &lt; '2011-07-21 00:00:00';
-+----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-| id | select_type | table     | partitions | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
-+----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-|  1 | SIMPLE      | partition | p20110720  | index | NULL          | PRIMARY | 16      | NULL |    2 | Using where; Using index |
-+----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-1 row in set (0.00 sec)
-
-mysql&gt; explain partitions select * from partition where created_at &lt; '2011-07-22 00:00:00';
-+----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-| id | select_type | table     | partitions          | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
-+----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-|  1 | SIMPLE      | partition | p20110720,p20110721 | index | NULL          | PRIMARY | 16      | NULL |    3 | Using where; Using index |
-+----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-1 row in set (0.01 sec)
-</code></pre>
-
-<p>前者だとp20110720からのみの検索になってるので刈り込み出来ているようです。これが大容量のデータに対してだと本来インデックがメモリに乗りきらずスワップしちゃうという状況でも、刈り込みによってメモリに収まる可能性が出て来るので、そうなった場合にパーティショニングの威力が発揮されるというのが想像出来ますね。</p>
-
-<h3>まとめ</h3>
-
-<p>削除のコストは思いの外大きくて、レプリケーション環境下でしこしこ古いデータを削除するだけのバッチを走らせたときに削除間隔を大きく取らないと同期ズレがずんどこずんどこ溜まっていく、というのを経験したことがあります。パーティションを使うとそういう苦労はせずに済みそうなので有効活用したいですね。</p>
-
-<p class="post-footer"><span class="date">2011-07-20</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -898,8 +807,8 @@ mysql&gt; explain partitions select * from partition where created_at &lt; '2011
 <p><style type="text/css">
 
 #htmltagcloud {
-  text-align:  center; 
-  line-height: 1; 
+  text-align:  center;
+  line-height: 1;
 }
 span.tagcloud0 {font-size: 12px;}
 span.tagcloud0 a {text-decoration: none;}
@@ -982,9 +891,11 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/java/">java</a></span>
 <span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>
 <span class="tagcloud13"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
+<span class="tagcloud0"><a href="/tag/packer/">packer</a></span>
 <span class="tagcloud24"><a href="/tag/perl/">perl</a></span>
 <span class="tagcloud0"><a href="/tag/phantomjs/">phantomjs</a></span>
 <span class="tagcloud13"><a href="/tag/php/">php</a></span>
+<span class="tagcloud0"><a href="/tag/vagrant/">vagrant</a></span>
 <span class="tagcloud0"><a href="/tag/wicket/">wicket</a></span>
 <span class="tagcloud8"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
 <span class="tagcloud8"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
