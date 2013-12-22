@@ -61,6 +61,391 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/10/19/20131019/" title="">AdmingeneratorGeneratorBundleを試す</a></h2>
+<p>php入れたのだから早速admingeneratorを試したいのだが、symfony2になってからのadmingeneratorは2種類あるっぽい</p>
+
+<ul>
+<li><a href="https://github.com/symfony2admingenerator/AdmingeneratorGeneratorBundle">symfony2admingenerator / AdmingeneratorGeneratorBundle</a></li>
+<li><a href="https://github.com/sonata-project/SonataAdminBundle">sonata-project / SonataAdminBundle</a></li>
+</ul>
+
+<p>どっちがどうとか知らないので、今回はとりあえず AdmingeneratorGeneratorBundle の方を試して行く</p>
+
+<h3>インストール</h3>
+
+<p>なにはなくともまずプロジェクトを作る</p>
+
+<pre><code>$ php composer.phar create-project symfony/framework-standard-edition 2.3.6 2.3.6
+</code></pre>
+
+<p>プレーンな状態で動くことを確認</p>
+
+<p><a href="https://github.com/symfony2admingenerator/AdmingeneratorGeneratorBundle/blob/master/Resources/doc/installation/installation-via-composer.md">AdmingeneratorGeneratorBundle / Resources / doc / installation / installation-via-composer.md</a>を参考にインストールを進める <a href="http://symfony2admingenerator.org/installation.html">こっちは自分には全く役に立たなかった</a></p>
+
+<p>composer.jsonを修正してupdateする</p>
+
+<pre><code>--- composer.json.1 2013-10-19 16:26:06.000000000 +0900
++++ composer.json   2013-10-19 16:27:02.000000000 +0900
+@@ -18,7 +18,8 @@
+         "sensio/distribution-bundle": "2.3.*",
+         "sensio/framework-extra-bundle": "2.3.*",
+         "sensio/generator-bundle": "2.3.*",
+-        "incenteev/composer-parameter-handler": "~2.0"
++        "incenteev/composer-parameter-handler": "~2.0",
++        "cedriclombardot/admingenerator-generator-bundle": "2.3.*@dev"
+     },
+     "scripts": {
+         "post-install-cmd": [
+@@ -37,7 +38,8 @@
+         ]
+     },
+     "config": {
+-        "bin-dir": "bin"
++        "bin-dir": "bin",
++        "component-dir": "web/components"
+     },
+     "minimum-stability": "stable",
+     "extra": {
+</code></pre>
+
+<p>たぶん怒られるのでさらにcomposer.jsonを修正してupdateする</p>
+
+<pre><code>--- composer.json.2 2013-10-19 16:48:58.000000000 +0900
++++ composer.json   2013-10-19 16:51:56.000000000 +0900
+@@ -41,7 +41,7 @@
+         "bin-dir": "bin",
+         "component-dir": "web/components"
+     },
+-    "minimum-stability": "stable",
++    "minimum-stability": "dev",
+     "extra": {
+         "symfony-app-dir": "app",
+         "symfony-web-dir": "web",
+</code></pre>
+
+<p>Symfony\Component\Process\Exception\ProcessTimedOutException などと言って怒られる場合はタイムアウトの時間を伸ばしてみる</p>
+
+<pre><code>$ COMPOSER_PROCESS_TIMEOUT=600 php composer.phar update
+</code></pre>
+
+<p>上手く言ったらBundleを有効にする</p>
+
+<pre><code>--- app/AppKernel.php.1 2013-10-19 17:26:45.000000000 +0900
++++ app/AppKernel.php   2013-10-19 17:27:12.000000000 +0900
+@@ -16,6 +16,9 @@
+             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
+             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
+             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
++            new Admingenerator\GeneratorBundle\AdmingeneratorGeneratorBundle(),
++            new Knp\Bundle\MenuBundle\KnpMenuBundle(),
++            new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
+         );
+
+         if (in_array($this-&gt;getEnvironment(), array('dev', 'test'))) {
+</code></pre>
+
+<p>app/config/config.yml に admingenerator の設定追加 使うORMとAsseticを使うかで修正内容を変えるっぽい</p>
+
+<pre><code>--- app/config/config.yml.1 2013-10-19 17:28:28.000000000 +0900
++++ app/config/config.yml   2013-10-19 17:32:20.000000000 +0900
+@@ -64,3 +64,13 @@
+     username:  %mailer_user%
+     password:  %mailer_password%
+     spool:     { type: memory }
++
++admingenerator_generator:
++    # choose  and enable at least one
++    use_propel:           false
++    use_doctrine_orm:     true
++    use_doctrine_odm:     false
++
++    # choose and uncomment only one
++#    base_admin_template: AdmingeneratorGeneratorBundle::base_admin.html.twig
++    base_admin_template: AdmingeneratorGeneratorBundle::base_admin_assetic_less.html.twig
+</code></pre>
+
+<p>Asseticは無視して Install assets</p>
+
+<pre><code>$ php app/console assets:install web --symlink
+</code></pre>
+
+<p>Dashboard route も無視</p>
+
+<p>AdmingeneratorGeneratorBundle のインストール自体は多分これで完了</p>
+
+<h3>php app/console generate:bundle する</h3>
+
+<p>最初から admin:generate-admin admin:generate-bundle をして admingenerater が適用されたBundleを作っても良いのだが色々面倒だったので</p>
+
+<ul>
+<li>Bundleを作る</li>
+<li>Entityを作る</li>
+<li>admin:generate-admin する</li>
+</ul>
+
+<p>という感じで進める</p>
+
+<pre><code>$ php app/console generate:bundle
+</code></pre>
+
+<ul>
+<li>Bundle namespace: Acme/SampleBundle</li>
+<li>Bundle name [AcmeSampleBundle]:</li>
+<li>Target directory [/project/path/src]:</li>
+<li>Configuration format (yml, xml, php, or annotation): annotation</li>
+<li>Do you want to generate the whole directory structure [no]?</li>
+<li>Do you confirm generation [yes]?</li>
+<li>Confirm automatic update of your Kernel [yes]?</li>
+<li>Confirm automatic update of the Routing [yes]?</li>
+</ul>
+
+<p><a href="http://docs.symfony.gr.jp/symfony2/book/doctrine.html">データベースと Doctrine (“The Model”)</a> ここを参考に適当にEntityを作って行く</p>
+
+<p>確認ごときに mysql は仰々しすぎるので sqlite にする</p>
+
+<pre><code>--- app/config/parameters.yml.1 2013-10-19 19:39:04.000000000 +0900
++++ app/config/parameters.yml   2013-10-19 19:39:25.000000000 +0900
+@@ -1,6 +1,6 @@
+ # This file is auto-generated during the composer install
+ parameters:
+-    database_driver: pdo_mysql
++    database_driver: pdo_sqlite
+     database_host: 127.0.0.1
+     database_port: null
+     database_name: symfony
+@@ -10,5 +10,5 @@
+     mailer_host: 127.0.0.1
+     mailer_user: null
+     mailer_password: null
+-    locale: en
++    locale: ja
+     secret: ThisTokenIsNotSoSecretChangeIt
+</code></pre>
+
+<p>この状態で doctrine:database:create するとプロジェクト直下に "symfony" とか出来て悲しみを背負う</p>
+
+<p>よく見ると config.yml に「sqlite では設定を追加しろ」という指示が書いてあるので従う</p>
+
+<pre><code>--- app/config/config.yml.2 2013-10-19 19:43:37.000000000 +0900
++++ app/config/config.yml   2013-10-19 19:43:50.000000000 +0900
+@@ -51,7 +51,7 @@
+         charset:  UTF8
+         # if using pdo_sqlite as your database driver, add the path in parameters.yml
+         # e.g. database_path: %kernel.root_dir%/data/data.db3
+-        # path:     %database_path%
++        path:     %database_path%
+
+     orm:
+         auto_generate_proxy_classes: %kernel.debug%
+
+--- app/config/parameters.yml.2 2013-10-19 19:43:15.000000000 +0900
++++ app/config/parameters.yml   2013-10-19 19:44:06.000000000 +0900
+@@ -12,3 +12,4 @@
+     mailer_password: null
+     locale: ja
+     secret: ThisTokenIsNotSoSecretChangeIt
++    database_path: %kernel.root_dir%/data/data.db3
+</code></pre>
+
+<p>この状態で doctrine:database:create すると今度はパスが無くてdbファイルが作れないのでディレクトリを掘る</p>
+
+<pre><code>$ mkdir app/data
+</code></pre>
+
+<p>これでようやく doctrine:database:create が出来る</p>
+
+<h3>Entity を作る</h3>
+
+<p>ドキュメントでは手で作成してたりするが面倒なのでTipに書いてあるコマンドで作る</p>
+
+<pre><code>$ php app/console doctrine:generate:entity --entity="AcmeSampleBundle:Product" --fields="name:string(255) price:float description:text"
+</code></pre>
+
+<ul>
+<li>The Entity shortcut name [AcmeSampleBundle:Product]:</li>
+<li>Configuration format (yml, xml, php, or annotation) [annotation]: annotation</li>
+<li>New field name (press <return> to stop adding fields):</li>
+<li>Do you want to generate an empty repository class [no]?</li>
+<li>Do you confirm generation [yes]?</li>
+</ul>
+
+<p>おそらくこれでEntityは出来たので admin:generate-admin してみる</p>
+
+<pre><code>$ php app/console admin:generate-admin
+</code></pre>
+
+<ul>
+<li>Generator to use (doctrine, doctrine_odm, propel) [doctrine]:</li>
+<li>Bundle namespace: Acme/SampleBundle</li>
+<li>Model name [YourModel]: Product</li>
+<li>Bundle name [AcmeSampleBundle]:</li>
+<li>Target directory [/project/path/src]:</li>
+<li>Prefix of yaml: sample</li>
+<li>Do you confirm generation [yes]?</li>
+<li>Confirm automatic update of the Routing [yes]?</li>
+</ul>
+
+<p>これで諸々最初に必要なものが出来たハズなので http://host:port/app_dev.php/admin/acme_sample_bundle/sample/ を確認するとテーブルが無いと言って怒られるので作る</p>
+
+<pre><code>$ php app/console doctrine:schema:create
+</code></pre>
+
+<p>echo ".schema" | sqlite3 app/data/data.db3 とかして出来てるのを確認</p>
+
+<p>これで再度 http://host:port/app_dev.php/admin/acme_sample_bundle/sample/ を確認するとそれっぽい画面が出てくる</p>
+
+<h3>触ってみる</h3>
+
+<p>とりあえずレコード追加してみるかと触ると setId()ねぇよ 的な怒られ方をする</p>
+
+<p>Productの中を見ると確かに無いがこれはAutoIncrementが効いているからなので、むしろcreate,edit時に編集させないようにするのが正しいと思われる</p>
+
+<pre><code>--- src/Acme/SampleBundle/Resources/config/Sample-generator.yml.1   2013-10-19 20:24:37.000000000 +0900
++++ src/Acme/SampleBundle/Resources/config/Sample-generator.yml 2013-10-19 20:25:10.000000000 +0900
+@@ -26,14 +26,14 @@
+     new:
+         params:
+             title: New object for SampleBundle
+-            display: ~
++            display: [name, price, description]
+             actions:
+                 save: ~
+                 list: ~
+     edit:
+         params:
+             title: "You're editing the object \"%object%\"|{ %object%: Product.title }|"
+-            display: ~
++            display: [name, price, description]
+             actions:
+                 save: ~
+                 list: ~
+</code></pre>
+
+<p>こんな感じで generator.yml を修正してもう一度試すと今度は title なんてメソッドねぇよ 的な怒られ方をする</p>
+
+<p>レコードは追加されていてレコード追加後 edit へリダイレクトした後にテンプレートのほうで怒られている</p>
+
+<p>これは generator.yml タイトル表示にtitleを参照しようとしてるからなので適当に name に変える</p>
+
+<pre><code>--- src/Acme/SampleBundle/Resources/config/Sample-generator.yml.2   2013-10-19 20:33:43.000000000 +0900
++++ src/Acme/SampleBundle/Resources/config/Sample-generator.yml 2013-10-19 20:34:02.000000000 +0900
+@@ -32,14 +32,14 @@
+                 list: ~
+     edit:
+         params:
+-            title: "You're editing the object \"%object%\"|{ %object%: Product.title }|"
++            title: "You're editing the object \"%object%\"|{ %object%: Product.name }|"
+             display: [name, price, description]
+             actions:
+                 save: ~
+                 list: ~
+     show:
+         params:
+-            title: "You're viewing the object \"%object%\"|{ %object%: Product.title }|"
++            title: "You're viewing the object \"%object%\"|{ %object%: Product.name }|"
+             display: ~
+             actions:
+                 list: ~
+</code></pre>
+
+<p>これでとりあえず触れる状態になったように思う</p>
+
+<h3>今回はここまで</h3>
+
+<p>次ぎはリレーション作ったときにどうなるのか、色々変えたくなったときにどうしたらいいのかを見たいのとsonataの方も試してみたいと思う</p>
+
+<p class="post-footer"><span class="date">2013-10-19</span></p>
+<h2><a href="/2013/10/12/20131012/" title="">続 phpenv+php-buildでphpをinstallしまくる</a></h2>
+<h3>最終的には以下のような感じになりました</h3>
+
+<p>5.3</p>
+
+<pre><code>configure_option "--enable-intl"
+configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
+configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
+configure_option -R "--with-tidy" "/usr/local"
+install_package "http://snaps.php.net/php5.3-latest.tar.bz2"
+install_pyrus
+install_xdebug "2.2.0"
+install_apc "3.1.13"
+</code></pre>
+
+<p>5.4</p>
+
+<pre><code>configure_option "--enable-intl"
+configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
+configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
+configure_option -R "--with-tidy" "/usr/local"
+install_package "http://snaps.php.net/php5.4-latest.tar.bz2"
+install_pyrus
+install_xdebug "2.2.1"
+install_apc "3.1.13"
+</code></pre>
+
+<p>5.5</p>
+
+<pre><code>configure_option "--enable-intl"
+configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
+configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
+configure_option -R "--with-tidy" "/usr/local"
+install_package "http://www.php.net/distributions/php-5.5.4.tar.bz2"
+install_pyrus
+install_xdebug "2.2.3"
+enable_builtin_opcache
+</code></pre>
+
+<ul>
+<li>--enable-intl のために --with-icu-dir --with-libxml-dir が必要
+<ul>
+<li>あとさらに C++ でないとダメなときがあるっぽい <a href="https://gist.github.com/nojimage/6723904">nojimage / fixes-5.3.sh</a></li>
+<li>gistそのままだとシェバングがアレだったり、Macだからだと思うけど sed でだめなので <a href="https://gist.github.com/mix3/6904829">mix3 / fixes-5.3.sh</a></li>
+</ul></li>
+<li>--with-tidy のパス指定は相変わらず "/usr/local"
+<ul>
+<li>brew --prefix だとなぜか上手く行かない</li>
+</ul></li>
+<li>5.3 5.4 ではAPCを有効にするため install_apc を指定(pluginが最初から用意されてる)</li>
+<li>5.5 では 5.5用のAPC が無い(というか開発されてない？)らしいので apcは入れない
+<ul>
+<li>Zend OPcache なるものがあるらしく enable_builtin_opcache が 5.5.* の definitions で最初から指定されてる</li>
+</ul></li>
+<li>5.5 だけ latest 指定でないのはfpmを使うと謎のセグフォして困ったから バグなのかなんなのかは不明</li>
+</ul>
+
+<p>--enable-intl 少しハマってググってたら同じくハマってた人 --disable-intlしろとか言われてて「そうじゃねぇよ」ってなってて笑った</p>
+
+<blockquote class="twitter-tweet"><p>intlのために <a href="http://t.co/241ee9MM6R">http://t.co/241ee9MM6R</a> ここに来て <a href="https://t.co/TwSABxyxhU">https://t.co/TwSABxyxhU</a> ここに来た</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/387982384060051456">October 9, 2013</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<blockquote class="twitter-tweet"><p><a href="https://t.co/HeGEH3q3RL">https://t.co/HeGEH3q3RL</a> symfony2使ってるから --enable-intl してるのに --disable-intl しろ言われててワロタ</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/387984437742280704">October 9, 2013</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>php.ini の date.timezone を毎回インストール後に弄るのあれなので php-build のトリガー機能を使って、インストール後自動で $PREFIX/etc/conf.d/date.ini を作ってそこに date.timezone の記述してみた</p>
+
+<p>~/.phpenv/plugins/php-build/share/php-build/after-install.d/date.sh
+    #!/bin/bash</p>
+
+<pre><code>set -e
+
+if [ -n "$PHP_BUILD_DEBUG" ]; then
+    set -x
+fi
+
+date_ini="$PREFIX/etc/conf.d/date.ini"
+
+if [ ! -f "$date_ini" ]; then
+    echo "[Date]" &gt; $date_ini
+    echo "date.timezone = Asia/Tokyo" &gt;&gt; $date_ini
+fi
+</code></pre>
+
+<p>これでオラオラとインストールしまくった　めでたしめでたし</p>
+
+<p>phpはなんでこんなにインストールが面倒なんや…</p>
+
+<p class="post-footer"><span class="date">2013-10-12</span></p>
 <h2><a href="/2013/10/07/20131007/" title="">phpenv+php-buildでphpをinstallしまくる</a></h2>
 <p>正確にはfpmとnginxで複数バージョンでも幸せになれる開発環境作り mix3です</p>
 
@@ -256,161 +641,6 @@ mix3 &gt; iku: ふぁ！？
 <p>という記事を8月中ぐらいに書いていて放置プレイしてたので改めて残しておく</p>
 
 <p class="post-footer"><span class="date">2013-08-30</span></p>
-<h2><a href="/2013/07/28/20130728/" title="">テスト書くのって難しい</a></h2>
-<p>布都ちゃんが可愛すぎて生きるのが辛い。mix3です。</p>
-
-<p><img src="/images/20130728/futo.png" /></p>
-
-<h3>テスト書くのって難しい</h3>
-
-<p>なんの意味も無い以下のような糞コードがあったとして、各subについてテストを書いたりなんかしてみるとこんな感じだろうか？</p>
-
-<script src="https://gist.github.com/mix3/6097116.js"></script>
-
-<p>なんでこんな糞コード書いたかというと</p>
-
-<ul>
-<li>type_a, type_b
-<ul>
-<li>まあ良い</li>
-</ul></li>
-<li>type_to_execute
-<ul>
-<li>type増えたらやだなぁと思うけどまあ良い</li>
-</ul></li>
-<li>calc_type
-<ul>
-<li>計算複雑になったらやだなぁと思うけどまあ良い</li>
-</ul></li>
-<li>execute
-<ul>
-<li>type_a,type_b,type_to_execute,calc_typeが総じて複雑になった時、全部と通るテスト書くの考えたくないんだけど…</li>
-</ul></li>
-</ul>
-
-<p>普通にアプリ書いてると、色々複雑になった上でexecuteみたいにいくつも関数経由して結果を返すやんちゃな関数が出てきてしまうのですが、そういうののテストは正直書いていて死にたくなります。そして後で機能拡張しようとしてやっぱり死んだりする。</p>
-
-<p>「そもそも設計が悪いよ」「それ◯◯で出来るよ」「糞コードに何を求めてるの」etc… ということなんでしょうか。テスト大事なのは分かるのですが、正しくて網羅的なテストというのはきちんとスキルを身につけてないと出来ないよなぁと思う事が多いです。「書かないよりはずっと良い」と心の中で言い訳しながら書いてますが。</p>
-
-<p>ただ、以下のような事もあるのでやっぱりただ書くだけでもダメなんだなと思いつつ、もやもやする今日この頃です。</p>
-
-<blockquote class="twitter-tweet"><p>リファクタリングに使えないテストのことをレガシーカバーと呼ぶ。結局リファクタリングできないんだからレガシーコードのまま。</p>&mdash; いろふ(成分無調整) (@irof) <a href="https://twitter.com/irof/statuses/346946470890573824">June 18, 2013</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p class="post-footer"><span class="date">2013-07-28</span></p>
-<h2><a href="/2013/04/13/20130413/" title="">phantomjsで遊ぶ</a></h2>
-<p>うわっ…私のチーム、レベル低すぎ…？ mix3です。リードエンジニアとしてどうにかしろって話ですが、コミュ
-障の自分には荷が重いです…</p>
-
-<h3><a href="http://d.hatena.ne.jp/karasuyamatengu/20110126/1296066287">PhantomJS: 最小限なheadlessのWebKitベースのJavaScriptツール</a></h3>
-
-<p>だそうです。正直良くわかりませんが、nodeのようにサーバーサイドで書けるイメージ。</p>
-
-<p>$ cat hello.js</p>
-
-<pre><code>console.log('Hello, world!');
-phantom.exit();
-</code></pre>
-
-<p>$ phantomjs hello.js</p>
-
-<pre><code>Hello, world!
-</code></pre>
-
-<p>とか</p>
-
-<p>$ cat google_capture.js</p>
-
-<pre><code>var page = require('webpage').create();
-page.open('http://www.google.com', function (status) {
-    page.render('google_capture.png');
-    phantom.exit();
-});
-</code></pre>
-
-<p><a href="/images/20130413/google_capture.png"><img src="/images/20130413/google_capture.png" width="200" /></a><br /></p>
-
-<p>とか</p>
-
-<p>$ cat hello_server.js</p>
-
-<pre><code>var system = require('system');
-
-if (system.args.length !== 2) {
-    console.log('Usage: hello_server.js &lt;portnumber&gt;');
-    phantom.exit(1);
-} else {
-    port = system.args[1];
-    server = require('webserver').create();
-
-    service = server.listen(port, function (request, response) {
-        response.statusCode = 200;
-        response.write('&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;');
-        response.close();
-    });
-
-    if (!service) {
-        console.log('Error: Could not create web server listening on port ' + port);
-        phantom.exit();
-    }
-}
-</code></pre>
-
-<p>$ phantomjs hello_server.js</p>
-
-<p>$ curl http://localhost:2525</p>
-
-<pre><code>&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;
-</code></pre>
-
-<p>などなど。単純なCLIプログラムや、Webページにアクセスしてキャプチャ取ったり、サーバプログラムも書けたりします。</p>
-
-<p>ローカルファイルも扱えるので、例えばあるディレクトリ以下の画像を並べて表示するサーバを立てつつ、それを</p>
-
-<pre><code>page.open('http://localhost:[port]', function () {
-    page.render(...);
-});
-</code></pre>
-
-<p>とかするとあら不思議。コマンド一発で複数画像を１枚画像に出来たりします。</p>
-
-<h3>なんでこんなもん触ってるかというと</h3>
-
-<p>ソーシャルゲームに携わっていて思う事なのですが、イベント中だと特にそうですが時間で文言が変わるということは良くあることです。そしてこういうものは当然リリース前にスケジュールはきっちり決まっていて（もちろん差し込みで仕込み直すこともありますが）がっつりテストすることになります。が、開発段階でも当然自分で目視チェックすることになるのですがこれが非常に面倒くさい。なぜ面倒くさいかというとモジュールの単体テストとは違いローカルプロキシ越しにブラウザで確認したり実機で確認したりすることになり、自動テストになかなか上手く落とし込めないからです。（見た目の部分は特に変更が出易いのでそういう意味でもテストに落としづらいというのはあると思います）他のプロジェクトだと一部定型的な部分はモデルに落とし込んでテスト出来るようにしていたりするようですが、当然限界もあり。</p>
-
-<p>ということで、今のところ画像、文言など見た目の部分をテストに落とし込むのは無理だろうなぁと思っておりますが、そうは言ってもチェックが面倒なことは面倒なのでチェックすること自体はいくらか楽にはしたい。特に時間で文言が切り替わるのを見比べられる状態にしたい。</p>
-
-<p>ということでphantomjsでしこしこ以下のようなスクリプト書いてました</p>
-
-<ul>
-<li>指定ページを時間別にキャプチャしてpngで吐き出すスクリプト</li>
-<li>フォルダ以下の*.png画像を横に並べて表示するサーバを立ててそれをキャプチャするスクリプト</li>
-</ul>
-
-<p>参考: <a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">PhantomJS でログインが必要なページでも自由自在にスクレイピング - 凹みTips</a></p>
-
-<p>ほぼほぼキャプチャの部分は<a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">参考</a>をそのまま使わせてもらっているのですが、参考のままだと画像などがキャプチャされないことがあったので、setTimeoutを使ってキャプチャのタイミングを遅らせるなどの簡単な工夫をしています。</p>
-
-<p>後、サーバがバイナリを出力するときは、ローカルからファイルを読み込む時に 'b' を指定するのとresponse.writeするまえにresponse.setEncoding('binary')しないといけないようなので注意が必要です。</p>
-
-<pre><code>var image = fs.read(file_path, 'b');
-response.headers = {
-    'Accept-Ranges': 'bytes',
-    'Content-Type': 'image/png',
-    'Content-Length': image.length
-};
-response.setEncoding('binary');
-response.write(image);
-</code></pre>
-
-<p>こうすることで横並び画像にして文言チェック出来るようになり捗りそうな気配がしています。（まだ作ったばかりで実際に活用するのはこれから）</p>
-
-<p>ちなみに一枚画像にしてしまうのは社内gyazoにあげてディレクターなど他の方にも見てもらえるようにしたかったからですが、今にして思えば別に一枚画像にする必要はなく、画像一括アップロード出来るフォームと横並びにして表示出来る簡単なサーバアプリを書くだけで良いことに気づいたので、ここは今後やりやすい方にシフトする感じで行きたい。</p>
-
-<p>ということでphantomjs便利なんじゃないかなというお話でした。</p>
-
-<p class="post-footer"><span class="date">2013-04-13</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -426,7 +656,7 @@ response.write(image);
  | 
 <a href="/page/5/">5</a>
 <a href="/page/3/" rel="next">&gt;</a>
-<a href="/page/7/">&gt;&gt;</a>
+<a href="/page/8/">&gt;&gt;</a>
 </div>
       </div>
       <div class="autopagerize_insert_before"></div>
@@ -440,6 +670,7 @@ response.write(image);
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/12/">2013年12月</a></li>
   <li><a href="/archives/2013/11/">2013年11月</a></li>
   <li><a href="/archives/2013/10/">2013年10月</a></li>
   <li><a href="/archives/2013/08/">2013年08月</a></li>
@@ -567,6 +798,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
 <span class="tagcloud0"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
+<span class="tagcloud8"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
 </div></p>
     </div>
   </div>

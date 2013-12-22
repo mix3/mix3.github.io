@@ -61,6 +61,105 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2012/08/12/20120812/" title="">そろそろ自分は本当に死んだ方が良い気がする件について</a></h2>
+<p>「バカジャネーノ」と言われてぐぅの根も出ないmix3です。</p>
+
+<h3>死んだ方が良い事の概要その１</h3>
+
+<p>今やってるサービスに諸事情により一つ機能を追加しなければならない必要に迫られ、その対応を自分がすることになったのですが、結果は盛大に燃やし散々な糞クオリティで納期に間に合わないという目も当てられない自体になってしまいました。
+設計段階で詰んでいて（DB設計の時点で要件を満たせない）どう尻拭いしても物理的に納期に間に合わないということで、結局お尻を先延ばしにしてもらって先輩にヘルプ入ってもらい設計からやり直しとなりました。</p>
+
+<h3>死んだ方が良い事の概要その２</h3>
+
+<p>スケジュール再編からは先輩の手によって設計が組み直され、画面仕様から必要な機能を洗い出してコントローラとモデルのインタフェースを決めて行く（勝手にIDD[インタフェースドリブンデベロップメント]などと呼んでいる）やりかたで、仕様認識の齟齬を減らしつつ必要充分な機能を決めて行きました。このやり方は関わるプログラマ全員の時間を使ってしまうのでなかなか面倒ですが、仕様認識齟齬が減るのと機能の洗い出しで全員がチェックするので抜けが減るので危険な香りがする時は積極的にするようにしています。またインタフェースを決めてしまうので、分業しやすいというのも利点です。Javaのインタフェースベースの作り方を思い出してとても気分良く作れます。</p>
+
+<p>ここまでは良いのですが、分業で自分がモデルを作って最後にコントローラと結合すると自分の糞クオリティを発揮して色々問題を起こしていました</p>
+
+<ul>
+<li>バリデート関数はエラーを返すだけというルールで決めたはずなのになぜかExceptionを投げてる</li>
+<li>関数の返り値の形を変えてしまった</li>
+<li>明らかにコピペしてる</li>
+<li>関数名、変数名の意味が分からない</li>
+<li>テスト書けていない（間に合ってない）</li>
+</ul>
+
+<p>時間も無いのに色々やらかして最終的に「バカジャネーノ」と言われて何も言えないmix3の姿がそこにはありました。</p>
+
+<h3>こういう怒られ方はずっと前から続いている 今回は集中しただけで</h3>
+
+<p>要するにプログラマとしては致命的なほど人から見て意味の通じるコードが書けないのだと思います。視野狭窄で自分しか見えてなくて、平気で他人から見て意味の分からないコードを書いてしまう。他人のコードを見て何がどう優れているか、このコードの何がだめか。変数、関数の意味は。怒られるたびに考えるようにしても、結局怒られる。良し悪しの判断がいつまでたっても改善されない。</p>
+
+<p>自分は成長していないといつも感じているしいつも言っているけど、こういったことの成長が無いことも多く含んでいる。</p>
+
+<h3>結局どうすれば良いのかは分からない</h3>
+
+<p>これだけ怒られて改善しないといけないと思っていて、でもどうすれば良いのかは良くわからない。</p>
+
+<p>ただ「他人が理解出来るコードを書けば良い」だけではあるけれども、それだけの事が出来ないということは、自分にはそれをするための何かが欠けてるということで、でもその何かを「何か」としか書けないということは全くその「何か」を理解していない。つまりどうしたら良いのか分からない。</p>
+
+<p>いっぱいコード書いて怒られて判断出来るようになる以外にもう方法が思いつかないが、でもそのやり方をするには既に時間を使いすぎてる感があるし、そのせいで関わるいろんなひとに迷惑をかけていて、今回は特に他のスケージュルに大きく影響を与え、お金を消費している。大きさ的に自分が取れる責任を大きく上回っている。</p>
+
+<p>だから最近はタイトルのようなことを良く考えている。自分が何かやらかすことで与える色々なな迷惑が大きすぎて、本音の本音では今すぐ逃げ出したい（逃げて人が減る事の方がとんでもない迷惑なのでしないけど）</p>
+
+<h3>ということで</h3>
+
+<ul>
+<li>mix3は今すぐ死ぬべきである。</li>
+<li>死なないのであれば迷惑を掛けないように生きるべきである</li>
+</ul>
+
+<p>どっちかを満たすためにmix3は頑張らなければならない。</p>
+
+<p>そしてそんな事とは関係なく<a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a>を更新してますYO。大本の<a href="http://d.hatena.ne.jp/yoya/20120808/swfed">swfed</a>のバージョンアップに追従しています。<a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a>は可愛いね。イイコイイコ。</p>
+
+<p class="post-footer"><span class="date">2012-08-12</span></p>
+<h2><a href="/2012/04/22/20120422/" title="">修論で作ったなつかしのもの</a></h2>
+<p>若い子たちが優秀すぎて生きるのが辛い（迫真） mix3です。</p>
+
+<p>新入社員の自己紹介としてネタが無い時に卒論、修論が鉄板として出てくるのか何かそういうのを聞く機会があったりなかったりして、懐かしいなぁとか思ったり思わなかったりしていました。みんな凄い事してて生きるのがどんどん辛くなります。ほんと自分は適当で不真面目で教授に迷惑ばかり掛けていました。今もそうです。ごめんなさい。猛省。</p>
+
+<h3>プロトタイピング</h3>
+
+<p>ソフトウェア開発の手法としてプロトタイピングというものがあります。「中身は無いが動く」ものを作り、早い段階から作るものに対しての評価、フィードバック得ることで、手戻りを減らすことを目的とした手法です。</p>
+
+<p>このプロトタイピングという手法は手戻りを防ぐという点で、当たり前ではあるけれども重要な開発手法なのですが、プロトタイプの製作に時間が掛かったりすると意味が無かったり、プロトタイプを見せたらそれを完成品と勘違いされたり（もう完成しているということで、納期や費用を削られそうになったり）という笑い話のような本当の話があったりして、工夫しないとそのまま適用するのは難しい手法だったりします。</p>
+
+<h3>mocketch</h3>
+
+<p>と、プロトタイピングには手法そのものに派生があるほど色々あるのですが、そんな難しいことは自分のような阿呆には考えられないので、修論ではとにもかくにも「プロトタイプを早く作れられれば良いんだろ？」と思考を放棄して動くものを作ってました。それが<a href="https://github.com/mix3/mocketch">mocketch</a>です。ウェブアプリのプロトタイプとして作るものが「モックアップ」や「スケッチ」などと呼ばれているっぽいのでそれをガッチャンコしただけという。酷いですね。</p>
+
+<p>具体的に何がしたかったかというと「HTMLを書くだけでそれがウェブアプリとして動くもの」を目指していました。HTMLで紙芝居だけでも十分というか実際そういう感じのようですが、それが実際に動くものだともっとイメージがしやすいしプロトタイプとしてより良いだろうという安易な考えでした。酷いですね。</p>
+
+<p>何気にgithubから落としてきて mvn jetty:run するだけで動いて自分でビビってしまいました。maven 凄いです。java 可愛いよ。</p>
+
+<p>以下実際に動かしてみたときのスクショ。さすがにサーバに上げて動かすのは怖いので。</p>
+
+<p>１）以下のような感じでHTMLを書くと<br />
+<a href="/images/20120422/mocketch1.png"><img src="/images/20120422/mocketch1.png" width="300" /></a></p>
+
+<p>２）なんかフォームが表示されて<br />
+<img src="/images/20120422/mocketch2.png" /></p>
+
+<p>３）適当に入力する<br />
+<img src="/images/20120422/mocketch3.png" /></p>
+
+<p>４）なんんかそれっぽく入力内容が反映される<br />
+<img src="/images/20120422/mocketch4.png" /></p>
+
+<p>５）もう一回繰り返してみた<br />
+<img src="/images/20120422/mocketch5.png" /></p>
+
+<p>というものでした。</p>
+
+<p>リスト表示のところに form を用意すると、掲示板のレスのような感じを表現出来たり、入力に対して必須項目や文字列長などのバリデートを入れたり、ページングを入れられたりもします。githubに上がってるものは少し古くて色々上手く動いていないですが。</p>
+
+<p>内部的にはHTMLに属性として meta:table meta:column を書くとkey-valueで解釈して HashMap で保存、表示しているだけです。wicketがよしなにやってくれてます。</p>
+
+<h3>ということで</h3>
+
+<p>酷い修論の製作物でした。ほんとごめんなさい。</p>
+
+<p class="post-footer"><span class="date">2012-04-22</span></p>
 <h2><a href="/2012/04/14/20120414/" title="">Capture::Tiny</a></h2>
 <p>前回pixivブログは github pages のコピーだから大丈夫とか書いたけど、github pages で書き始める前のpixivブログはバックアップ取ってなかったのでほんとは大丈夫じゃなかった mix3 です。SSH+LDAP とか keepalived を試してみた記事が消えたのはちょっともったいなかったかな。まあ、Google検索でキャッシュ漁ればある程度は発掘出来そうではあるけれども。</p>
 
@@ -128,630 +227,6 @@
 <p>自分のした設定にどんな意味があるのか、ちゃんと考える様にします...</p>
 
 <p class="post-footer"><span class="date">2011-11-23</span></p>
-<h2><a href="/2011/07/24/20110724/" title="">Play framework + Scala に入門してみる</a></h2>
-<h3>Scalaクラスタの怒りが聞こえる…</h3>
-
-<p>Scalaクラスタの怒りに満ちたTLが見えて当該セッションのUstを見れなかったのが悔しいです。何があったかはTogetterからある程度察する事が出来ます。</p>
-
-<p>参考：<a href="http://togetter.com/li/164689">2011/07/22_Advanced_Tech_Night No.2 「ジャバラーが知っておくべき最近の開発言語のこと」(#atn2011 )</a> </p>
-
-<h3>Play framework + Scala に入門してみる</h3>
-
-<p>そんな流れがあったのでScalaを触りたい気持ちが強くなりPlay frameworkの勉強と一緒にScalaをやってみようかと思い立ちました。Play frameworkというのははJava版Ruby on Railsといった感じでJavaだけれど非常に効率に良い開発が出来るフレームワークです（らしいです）Wicketとはまた違う爽快感のあるフレームワークのようです。</p>
-
-<h3>インストール</h3>
-
-<p>インストールは非常に簡単です。zipを落として適当に配置してPATHを通すだけ。ただしplayのコマンドはpythonで書かれているのでpythonが必要になるかもしれません。[play]とだけ打つとセットアップが出来ていれば以下のように結果が返ってくるでしょう。</p>
-
-<h4>$ play</h4>
-
-<pre><code>~        _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ Usage: play cmd [app_path] [--options]
-~ 
-~ with,  new      Create a new application
-~        run      Run the application in the current shell
-~        help     Show play help
-~
-</code></pre>
-
-<p>セットアップの確認が出来ればさっそく動作確認してみましょう。</p>
-
-<h3>プロジェクトの作成、アプリケーションの実行</h3>
-
-<p>以下のように打つとプロジェクトが作成出来ます。作成途中アプリケーションの名前を聞かれます。基本デフォルトのままで良いでしょう。スケルトンが作成されます。</p>
-
-<h4>$ play new [project_name] --with scala</h4>
-
-<pre><code>~        _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ The new application will be created in /path/to/[project_name]
-~ What is the application name? [project_name] 
-~
-~ OK, the application is created.
-~ Start it with : play run project_name
-~ Have fun!
-~
-</code></pre>
-
-<p>以下のようにして作成されたアプリケーションを起動する事が出来ます。9000番ポートで待っているようなので<a href="http://localhost:9000/">http://localhost:9000/</a>にアクセスしましょう。いかにもな導入ページが返って来たらOKです。</p>
-
-<h4>$ play run [project_name]</h4>
-
-<pre><code>~        _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ Ctrl+C to stop
-~ 
-Listening for transport dt_socket at address: 8000
-01:35:10,384 INFO  ~ Starting /path/to/[project_name]
-01:35:11,399 WARN  ~ You're running Play! in DEV mode
-01:35:11,609 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-01:43:01,925 INFO  ~ Application '[project_name]' is now started !
-</code></pre>
-
-<h3>Scalaで動作するプロジェクトを作成してみる。</h3>
-
-<p>今度はScalaのプロジェクトを作成してみます。ちなみに以下のように conf/dependencies.yml にScalaに依存することを追記して $ play dependencies [project_name] とすることでScala対応のプロジェクトにすることも出来ますが、スケルトンコードがJavaのままなので作り直したいと思います。</p>
-
-<h4>$ diff -u [project_name]/conf/dependencies.yml.orig [project_name]/conf/dependencies.yml</h4>
-
-<pre><code>--- project_name/conf/dependencies.yml.orig 2011-07-24 02:04:56.000000000 +0900
-+++ project_name/conf/dependencies.yml  2011-07-24 02:04:46.000000000 +0900
-@@ -2,3 +2,4 @@
-
- require:
-     - play
-+    - play -&gt; scala 0.9.1
-</code></pre>
-
-<h4>$ play dependencies [project_name]</h4>
-
-<pre><code>~            _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
-~
-~   play-&gt;scala 0.9.1 (from playLocalModules)
-~
-~ Installing resolved dependencies,
-~
-~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
-~
-~ Done!
-~
-</code></pre>
-
-<h3>Scala対応のプロジェクトを作成して動作確認する</h3>
-
-<p>Scala対応のプロジェクトを作成するにはまず以下のようにしてScalaモジュールをインストールする必要があります。</p>
-
-<h4>$ play install scala</h4>
-
-<pre><code>~        _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ Will install scala-0.9.1
-~ This module is compatible with: 1.2.2
-~ Do you want to install this version (y/n)? y
-~ Installing module scala-0.9.1...
-~
-~ Fetching http://www.playframework.org/modules/scala-0.9.1.zip
-~ [--------------------------100%-------------------------] 60034.6 KiB/s    
-~ Unzipping...
-~
-~ Module scala-0.9.1 is installed!
-~ You can now use it by adding it to the dependencies.yml file:
-~
-~ require:
-~     play -&gt; scala 0.9.1
-~
-</code></pre>
-
-<p>インストールが済んだら実際にScala対応のプロジェクトを作成してみましょう。</p>
-
-<h4>$ play new [project_name] --with scala</h4>
-
-<pre><code>~        _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ The new application will be created in /path/to/[project_name]
-~ What is the application name? [project_name] 
-~
-~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
-~
-~   play-&gt;scala 0.9.1 (from playLocalModules)
-~
-~ Installing resolved dependencies,
-~
-~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
-~
-~ Done!
-~
-~ OK, the application is created.
-~ Start it with : play run project_name
-~ Have fun!
-~
-</code></pre>
-
-<p>動作確認はJavaの時と同様に $ play run [project_name] で出来ます。</p>
-
-<h4>$ play run project_name/</h4>
-
-<pre><code>~        _                _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ Ctrl+C to stop
-~ 
-Listening for transport dt_socket at address: 8000
-02:15:51,036 INFO  ~ Starting /path/to/[project_name]
-02:15:51,067 INFO  ~ Module scala is available (/path/to/[play]/modules/scala-0.9.1)
-02:15:54,598 INFO  ~ Scala support is active
-02:15:54,598 WARN  ~ You're running Play! in DEV mode
-02:15:54,734 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-Compiling:
-    /path/to/[project_name]/app/controllers.scala
-    /path/to/[play]/modules/docviewer/app/controllers/PlayDocumentation.java
-    /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
-    /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
-    /path/to/[play]/modules/docviewer/app/DocViewerPlugin.java
-    /path/to/[project_name]/tmp/generated/views.html.main.scala
-    /path/to/[play]/modules/docviewer/app/helpers/CheatSheetHelper.java
-Traversing /path/to/[project_name]/app/controllers.scala
-Traversing /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
-Traversing /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
-Traversing /path/to/[project_name]/tmp/generated/views.html.main.scala
-API phase took : 0.503 s
-02:16:21,114 INFO  ~ Application '[project_name]' is now started !
-</code></pre>
-
-<h3>プロジェクト構成</h3>
-
-<p>Playのプロジェクトは以下のような構成となっています。アプリケーションを構築して行く際は主にapp以下を弄って行く事になるでしょう。</p>
-
-<ul>
-<li>app
-<ul>
-<li>コントローラ、モデル、ビューなど。</li>
-</ul></li>
-<li>conf
-<ul>
-<li>アプリケーションの設定。ルーティングの設定もここ。</li>
-</ul></li>
-<li>lib
-<ul>
-<li>jarファイルなどのlib関係。</li>
-</ul></li>
-<li>modules
-<ul>
-<li>プロジェクトが依存しているものがこの下に書き出されるのかな？</li>
-</ul></li>
-<li>public
-<ul>
-<li>静的ファイルなど。</li>
-</ul></li>
-<li>test
-<ul>
-<li>テスト関係など。</li>
-</ul></li>
-<li>tmp
-<ul>
-<li>生成されたclassファイルの配置やキャッシュなど。</li>
-</ul></li>
-</ul>
-
-<h3>とりあえず中身を眺めてみる</h3>
-
-<p>生成されるスケルトンは以下のようになっています。ルーティングとコントローラ/アクションの対応は直感的で分かりやすいですね。Controllerを継承したApplicationがコントローラ、その中で定義したメソッドがアクションのようです。</p>
-
-<p>ただアクションで何を返すかが非常に分りづらいですね（もちろん基本はテンプレートですが）テンプレートそのものも@が出て来て関数定義っぽいし非常に分りづらいです。Webデザイナー殺しですね<s>死ねば良いと思います＾＾</s></p>
-
-<h4>$ cat [project_name]/conf/routes</h4>
-
-<pre><code># Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
-
-# Home page
-GET     /                                       Application.index
-
-# Ignore favicon requests
-GET     /favicon.ico                            404
-
-# Map static resources from the /app/public folder to the /public path
-GET     /public/                                staticDir:public
-
-# Catch all
-*       /{controller}/{action}                  {controller}.{action}
-</code></pre>
-
-<h4>$ cat [project_name]/app/controllers.scala</h4>
-
-<pre><code>package controllers
-
-import play._
-import play.mvc._
-
-object Application extends Controller {
-
-    import views.Application._
-
-    def index = {
-        html.index("Your Scala application is ready!")
-    }
-
-}
-</code></pre>
-
-<h4>$ cat [project_name]/app/views/Application/index.scala.html</h4>
-
-<pre><code>@(title:String)
-
-@main(title) {
-
-    @views.defaults.html.welcome(title)
-
-}
-</code></pre>
-
-<h4>$ cat [project_name]/app/views/main.scala.html</h4>
-
-<pre><code>@(title:String = "")(body: =&gt; Html)
-
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-    &lt;head&gt;
-        &lt;title&gt;@title&lt;/title&gt;
-        &lt;link rel="stylesheet" media="screen" href="@asset("public/stylesheets/main.css")"&gt;
-        &lt;link rel="shortcut icon" type="image/png" href="@asset("public/images/favicon.png")"&gt;
-        &lt;script src="@asset("public/javascripts/jquery-1.5.2.min.js")" type="text/javascript"&gt;&lt;/script&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-        @body
-    &lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-<h3>アクションとビュー</h3>
-
-<p>とりあえずスケルトンでは以下のような感じで動いているようです。</p>
-
-<ul>
-<li>views/[レイアウト].scala.html
-<ul>
-<li>レイアウトを定義</li>
-</ul></li>
-<li>views/[コントローラ]/[アクション].scala.html
-<ul>
-<li>@レイアウト(引数) { HTML }</li>
-<li>レイアウトとHTMLをガッチャンコして返す</li>
-</ul></li>
-</ul>
-
-<p>HTMLの部分が@views.defaults.html.welcome(title)となってこれが何を差しているのかが分りづらくしています。ここを&lt;h1&gt;@title&lt;/h1&gt;とでもすればもう少し見通しが良くなるのではないかと思います。具体的には以下のような感じ。</p>
-
-<h4>$ diff -u [project_name]/app/views/Application/index.scala.html.orig [project_name]/app/views/Application/index.scala.html</h4>
-
-<pre><code>--- project_name/app/views/Application/index.scala.html.orig    2011-07-24 03:45:31.000000000 +0900
-+++ project_name/app/views/Application/index.scala.html 2011-07-24 03:47:38.000000000 +0900
-@@ -2,6 +2,6 @@
-
- @main(title) {
-
--    @views.defaults.html.welcome(title)
-+    &lt;h1&gt;@title&lt;/h1&gt;
-
--}
-\ No newline at end of file
-+}
-</code></pre>
-
-<h4>$ diff -u project_name/app/controllers.scala.orig project_name/app/controllers.scala</h4>
-
-<pre><code>--- project_name/app/controllers.scala.orig 2011-07-24 03:49:42.000000000 +0900
-+++ project_name/app/controllers.scala  2011-07-24 03:48:58.000000000 +0900
-@@ -8,7 +8,11 @@
-     import views.Application._
-
-     def index = {
--        html.index("Your Scala application is ready!")
-+        html.index("index")
-     }
-
-+    def sample = {
-+        html.index("sample")
-+    }
-+
- }
-</code></pre>
-
-<p>アクションも増やしてみました。これでルーティング設定も確認出来ます。$ play run [project_name] として以下へアクセスするとそれぞれindex、sampleが&lt;h1&gt;で表示されることが確認出来ると思います。</p>
-
-<ul>
-<li><a href="http://localhost:9000/">http://localhost:9000/</a></li>
-<li><a href="http://localhost:9000/Application/sample">http://localhost:9000/Application/sample</a></li>
-</ul>
-
-<p>なんとなくではありますがアクションからテンプレートが呼ばれ、引数を使ってレイアウトを解決して表示していることが見えてきた感じがします。</p>
-
-<h3>まとめ</h3>
-
-<p>とりあえず一旦ここまで。何をしているか理解出来たらまたコントローラ／アクション／テンプレートの関係を文字に起こしてみたいと思います。</p>
-
-<p>Play frameworkですが面白そうではあるもののやはりテンプレート周りが気に入らないですね。テンプレートの中にコードを埋め込んだり、独自の構文でロジックを埋め込んだりというのはどうしても慣れないです。どんなに簡単な構文でそれが可能だとしてもデザイナーとの連携の時にはやはり困ると思うのです。「ここは動的な情報が入るのでこういう書き方をして下さい」なんて絶対混乱します。テンプレートをHTMLで書くならそのテンプレートはプレーンなHTMLであるべきだと自分は思います。</p>
-
-<p class="post-footer"><span class="date">2011-07-24</span></p>
-<h2><a href="/2011/07/22/20110722/" title="">blessとMouse</a></h2>
-<h3>健康診断</h3>
-
-<p>健康診断へ行って血を取ってきました。前回はチューブ通して採血の容器に取ってたのが今回は針から直結するようになって、それのおかげか何なのかは分りませんが採血スピードが向上して地味に嬉しかったです。痛いのは嫌いなのです…</p>
-
-<h3>blessとMouseの速度比較</h3>
-
-<p>すこし気になってblessとMouse、その他の速度比較。いろんなところでやられてるので今更自分でする事でもないでしょうが。なおblessで作るクラスは手を抜いて型制限などの実装はせずアクセサを用意して値を操作するだけにしました。適当適当。</p>
-
-<p><a href="http://blog.livedoor.jp/sasata299/archives/51281496.html">いまさら聞けない「Moose」超入門</a>を参考にblessとMouseのコードを書き足しました。以下の処理の速度を比較しています。</p>
-
-<ol>
-<li>hoge/fugaのアクセサを持ったクラスをnew
-<ul>
-<li>初期値はfugaに1</li>
-</ul></li>
-<li>hogeに'bbb'を代入</li>
-<li>fugaの値を取得</li>
-<li>hogeの値を取得</li>
-</ol>
-
-<h4>cost.pl</h4>
-
-<pre><code># おまじないしない場合
-package MooseTest;
-use Moose;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-no Moose;
-
-1;
-
-# おまじないする場合
-package MooseTest_mi;
-use Moose;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-__PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
-
-no Moose;
-
-1;
-
-# おまじないしない場合
-package MouseTest;
-use Mouse;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-no Mouse;
-
-1;
-
-# おまじないする場合
-package MouseTest_mi;
-use Mouse;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-__PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
-
-no Mouse;
-
-1;
-
-# Class::Accessor を使った場合
-package ClassAccessorTest;
-use strict;
-use warnings;
-use base 'Class::Accessor';
-
-__PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
-
-1;
-
-# Class::Accessor::Fast を使った場合
-package ClassAccessorFastTest;
-use strict;
-use warnings;
-use base 'Class::Accessor::Fast';
-
-__PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
-
-1;
-
-# perl5 OOP の場合
-package Bless;
-use strict;
-use warnings;
-
-sub new {
-    my $class = shift;
-    my $self  = shift || {};
-    return bless $self, $class;
-}
-
-sub hoge {
-    my $self = shift;
-    if (@_) {
-        $self-&gt;{hoge} = shift;
-    } else {
-        $self-&gt;{hoge};
-    }
-}
-
-sub fuga {
-    my $self = shift;
-    if (@_) {
-        $self-&gt;{fuga} = shift;
-    } else {
-        $self-&gt;{fuga};
-    }
-}
-
-1;
-
-package main;
-use strict;
-use warnings;
-use Benchmark qw(cmpthese timethese);
-
-cmpthese timethese(100000, {
-    moose =&gt; sub {
-        my $moose = MooseTest-&gt;new( fuga =&gt; 1 );
-        $moose-&gt;hoge('bbb');
-        $moose-&gt;fuga;
-        $moose-&gt;hoge;
-    },
-    moose_mi =&gt; sub {
-        my $moose = MooseTest_mi-&gt;new( fuga =&gt; 1 );
-        $moose-&gt;hoge('bbb');
-        $moose-&gt;fuga;
-        $moose-&gt;hoge;
-    },
-    mouse =&gt; sub {
-        my $mouse = MouseTest-&gt;new( fuga =&gt; 1 );
-        $mouse-&gt;hoge('bbb');
-        $mouse-&gt;fuga;
-        $mouse-&gt;hoge;
-    },
-    mouse_mi =&gt; sub {
-        my $mouse = MouseTest_mi-&gt;new( fuga =&gt; 1 );
-        $mouse-&gt;hoge('bbb');
-        $mouse-&gt;fuga;
-        $mouse-&gt;hoge;
-    },
-    accessor =&gt; sub {
-        my $class = ClassAccessorTest-&gt;new({ fuga =&gt; 1 });
-        $class-&gt;hoge('bbb');
-        $class-&gt;fuga;
-        $class-&gt;hoge;
-    },
-    accessor_fast =&gt; sub {
-        my $class = ClassAccessorFastTest-&gt;new({ fuga =&gt; 1 });
-        $class-&gt;hoge('bbb');
-        $class-&gt;fuga;
-        $class-&gt;hoge;
-    },
-    bless =&gt; sub {
-        my $class = Bless-&gt;new({ fuga =&gt; 1 });
-        $class-&gt;hoge('bbb');
-        $class-&gt;fuga;
-        $class-&gt;hoge;
-    },
-});
-</code></pre>
-
-<p>結果はこんな感じになりました。何回か実行するとばらつくので３つほど結果を書き出しています。</p>
-
-<pre><code>Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-  accessor:  2 wallclock secs ( 1.19 usr +  0.00 sys =  1.19 CPU) @ 84033.61/s (n=100000)
-accessor_fast:  0 wallclock secs ( 0.58 usr +  0.00 sys =  0.58 CPU) @ 172413.79/s (n=100000)
-     bless:  1 wallclock secs ( 0.41 usr +  0.00 sys =  0.41 CPU) @ 243902.44/s (n=100000)
-     moose: 21 wallclock secs (21.26 usr +  0.02 sys = 21.28 CPU) @ 4699.25/s (n=100000)
-  moose_mi:  2 wallclock secs ( 1.67 usr +  0.00 sys =  1.67 CPU) @ 59880.24/s (n=100000)
-     mouse:  0 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
-  mouse_mi: -1 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
-                  Rate moose moose_mi accessor accessor_fast mouse_mi mouse bless
-moose           4699/s    --     -92%     -94%          -97%     -98%  -98%  -98%
-moose_mi       59880/s 1174%       --     -29%          -65%     -69%  -69%  -75%
-accessor       84034/s 1688%      40%       --          -51%     -57%  -57%  -66%
-accessor_fast 172414/s 3569%     188%     105%            --     -12%  -12%  -29%
-mouse_mi      196078/s 4073%     227%     133%           14%       --    0%  -20%
-mouse         196078/s 4073%     227%     133%           14%       0%    --  -20%
-bless         243902/s 5090%     307%     190%           41%      24%   24%    --
-
-Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-  accessor:  1 wallclock secs ( 0.87 usr +  0.00 sys =  0.87 CPU) @ 114942.53/s (n=100000)
-accessor_fast:  0 wallclock secs ( 0.56 usr +  0.00 sys =  0.56 CPU) @ 178571.43/s (n=100000)
-     bless:  1 wallclock secs ( 0.43 usr +  0.00 sys =  0.43 CPU) @ 232558.14/s (n=100000)
-     moose: 18 wallclock secs (18.30 usr +  0.00 sys = 18.30 CPU) @ 5464.48/s (n=100000)
-  moose_mi:  2 wallclock secs ( 1.57 usr +  0.00 sys =  1.57 CPU) @ 63694.27/s (n=100000)
-     mouse:  0 wallclock secs ( 0.55 usr +  0.00 sys =  0.55 CPU) @ 181818.18/s (n=100000)
-  mouse_mi:  1 wallclock secs ( 0.65 usr +  0.00 sys =  0.65 CPU) @ 153846.15/s (n=100000)
-                  Rate moose moose_mi accessor mouse_mi accessor_fast mouse bless
-moose           5464/s    --     -91%     -95%     -96%          -97%  -97%  -98%
-moose_mi       63694/s 1066%       --     -45%     -59%          -64%  -65%  -73%
-accessor      114943/s 2003%      80%       --     -25%          -36%  -37%  -51%
-mouse_mi      153846/s 2715%     142%      34%       --          -14%  -15%  -34%
-accessor_fast 178571/s 3168%     180%      55%      16%            --   -2%  -23%
-mouse         181818/s 3227%     185%      58%      18%            2%    --  -22%
-bless         232558/s 4156%     265%     102%      51%           30%   28%    --
-
-Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-  accessor:  1 wallclock secs ( 0.90 usr +  0.00 sys =  0.90 CPU) @ 111111.11/s (n=100000)
-accessor_fast:  0 wallclock secs ( 0.75 usr +  0.00 sys =  0.75 CPU) @ 133333.33/s (n=100000)
-     bless:  1 wallclock secs ( 0.47 usr +  0.00 sys =  0.47 CPU) @ 212765.96/s (n=100000)
-     moose: 22 wallclock secs (21.62 usr +  0.01 sys = 21.63 CPU) @ 4623.21/s (n=100000)
-  moose_mi:  1 wallclock secs ( 1.61 usr +  0.00 sys =  1.61 CPU) @ 62111.80/s (n=100000)
-     mouse:  1 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
-  mouse_mi:  0 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
-                  Rate moose moose_mi accessor accessor_fast bless mouse_mi mouse
-moose           4623/s    --     -93%     -96%          -97%  -98%     -98%  -98%
-moose_mi       62112/s 1243%       --     -44%          -53%  -71%     -72%  -72%
-accessor      111111/s 2303%      79%       --          -17%  -48%     -50%  -50%
-accessor_fast 133333/s 2784%     115%      20%            --  -37%     -40%  -40%
-bless         212766/s 4502%     243%      91%           60%    --      -4%   -4%
-mouse_mi      222222/s 4707%     258%     100%           67%    4%       --    0%
-mouse         222222/s 4707%     258%     100%           67%    4%       0%    --
-</code></pre>
-
-<p>Mouseが爆速でblessより速いこともあるようです。にわかに信じられないのですが。何か最適化されているものでもあるのでしょうか？ちゃんと中身を見ないといけませんね。</p>
-
-<h3>思う事</h3>
-
-<p>速度というのは最近気にしているテーマで、Webアプリの１リクエストのレスポンスタイムが10msと100msとあったとして、それの時間差が90msと何となく微々たる物のように思う物でも分間10リクエストとして合計100msと1000msになり差が900msとどんどん大きくなっていくのが恐ろしいなぁと思ったりしています。もしもこれが分間じゃなくて秒間だったら？10リクエストじゃなくて100リクエストだったら？1000リクエストだったら？…まだ実感の伴わない話なのでアレですが今後直面する問題だろうなと感じています。モダンだ流行だと色々なものに飛びつくのも勉強になって良いですが、ただ実際それが実用に堪えうるのかどうかちゃんと検証することも覚えないといけないなと。そんなことを考えています。</p>
-
-<p class="post-footer"><span class="date">2011-07-22</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -767,7 +242,7 @@ mouse         222222/s 4707%     258%     100%           67%    4%       0%    -
  | 
 <a href="/page/7/">7</a>
 <a href="/page/6/" rel="next">&gt;</a>
-<a href="/page/7/">&gt;&gt;</a>
+<a href="/page/8/">&gt;&gt;</a>
 </div>
       </div>
       <div class="autopagerize_insert_before"></div>
@@ -781,6 +256,7 @@ mouse         222222/s 4707%     258%     100%           67%    4%       0%    -
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/12/">2013年12月</a></li>
   <li><a href="/archives/2013/11/">2013年11月</a></li>
   <li><a href="/archives/2013/10/">2013年10月</a></li>
   <li><a href="/archives/2013/08/">2013年08月</a></li>
@@ -908,6 +384,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
 <span class="tagcloud0"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
+<span class="tagcloud8"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
 </div></p>
     </div>
   </div>

@@ -10,6 +10,173 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>ndenv を homebrew で入れる話 または如何にして心配するのを止めてRequireJSを愛するようになったか</title>
+<description>
+<![CDATA[
+<p>というようなことを元々は <a href="http://tech.kayac.com/archive/techkayaccom_advent_calendar_2013.html">teck.kayac.com Advent Calender 2013</a> の17日目 の記事として考えてたんだけど、結局なんか無性にWicketの事を書きたくなっちゃったので、お蔵入りになった記事をこっちに書く事にする。</p>
+
+<p>カレンダーのノリで書いてたのをそのまま持ってくると大分寒い感じがするが、面倒なので不自然なカレンダー要素を消す意外は無編集で。</p>
+
+<h3>ndenv を homebrew で入れる話 または如何にして心配するのを止めてRequireJSを愛するようになったか</h3>
+
+<p><s>Advent Calenderネタの捏造のため</s>紆余曲折あって週末Backbone.jsの<a href="https://github.com/jashkenas/backbone/tree/master/examples">example</a>を永続化部分をローカルストレージじゃなくてAPIベースに書き換えつつテストをコマンドライン（Mocha on node）でやる、みたいなことをやってました。</p>
+
+<p>その副産物として<a href="https://github.com/riywo/ndenv">ndenv</a>をhomebrewで入れられるよう<a href="https://github.com/mix3/ndenv">forkして弄りつつ</a>、<a href="https://github.com/mix3/homebrew-ndenv">Formula</a>を書いたりしました。</p>
+
+<pre><code>brew tap mix3/ndenv
+brew install ndenv node-build --HEAD
+</code></pre>
+
+<p>こんな感じで入れられると思います --HEAD なのはお察しください。多分他の誰かが既にやってるんじゃないかと思いますが気にしない事にしました。</p>
+
+<h3>先生助けてっ Mochaが息してないの！</h3>
+
+<p>で、node入れて<a href="https://github.com/jashkenas/backbone/tree/master/examples">backbone-examples</a>を弄ったわけですがAPIベースにするのは割と簡単に出来る（Backboneがモデルの永続化にRESTが使える）のですが「さてRequireJSで分割したのだし何かテスト書くか」と適当に書くとあら不思議。Mochaでテストが全くが実行されません。</p>
+
+<p><a href="http://blog.kjirou.net/p/3206">AMD準拠のmochaテストをWebとCUIで共通化 - それなりブログ</a>にあるように非同期関連でうまく行かないようで同ブログにて書いてある通り「<a href="https://github.com/jrburke/amdefine">amdefine</a>で解決や！」と思ったらcollectionのテストの時にmodelを呼ぼうとして「みつかんねーよ！」と怒られてRequireJSの時と違ってbaseUrl設定してないんだし、そうだよなってなって奇声上げてました。</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>reqirejs で分割した後、mochaでcliテスト書こうとしたら全くテスト走らないので、amdefine 使ったらbaseUrl の関係でエラるしキエェェェーーー！！！ってなってる</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/412135316514820096">2013, 12月 15</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>で色々見ててどうにもならない感じだったけど、なんか他のサンプルとか色々眺めてるとテストの中でrequirejs使ってるのが多いっぽかったので、どうもそっちの方が一般的のようです。</p>
+
+<pre><code>describe("Did it run?", function(){
+    it("model is a model", function(done){
+        // こんな感じで中でrequirejsを呼ぶ
+        requirejs(["model"], function(model) {
+            expect(model).to.be.a("model");
+            done();
+        });
+    }); 
+});
+</code></pre>
+
+<p>無理せずrequirejs使っていきましょう。</p>
+
+<p>もう一つテストで困るのが、コマンドラインテストだとajaxとかで怒られるということ。（domが無いからってことで良いんだよね多分）</p>
+
+<ul>
+<li><a href="https://github.com/NilsLattek/backbone-requirejs-node-boilerplate/blob/master/test/client/requirejs_testing.js">NilsLattek/backbone-requirejs-node-boilerplate</a></li>
+<li><a href="http://www.netboy.pl/2012/10/testing-jquery-code-with-mocha-chai-and-jsdom/">Testing jQuery code with Mocha, Chai and jsdom | Netboy</a></li>
+</ul>
+
+<p>この辺りを<s>コピって</s>参考にして<a href="https://github.com/tmpvar/jsdom">jsdom</a>を使うようにしてあげると良いようです。</p>
+
+<p>ということで出来たのが<a href="https://github.com/mix3/backbone-examples-replace-to-api-base-app">こちら</a>になります。</p>
+
+<p>どうやってコマンドラインでテストするかばかり考えていて「Backbonアプリのテストってどんな感じで書けば良いのか」についてまでたどり着かなかったので次触るときはそこまで考えて触りたいものですね。</p>
+
+<h3>まとめ</h3>
+
+<ul>
+<li>実は一番最初の発端は「<a href="http://angularjs.org/">AngularJS</a>触ろう！」だったのにどうしてこうなった。</li>
+<li>今は<a href="http://marionettejs.com/">Marionette.js</a>が気になります。</li>
+<li>js、結局クライアントとサーバで分かれてるのが少し不幸っぽい（小並感）</li>
+</ul>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/2013/12/22/20131222_02/</guid>
+<pubDate>Sun, 22 Dec 2013 00:00:01 +0900</pubDate>
+</item>
+<item>
+<title>退勤時間の自動検出ソリューション</title>
+<description>
+<![CDATA[
+<p>というようなことを元々は <a href="http://tech.kayac.com/archive/techkayaccom_advent_calendar_2013.html">teck.kayac.com Advent Calender 2013</a> の17日目 の記事として考えてたんだけど、結局なんか無性にWicketの事を書きたくなっちゃったので、お蔵入りになった記事をこっちに書く事にする。</p>
+
+<p>カレンダーのノリで書いてたのをそのまま持ってくると大分寒い感じがするが、面倒なので不自然なカレンダー要素を消す意外は無編集で。</p>
+
+<h3>勤怠管理してますか？</h3>
+
+<p>私はと言うとまあお察しください。そう、勤怠管理は面倒です。</p>
+
+<ul>
+<li>何時に出社したか？</li>
+<li>何時ににどれくらい休憩したか？</li>
+<li>何時に退勤したか？</li>
+</ul>
+
+<p>覚えてられないですね。退勤時に記録を付けるときにはもう記憶が曖昧です ＞＜;</p>
+
+<p>ということで退勤時間の自動検出ソリューションとか言って、適当に休憩や退勤の時間を記録するライフ八苦したいと思います。</p>
+
+<h3>いかにして自動的に記録するか</h3>
+
+<p>自分は最近 MacBookPro Retina 13インチ 16GBメモリ 512GB SSD というとても快適な環境で仕事してるのですが（16GBも積んでると<a href="https://www.virtualbox.org/">VirtualBox</a>&amp;<a href="http://www.vagrantup.com/">Vagrant</a>による開発環境が本当に快適）</p>
+
+<ul>
+<li>昼休憩はスクリーンセーバーで日々萌え萌え画像を垂れ流して「 <em>頭おかしい人</em> 」を演出</li>
+<li>出社退社移動中はPC閉じてスリープ</li>
+</ul>
+
+<p>という感じなので、スクリーンセーバーになってた時間とスリープしてた時間が後から分かれば休憩、退勤の時間が分かると言えます。（実際は業務内容と時間を紐づける必要がありますが、今のところ自分の業務内容は一つだけなので考えなくてOK。複数案件抱えてたりしてる人は本当に大変そうです…）</p>
+
+<p>問題はスリープの状態は記録出来ないこと。記録付けたくてもPCが眠ってるのでPC自身がアクション起こせません。</p>
+
+<h3>ということでジョースター卿に教えを乞いました</h3>
+
+<p><img src="/images/20131222/d2bdffc4.png" width="500" alt="ジョースター卿" /></p>
+
+<p><em>なるほど！！！</em> </p>
+
+<p>ということで<a href="http://dic.nicovideo.jp/a/%E9%80%86%E3%81%AB%E8%80%83%E3%81%88%E3%82%8B%E3%82%93%E3%81%A0">ジョースター卿の教え</a>を受けてPC稼働中は常に記録を取り続け、スクリーンセーバーの時は記録しない、という感じにやってあげるとうまく行きそうな気がしてきました。</p>
+
+<h3>具体的には？</h3>
+
+<p>homebrew で mysql を入れた後、適当に create database して適当に以下のようなテーブルを用意して</p>
+
+<pre><code>CREATE TABLE receive (
+    time datetime NOT NULL,
+    PRIMARY KEY (`time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+</code></pre>
+
+<p>以下のようなスクリプトを書いてcronに設定</p>
+
+<pre><code>#!/bin/bash
+
+if [ "" == "$(ps aux | grep ScreenSaverEngine | grep -v grep)" ]; then
+    /usr/local/opt/mysql/bin/mysql -u root beacon_receiver -e "insert into receive values (now());"
+fi
+
+* * * * * /bin/bash ~/.beacon.sh
+</code></pre>
+
+<p>すると<a href="https://gist.github.com/mix3/7973095#file-active_monitor-pl">こんな感じ</a>のスクリプトを用意ししてぺろっと出力すると</p>
+
+<p><img src="/images/20131222/a6f42cb8.png" alt="9時半に出社してる" /></p>
+
+<ul>
+<li>9時半に出社してる</li>
+</ul>
+
+<p><img src="/images/20131222/0130bdfb.png" alt="13時15分ぐらいから昼行ったっぽい" /></p>
+
+<ul>
+<li>13時15分ぐらいから昼飯行ったっぽい
+<ul>
+<li>なんか 13:50 辺りでちょっと復帰してるの気になるけど…</li>
+</ul></li>
+</ul>
+
+<p><img src="/images/20131222/32609ec0.png" alt="20時45分ぐらいに退社してる" /></p>
+
+<ul>
+<li>20時45分ぐらいに退社してる</li>
+</ul>
+
+<p>というのが分かって「 <em>あらやだ便利！</em> 」という感じになりました。ソース一式はこちら⇒<a href="https://gist.github.com/mix3/7973095">https://gist.github.com/mix3/7973095</a></p>
+
+<p>お試しあれ。</p>
+
+<p>なお、日々ちゃんと勤怠管理出来てる人には関係ない話の模様。</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/2013/12/22/20131222_01/</guid>
+<pubDate>Sun, 22 Dec 2013 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>packerを使ってboxを作ってvagrant upしてansibleでprovisioningしてみるなど</title>
 <description>
 <![CDATA[
@@ -1282,173 +1449,6 @@ mix3 &gt; iku: ふぁ！？
 </description>
 <guid isPermaLink="true">http://mix3.github.io/2013/08/30/20130830/</guid>
 <pubDate>Fri, 30 Aug 2013 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>テスト書くのって難しい</title>
-<description>
-<![CDATA[
-<p>布都ちゃんが可愛すぎて生きるのが辛い。mix3です。</p>
-
-<p><img src="/images/20130728/futo.png" /></p>
-
-<h3>テスト書くのって難しい</h3>
-
-<p>なんの意味も無い以下のような糞コードがあったとして、各subについてテストを書いたりなんかしてみるとこんな感じだろうか？</p>
-
-<script src="https://gist.github.com/mix3/6097116.js"></script>
-
-<p>なんでこんな糞コード書いたかというと</p>
-
-<ul>
-<li>type_a, type_b
-<ul>
-<li>まあ良い</li>
-</ul></li>
-<li>type_to_execute
-<ul>
-<li>type増えたらやだなぁと思うけどまあ良い</li>
-</ul></li>
-<li>calc_type
-<ul>
-<li>計算複雑になったらやだなぁと思うけどまあ良い</li>
-</ul></li>
-<li>execute
-<ul>
-<li>type_a,type_b,type_to_execute,calc_typeが総じて複雑になった時、全部と通るテスト書くの考えたくないんだけど…</li>
-</ul></li>
-</ul>
-
-<p>普通にアプリ書いてると、色々複雑になった上でexecuteみたいにいくつも関数経由して結果を返すやんちゃな関数が出てきてしまうのですが、そういうののテストは正直書いていて死にたくなります。そして後で機能拡張しようとしてやっぱり死んだりする。</p>
-
-<p>「そもそも設計が悪いよ」「それ◯◯で出来るよ」「糞コードに何を求めてるの」etc… ということなんでしょうか。テスト大事なのは分かるのですが、正しくて網羅的なテストというのはきちんとスキルを身につけてないと出来ないよなぁと思う事が多いです。「書かないよりはずっと良い」と心の中で言い訳しながら書いてますが。</p>
-
-<p>ただ、以下のような事もあるのでやっぱりただ書くだけでもダメなんだなと思いつつ、もやもやする今日この頃です。</p>
-
-<blockquote class="twitter-tweet"><p>リファクタリングに使えないテストのことをレガシーカバーと呼ぶ。結局リファクタリングできないんだからレガシーコードのまま。</p>&mdash; いろふ(成分無調整) (@irof) <a href="https://twitter.com/irof/statuses/346946470890573824">June 18, 2013</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/2013/07/28/20130728/</guid>
-<pubDate>Sun, 28 Jul 2013 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>phantomjsで遊ぶ</title>
-<description>
-<![CDATA[
-<p>うわっ…私のチーム、レベル低すぎ…？ mix3です。リードエンジニアとしてどうにかしろって話ですが、コミュ
-障の自分には荷が重いです…</p>
-
-<h3><a href="http://d.hatena.ne.jp/karasuyamatengu/20110126/1296066287">PhantomJS: 最小限なheadlessのWebKitベースのJavaScriptツール</a></h3>
-
-<p>だそうです。正直良くわかりませんが、nodeのようにサーバーサイドで書けるイメージ。</p>
-
-<p>$ cat hello.js</p>
-
-<pre><code>console.log('Hello, world!');
-phantom.exit();
-</code></pre>
-
-<p>$ phantomjs hello.js</p>
-
-<pre><code>Hello, world!
-</code></pre>
-
-<p>とか</p>
-
-<p>$ cat google_capture.js</p>
-
-<pre><code>var page = require('webpage').create();
-page.open('http://www.google.com', function (status) {
-    page.render('google_capture.png');
-    phantom.exit();
-});
-</code></pre>
-
-<p><a href="/images/20130413/google_capture.png"><img src="/images/20130413/google_capture.png" width="200" /></a><br /></p>
-
-<p>とか</p>
-
-<p>$ cat hello_server.js</p>
-
-<pre><code>var system = require('system');
-
-if (system.args.length !== 2) {
-    console.log('Usage: hello_server.js &lt;portnumber&gt;');
-    phantom.exit(1);
-} else {
-    port = system.args[1];
-    server = require('webserver').create();
-
-    service = server.listen(port, function (request, response) {
-        response.statusCode = 200;
-        response.write('&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;');
-        response.close();
-    });
-
-    if (!service) {
-        console.log('Error: Could not create web server listening on port ' + port);
-        phantom.exit();
-    }
-}
-</code></pre>
-
-<p>$ phantomjs hello_server.js</p>
-
-<p>$ curl http://localhost:2525</p>
-
-<pre><code>&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;
-</code></pre>
-
-<p>などなど。単純なCLIプログラムや、Webページにアクセスしてキャプチャ取ったり、サーバプログラムも書けたりします。</p>
-
-<p>ローカルファイルも扱えるので、例えばあるディレクトリ以下の画像を並べて表示するサーバを立てつつ、それを</p>
-
-<pre><code>page.open('http://localhost:[port]', function () {
-    page.render(...);
-});
-</code></pre>
-
-<p>とかするとあら不思議。コマンド一発で複数画像を１枚画像に出来たりします。</p>
-
-<h3>なんでこんなもん触ってるかというと</h3>
-
-<p>ソーシャルゲームに携わっていて思う事なのですが、イベント中だと特にそうですが時間で文言が変わるということは良くあることです。そしてこういうものは当然リリース前にスケジュールはきっちり決まっていて（もちろん差し込みで仕込み直すこともありますが）がっつりテストすることになります。が、開発段階でも当然自分で目視チェックすることになるのですがこれが非常に面倒くさい。なぜ面倒くさいかというとモジュールの単体テストとは違いローカルプロキシ越しにブラウザで確認したり実機で確認したりすることになり、自動テストになかなか上手く落とし込めないからです。（見た目の部分は特に変更が出易いのでそういう意味でもテストに落としづらいというのはあると思います）他のプロジェクトだと一部定型的な部分はモデルに落とし込んでテスト出来るようにしていたりするようですが、当然限界もあり。</p>
-
-<p>ということで、今のところ画像、文言など見た目の部分をテストに落とし込むのは無理だろうなぁと思っておりますが、そうは言ってもチェックが面倒なことは面倒なのでチェックすること自体はいくらか楽にはしたい。特に時間で文言が切り替わるのを見比べられる状態にしたい。</p>
-
-<p>ということでphantomjsでしこしこ以下のようなスクリプト書いてました</p>
-
-<ul>
-<li>指定ページを時間別にキャプチャしてpngで吐き出すスクリプト</li>
-<li>フォルダ以下の*.png画像を横に並べて表示するサーバを立ててそれをキャプチャするスクリプト</li>
-</ul>
-
-<p>参考: <a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">PhantomJS でログインが必要なページでも自由自在にスクレイピング - 凹みTips</a></p>
-
-<p>ほぼほぼキャプチャの部分は<a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">参考</a>をそのまま使わせてもらっているのですが、参考のままだと画像などがキャプチャされないことがあったので、setTimeoutを使ってキャプチャのタイミングを遅らせるなどの簡単な工夫をしています。</p>
-
-<p>後、サーバがバイナリを出力するときは、ローカルからファイルを読み込む時に 'b' を指定するのとresponse.writeするまえにresponse.setEncoding('binary')しないといけないようなので注意が必要です。</p>
-
-<pre><code>var image = fs.read(file_path, 'b');
-response.headers = {
-    'Accept-Ranges': 'bytes',
-    'Content-Type': 'image/png',
-    'Content-Length': image.length
-};
-response.setEncoding('binary');
-response.write(image);
-</code></pre>
-
-<p>こうすることで横並び画像にして文言チェック出来るようになり捗りそうな気配がしています。（まだ作ったばかりで実際に活用するのはこれから）</p>
-
-<p>ちなみに一枚画像にしてしまうのは社内gyazoにあげてディレクターなど他の方にも見てもらえるようにしたかったからですが、今にして思えば別に一枚画像にする必要はなく、画像一括アップロード出来るフォームと横並びにして表示出来る簡単なサーバアプリを書くだけで良いことに気づいたので、ここは今後やりやすい方にシフトする感じで行きたい。</p>
-
-<p>ということでphantomjs便利なんじゃないかなというお話でした。</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/2013/04/13/20130413/</guid>
-<pubDate>Sat, 13 Apr 2013 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>

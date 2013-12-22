@@ -61,6 +61,42 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/02/14/20130214/" title="">すぐにpixivのランキングイラストを見れるGoogleChromeの拡張を作った。</a></h2>
+<p>生きていればつらいことがある。
+しかし、つらいからと言って簡単に投げ出す事は出来ないということも多い。</p>
+
+<p>みなさんもつらまってる時、よくpixivを見ると思う。
+当然のごとく僕もそうである。</p>
+
+<p>最近つらい事がよくある。
+そんな時のために、pixivのランキングイラストを素早く表示する必要があった。
+なので、pixivのランキングイラストをすぐ見れるGoogle Chromeの拡張を作った。</p>
+
+<p><a href="https://github.com/mix3/chrome-pixiv-illust-daily-ranking-redirect">mix3/chrome-pixiv-illust-daily-ranking-redirect - GitHub</a></p>
+
+<p>「だめだ。もうやってらねー」って時は、空のtabを表示すればすぐpixivのランキングイラストが見れる。最高。自分も絵描きたい。</p>
+
+<p><a href="/images/20130214/pixiv-illust-daily-ranking-redirect.png"><img src="/images/20130214/pixiv-illust-daily-ranking-redirect.png" width="300" /></a></p>
+
+<p>参考</p>
+
+<ul>
+<li><a href="http://blog.hisaichi5518.com/entry/2013/02/01/003820">すぐに吉高由里子を見れるGoogle Chromeの拡張作った。 - パルカワ2</a></li>
+<li><a href="http://soh335.hatenablog.com/entry/2013/02/10/011039">すぐに宮崎あおいを見れるGoogle Chromeの拡張作っ>た。 - soh335 memo</a></li>
+<li><a href="http://mizzy.org/blog/2013/02/11/1/">すぐにハッブル宇宙望遠鏡撮影画像を見れるGoogle Chromeの拡張作った。 - Gosuke Miyashita</a></li>
+</ul>
+
+<p class="post-footer"><span class="date">2013-02-14</span></p>
+<h2><a href="/2013/01/06/20130106/" title="">あけおめ</a></h2>
+<p>ことよろ。なんか本当に久しぶりに落書きしたmix3です。</p>
+
+<script src="http://source.pixiv.net/source/embed.js" data-id="32685756_6064c2b2416178ec058c322de47db89e" data-size="medium" data-border="on" charset="utf-8"></script>
+
+<noscript><p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=32685756" target="_blank">あけおめ</a> by <a href="http://www.pixiv.net/member.php?id=88339" target="_blank">mix3</a> on <a href="http://www.pixiv.net/" target="_blank">pixiv</a></p></noscript>
+
+<p>年に1回の年賀絵ぐらい継続して描きたいものですね…</p>
+
+<p class="post-footer"><span class="date">2013-01-06</span></p>
 <h2><a href="/2012/12/30/20121230/" title="">トランザクション</a></h2>
 <p>トランザクションってなーに？mix3です</p>
 
@@ -298,105 +334,6 @@ exit 0
 </ul>
 
 <p class="post-footer"><span class="date">2012-11-03</span></p>
-<h2><a href="/2012/08/12/20120812/" title="">そろそろ自分は本当に死んだ方が良い気がする件について</a></h2>
-<p>「バカジャネーノ」と言われてぐぅの根も出ないmix3です。</p>
-
-<h3>死んだ方が良い事の概要その１</h3>
-
-<p>今やってるサービスに諸事情により一つ機能を追加しなければならない必要に迫られ、その対応を自分がすることになったのですが、結果は盛大に燃やし散々な糞クオリティで納期に間に合わないという目も当てられない自体になってしまいました。
-設計段階で詰んでいて（DB設計の時点で要件を満たせない）どう尻拭いしても物理的に納期に間に合わないということで、結局お尻を先延ばしにしてもらって先輩にヘルプ入ってもらい設計からやり直しとなりました。</p>
-
-<h3>死んだ方が良い事の概要その２</h3>
-
-<p>スケジュール再編からは先輩の手によって設計が組み直され、画面仕様から必要な機能を洗い出してコントローラとモデルのインタフェースを決めて行く（勝手にIDD[インタフェースドリブンデベロップメント]などと呼んでいる）やりかたで、仕様認識の齟齬を減らしつつ必要充分な機能を決めて行きました。このやり方は関わるプログラマ全員の時間を使ってしまうのでなかなか面倒ですが、仕様認識齟齬が減るのと機能の洗い出しで全員がチェックするので抜けが減るので危険な香りがする時は積極的にするようにしています。またインタフェースを決めてしまうので、分業しやすいというのも利点です。Javaのインタフェースベースの作り方を思い出してとても気分良く作れます。</p>
-
-<p>ここまでは良いのですが、分業で自分がモデルを作って最後にコントローラと結合すると自分の糞クオリティを発揮して色々問題を起こしていました</p>
-
-<ul>
-<li>バリデート関数はエラーを返すだけというルールで決めたはずなのになぜかExceptionを投げてる</li>
-<li>関数の返り値の形を変えてしまった</li>
-<li>明らかにコピペしてる</li>
-<li>関数名、変数名の意味が分からない</li>
-<li>テスト書けていない（間に合ってない）</li>
-</ul>
-
-<p>時間も無いのに色々やらかして最終的に「バカジャネーノ」と言われて何も言えないmix3の姿がそこにはありました。</p>
-
-<h3>こういう怒られ方はずっと前から続いている 今回は集中しただけで</h3>
-
-<p>要するにプログラマとしては致命的なほど人から見て意味の通じるコードが書けないのだと思います。視野狭窄で自分しか見えてなくて、平気で他人から見て意味の分からないコードを書いてしまう。他人のコードを見て何がどう優れているか、このコードの何がだめか。変数、関数の意味は。怒られるたびに考えるようにしても、結局怒られる。良し悪しの判断がいつまでたっても改善されない。</p>
-
-<p>自分は成長していないといつも感じているしいつも言っているけど、こういったことの成長が無いことも多く含んでいる。</p>
-
-<h3>結局どうすれば良いのかは分からない</h3>
-
-<p>これだけ怒られて改善しないといけないと思っていて、でもどうすれば良いのかは良くわからない。</p>
-
-<p>ただ「他人が理解出来るコードを書けば良い」だけではあるけれども、それだけの事が出来ないということは、自分にはそれをするための何かが欠けてるということで、でもその何かを「何か」としか書けないということは全くその「何か」を理解していない。つまりどうしたら良いのか分からない。</p>
-
-<p>いっぱいコード書いて怒られて判断出来るようになる以外にもう方法が思いつかないが、でもそのやり方をするには既に時間を使いすぎてる感があるし、そのせいで関わるいろんなひとに迷惑をかけていて、今回は特に他のスケージュルに大きく影響を与え、お金を消費している。大きさ的に自分が取れる責任を大きく上回っている。</p>
-
-<p>だから最近はタイトルのようなことを良く考えている。自分が何かやらかすことで与える色々なな迷惑が大きすぎて、本音の本音では今すぐ逃げ出したい（逃げて人が減る事の方がとんでもない迷惑なのでしないけど）</p>
-
-<h3>ということで</h3>
-
-<ul>
-<li>mix3は今すぐ死ぬべきである。</li>
-<li>死なないのであれば迷惑を掛けないように生きるべきである</li>
-</ul>
-
-<p>どっちかを満たすためにmix3は頑張らなければならない。</p>
-
-<p>そしてそんな事とは関係なく<a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a>を更新してますYO。大本の<a href="http://d.hatena.ne.jp/yoya/20120808/swfed">swfed</a>のバージョンアップに追従しています。<a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a>は可愛いね。イイコイイコ。</p>
-
-<p class="post-footer"><span class="date">2012-08-12</span></p>
-<h2><a href="/2012/04/22/20120422/" title="">修論で作ったなつかしのもの</a></h2>
-<p>若い子たちが優秀すぎて生きるのが辛い（迫真） mix3です。</p>
-
-<p>新入社員の自己紹介としてネタが無い時に卒論、修論が鉄板として出てくるのか何かそういうのを聞く機会があったりなかったりして、懐かしいなぁとか思ったり思わなかったりしていました。みんな凄い事してて生きるのがどんどん辛くなります。ほんと自分は適当で不真面目で教授に迷惑ばかり掛けていました。今もそうです。ごめんなさい。猛省。</p>
-
-<h3>プロトタイピング</h3>
-
-<p>ソフトウェア開発の手法としてプロトタイピングというものがあります。「中身は無いが動く」ものを作り、早い段階から作るものに対しての評価、フィードバック得ることで、手戻りを減らすことを目的とした手法です。</p>
-
-<p>このプロトタイピングという手法は手戻りを防ぐという点で、当たり前ではあるけれども重要な開発手法なのですが、プロトタイプの製作に時間が掛かったりすると意味が無かったり、プロトタイプを見せたらそれを完成品と勘違いされたり（もう完成しているということで、納期や費用を削られそうになったり）という笑い話のような本当の話があったりして、工夫しないとそのまま適用するのは難しい手法だったりします。</p>
-
-<h3>mocketch</h3>
-
-<p>と、プロトタイピングには手法そのものに派生があるほど色々あるのですが、そんな難しいことは自分のような阿呆には考えられないので、修論ではとにもかくにも「プロトタイプを早く作れられれば良いんだろ？」と思考を放棄して動くものを作ってました。それが<a href="https://github.com/mix3/mocketch">mocketch</a>です。ウェブアプリのプロトタイプとして作るものが「モックアップ」や「スケッチ」などと呼ばれているっぽいのでそれをガッチャンコしただけという。酷いですね。</p>
-
-<p>具体的に何がしたかったかというと「HTMLを書くだけでそれがウェブアプリとして動くもの」を目指していました。HTMLで紙芝居だけでも十分というか実際そういう感じのようですが、それが実際に動くものだともっとイメージがしやすいしプロトタイプとしてより良いだろうという安易な考えでした。酷いですね。</p>
-
-<p>何気にgithubから落としてきて mvn jetty:run するだけで動いて自分でビビってしまいました。maven 凄いです。java 可愛いよ。</p>
-
-<p>以下実際に動かしてみたときのスクショ。さすがにサーバに上げて動かすのは怖いので。</p>
-
-<p>１）以下のような感じでHTMLを書くと<br />
-<a href="/images/20120422/mocketch1.png"><img src="/images/20120422/mocketch1.png" width="300" /></a></p>
-
-<p>２）なんかフォームが表示されて<br />
-<img src="/images/20120422/mocketch2.png" /></p>
-
-<p>３）適当に入力する<br />
-<img src="/images/20120422/mocketch3.png" /></p>
-
-<p>４）なんんかそれっぽく入力内容が反映される<br />
-<img src="/images/20120422/mocketch4.png" /></p>
-
-<p>５）もう一回繰り返してみた<br />
-<img src="/images/20120422/mocketch5.png" /></p>
-
-<p>というものでした。</p>
-
-<p>リスト表示のところに form を用意すると、掲示板のレスのような感じを表現出来たり、入力に対して必須項目や文字列長などのバリデートを入れたり、ページングを入れられたりもします。githubに上がってるものは少し古くて色々上手く動いていないですが。</p>
-
-<p>内部的にはHTMLに属性として meta:table meta:column を書くとkey-valueで解釈して HashMap で保存、表示しているだけです。wicketがよしなにやってくれてます。</p>
-
-<h3>ということで</h3>
-
-<p>酷い修論の製作物でした。ほんとごめんなさい。</p>
-
-<p class="post-footer"><span class="date">2012-04-22</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -412,7 +349,7 @@ exit 0
  | 
 <a href="/page/6/">6</a>
 <a href="/page/5/" rel="next">&gt;</a>
-<a href="/page/7/">&gt;&gt;</a>
+<a href="/page/8/">&gt;&gt;</a>
 </div>
       </div>
       <div class="autopagerize_insert_before"></div>
@@ -426,6 +363,7 @@ exit 0
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/12/">2013年12月</a></li>
   <li><a href="/archives/2013/11/">2013年11月</a></li>
   <li><a href="/archives/2013/10/">2013年10月</a></li>
   <li><a href="/archives/2013/08/">2013年08月</a></li>
@@ -553,6 +491,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
 <span class="tagcloud0"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
+<span class="tagcloud8"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
 </div></p>
     </div>
   </div>

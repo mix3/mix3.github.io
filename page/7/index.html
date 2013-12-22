@@ -61,6 +61,113 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2011/07/03/20110703/" title="">Markdownブログ</a></h2>
+<h3>Markdownブログ</h3>
+
+<p>Markdownでブログが書きたかった。githubのページ公開機能なら何でも良かった。今は反省している。</p>
+
+<p><a href="https://github.com/mix3/mix3.github.io">https://github.com/mix3/mix3.github.io</a></p>
+
+<h4>使い方</h4>
+
+<ol>
+<li>resource以下に.mdでMarkdownの文書を作成する。</li>
+<li>script/generate.plを実行する</li>
+<li>githubにコミットする</li>
+<li><a href="http://mix3.github.io/">こんな感じになる</a></li>
+</ol>
+
+<h4>ちなみに</h4>
+
+<p>pixivブログでjsを使ってごにょごにょしようとしてみたがムリっぽい。HTMLの中にMarkdownを埋め込んだり別サーバに置いてみたり色々してみたがどうにも上手く行かず。</p>
+
+<ul>
+<li>別ドメインにならざるを得ずセキュリティ制限が掛かる</li>
+<li>JSONPだとヒアドキュメントが使えないのでキモイ</li>
+<li>２重エスケープなどで上手く表示出来ない</li>
+</ul>
+
+<p>などなど。</p>
+
+<p>ということでpixivブログで割と満足している現状全く使いどころが無いMarkdownブログだけどまあいっか。</p>
+
+<p class="post-footer"><span class="date">2011-07-03</span></p>
+<h2><a href="/2011/06/22/20110622/" title="">MobaSiFを弄ってみた</a></h2>
+<p>MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。</p>
+
+<ul>
+<li>アプリケーションロジックを記述</li>
+<li>レスポンスの値を生成＆セット</li>
+</ul>
+
+<p>具体的に書くと以下のような感じ。</p>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = (
+    'test' =&gt; [0,0,0, 'Page::Sample', 'pageMain'],
+);
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<pre><code>package Page::Sample;
+sub pageMain {
+    my $func = shift;
+    # レスポンスの生成
+    my $html = HTMLTemplate::insert('sample/index', $rhData);
+    # レスポンスヘッダに値をセット
+    Response::output(¥$html);
+}
+</code></pre>
+
+<h4>template/_system/sample/index.html</h4>
+
+<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;$CON:title$&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    test
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>普段触るフレームワークだと「レスポンスの生成」も「レスポンスヘッダへの値のセット」も自分ですることはまず無くて。テンプレートに渡す値をハッシュで用意して、テンプレート自体はクエリパスなどから自動で判断するかもしくは明示的に指定するかする場合が多い。</p>
+
+<p>ということでこの辺り結構違和感が大きいのでちょっとそれっぽくなるように手を入れてみた。</p>
+
+<h4>pm/Context.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Context.pm"></script>
+
+<h4>pm/Page/Main.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Main.pm"></script>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = (
+        .
+        .
+        .
+    'test'  =&gt; [0,0,0, 'Page::Sample', 'test'],
+    'test1' =&gt; [0,0,0, 'Page::Sample', 'test1'],
+    'test2' =&gt; [0,0,0, 'Page::Sample', 'test2'],
+);
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Sample.pm"></script>
+
+<h4>template/_system/sample/test.html</h4>
+
+<script src="https://gist.github.com/1038137.js?file=test.html"></script>
+
+<h3>次回はDB周りを触ってみる</h3>
+
+<p>commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。</p>
+
+<p class="post-footer"><span class="date">2011-06-22</span></p>
 <h2><a href="/2011/06/21/20110621/" title="">MobaSiFを触ってみた</a></h2>
 <h3>インストール</h3>
 
@@ -459,69 +566,11 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 <script src="https://gist.github.com/953572.js"> </script>
 
 <p class="post-footer"><span class="date">2011-05-04</span></p>
-<h2><a href="/2011/05/04/20110504_02/" title="">Qudoでログ回収</a></h2>
-<ul>
-<li>SCPやrsyncやらで各アプリケーションサーバから回収
-<ul>
-<li>自由が利く</li>
-</ul></li>
-<li>各アプリケーションサーバから解析サーバへ投げてもらう
-<ul>
-<li>HDFSなどHadoopが扱うファイルシステムに直接入れる事が可能</li>
-<li>※ただし、各アプリケーションサーバがそのファイルシステムを扱えるように色々セットアップが必要</li>
-</ul></li>
-</ul>
-
-<p>後者のアプリから投げてもらう方だと各サーバでファイルシステムを扱えるようセットアップが必要になるので、そこまでアプリ側に負担を掛けられないかなということで今考えているのは前者の方法となります。</p>
-
-<h3>コード</h3>
-
-<p>Hadoopが扱うファイルシステムはHDFSという前提で前回構築した環境でサンプルを作ってみました。</p>
-
-<h3>シェルスクリプトで並列回収</h3>
-
-<p>まず最初にシェルスクリプトで書いてみました。「これだと回収先のアプリが100万個ある場合は100万個同時にダウンロードしちゃうってことだよね？」というもっともな指摘で没になりました。まったくもってその通りだと思います。</p>
-
-<script src="https://gist.github.com/954830.js"> </script>
-
-<h3>Qudoで並列回収</h3>
-
-<ul>
-<li>ジョブ／キューを使いたい
-<ul>
-<li>なんとなくジョブは消えてほしく無い</li>
-<li>失敗したらリトライしてほしい</li>
-</ul></li>
-<li>回収は並列
-<ul>
-<li>でも同時実行数は上限あり</li>
-</ul></li>
-</ul>
-
-<p>以上の要件で最初はTheSchwartz＆Parallel::Preforkで考えていましたが何やらGearmanでもDBを使って動作させられるという話があったりQudoを見つけてみたりで、でもやりたいことって別にそんなに複雑な事でもないので結局何使っても良いかなと思ってQudoを選びました。後々機能を増やしたい時にフックポイントが色々用意されているので悪くないかなと。</p>
-
-<script src="https://gist.github.com/951476.js"> </script>
-
-<p>どうでも良いですがnekokakさん曰くQudoは「駆動」らしいですが「弓道」の方が良いと思います＾＾</p>
-
-<p class="post-footer"><span class="date">2011-05-04</span></p>
-<h2><a href="/2011/04/30/20110430/" title="">Hadoopを触ってみた</a></h2>
-<p>具体的にはgistに書いた。</p>
-
-<p>完全分散モードが結構癖が強い感じなので気をつけたい。</p>
-
-<script src="https://gist.github.com/944255.js"> </script>
-
-<script src="https://gist.github.com/944342.js"> </script>
-
-<p class="post-footer"><span class="date">2011-04-30</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
 <a href="/page/6/">&lt;</a>
 
-<a href="/page/3/">3</a>
- | 
 <a href="/page/4/">4</a>
  | 
 <a href="/page/5/">5</a>
@@ -529,8 +578,10 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 <a href="/page/6/">6</a>
  | 
 7
-&gt;
-&gt;&gt;
+ | 
+<a href="/page/8/">8</a>
+<a href="/page/8/" rel="next">&gt;</a>
+<a href="/page/8/">&gt;&gt;</a>
 </div>
       </div>
       <div class="autopagerize_insert_before"></div>
@@ -544,6 +595,7 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2013/12/">2013年12月</a></li>
   <li><a href="/archives/2013/11/">2013年11月</a></li>
   <li><a href="/archives/2013/10/">2013年10月</a></li>
   <li><a href="/archives/2013/08/">2013年08月</a></li>
@@ -671,6 +723,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
 <span class="tagcloud0"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
+<span class="tagcloud8"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
 </div></p>
     </div>
   </div>
