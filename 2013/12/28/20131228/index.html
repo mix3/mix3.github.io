@@ -37,7 +37,8 @@
   <link href="http://coderwall.com/stylesheets/jquery.coderwall.css" media="all" rel="stylesheet" type="text/css" />
   <script src="http://coderwall.com/javascripts/jquery.coderwall.js"></script>
 
-  <title>萌えキャラとは何だったのか</title>
+  <title>萌えキャラとは何だったのか - Vagrant with Virtualbox tips - internal network setting
+</title>
 </head>
 <body>
 <div id="wrap">
@@ -61,84 +62,60 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
-<h2><a href="/2012/12/30/20121230/" title="">トランザクション</a></h2>
-<p>トランザクションってなーに？mix3です</p>
+<h2><a href="/2013/12/28/20131228/" title="">Vagrant with Virtualbox tips - internal network setting</a></h2>
+<p>ちょっと詰まったことがあったのでメモ書き これ書いてる時点でVagrantのバージョンは <em>1.4.1</em> となります</p>
 
-<h3>同時更新処理</h3>
-
-<p><a href="http://mix3.github.io/2012/11/03/20121103/">スレーブ遅延</a>のときにSELECT > UPDATEで古い情報をもとにUPDATEしてしまうと不整合が発生すると書きましたが、</p>
-
-<p>たとえば同じ行を複数で同時にSELECT > UPDATEすると同じように不整合が発生することがあります。</p>
-
-<ol>
-<li>AがT1からSELECT</li>
-<li>BがT1からSELECT</li>
-<li>AがT1をUPDATE</li>
-<li>BがT1をUPDATE</li>
-</ol>
-
-<p>このような順序で更新がかかると、BがAの更新を上書きしてしまうため、実質Aの更新が無かった事になってしまいます。</p>
-
-<p>これも更新がアトミックであれば発生しないので可能であればアトミックな更新にするのが良いですが、更新が複数ある場合はそういった変更も出来ません。</p>
-
-<h3>そんなときこそトランザクション。そんなふうに考えていた時期が僕にもありました。</h3>
-
-<p>で、そういうときはトランザクションを使う物だと思っていました。トランザクションは複数の処理を一つの処理としてまとめて成功するか失敗するか、どちらかを保証してくれます。</p>
-
-<p>なので、SELECT > UPDATEをトランザクションでまとめてしまえば大丈夫だよね！と思っていたので、以下のようなコードを書いて確認しました。</p>
-
-<script src="https://gist.github.com/4411441.js"></script>
-
-<script src="https://gist.github.com/4411446.js"></script>
-
-<p>scoreが更新回数になるので、'v' => '&lt;更新回数>' と揃えば不整合無く更新出来たことになるのですが、</p>
-
-<p>見ての通りトランザクションを使った方は残念な結果になっています。で、すこしググッた結果トランザクションとロックは別で考えないと行けないことを知りました。</p>
-
-<p><strong>トランザクションを使ったからといって勝手に行読み込みなどをロックして整合性を保証してくれるとかでは全然無いんですね。</strong></p>
-
-<p>当たり前だろダラズ！と言われても仕方ないような勘違いですが、いやトランザクションを使わない世界でしばらく生きていたので…</p>
-
-<p>で、SELECTにテーブルロックや行ロックが掛かってないためにSELECT > UPDATEの不整合が防げていないようなので、SELECT文にFOR UPDATE を付けてそれを防いでみました</p>
-
-<script src="https://gist.github.com/4411474.js"></script>
-
-<p>結果またしても残念な結果になりました…</p>
-
-<h3>ちゃんとストレージエンジンを指定しましょう</h3>
-
-<p>結果から言うとストレージエンジンを指定していなかったのでトランザクションの使えないMyISAMでテーブルが作られていたからでした。</p>
-
-<script src="https://gist.github.com/4411511.js"></script>
-
-<p>こんな感じでInnoDBを指定する事で期待通り、不整合なく更新されるようになりました。めでたしめでたし。</p>
-
-<p>ちなみにSELECTのロックには共有ロックと排他ロックとあり、FOR UPDATEは排他ロックになります。LOCK IN SHARE MODEだと共有ロックになります。</p>
-
-<p>今回の場合にLOCK IN SHARE MODEを使うと10ものプロセスが共有ロックを取り合って凄い勢いでデッドロックしました。</p>
-
-<script src="https://gist.github.com/4411540.js"></script>
-
-<p>ロックするということは同時にデッドロックする可能性もあるということなので、適切なロックを選択して使い、デッドロックの可能性を減らしながら上手く付き合っていきたいですね。</p>
-
-<h3>まとめ</h3>
+<p>Virtualboxのネットワークアダプタにはいくつか種類があり</p>
 
 <ul>
-<li>トランザクションはロックとはまた別問題
+<li>NAT
 <ul>
-<li>不整合を防ぎたいならちゃんとロックのことを考えてSQLを書く</li>
+<li>ゲストOS -> 外</li>
 </ul></li>
-<li>MySQLのデフォルトストレージエンジンはMyISAMだけど、それトランザクション使えないからね？</li>
-<li>ロックにも種類はあり、デッドロックには気をつける</li>
+<li>内部ネットワーク
+<ul>
+<li>ゲストOS &lt;-> ゲストOS</li>
+</ul></li>
+<li>ホストオンリーアダプタ
+<ul>
+<li>ホスト -> ゲストOS</li>
+</ul></li>
 </ul>
 
-<h3>今年のブログはこれが最後な気がするので。</h3>
+<p>あたりを組み合わせて遊んだりするのですが、Vagrant で内部ネットワークを設定する方法が分かりづらかったのでメモ</p>
 
-<p>来年はもっとブログをコードを書いてアウトプットを増やして行きたいです。</p>
+<pre><code>VAGRANTFILE_API_VERSION = "2"
 
-<h3>それでは良いお年を！</h3>
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "box_name"
+    config.vm.define :host1 do |host1|
+    host1.vm.hostname = "host1"
+    host1.vm.network :private_network, ip: "192.168.1.111", virtualbox__intnet: "intnet"
+  end
+    config.vm.define :host2 do |host2|
+    host2.vm.hostname = "host2"
+    host2.vm.network :private_network, ip: "192.168.1.112", virtualbox__intnet: "intnet"
+  end
+  config.vm.provision "shell", inline: "/etc/init.d/network restart"
+end
+</code></pre>
 
-<p class="post-footer"><span class="date">2012-12-30</span></p>
+<p>抜粋するとこんな感じ</p>
+
+<p><a href="http://docs.vagrantup.com/v2/networking/private_network.html">Private Networks - Networking - Vagrant Documentation</a> とか見てると</p>
+
+<pre><code>virtualbox__intnet: true
+</code></pre>
+
+<p>とか書いてるけどそのまま設定すると「（trueが）文字列じゃねーよゴルァ！」と怒られるので、何かしら文字列を指定してあげる。</p>
+
+<p>Virtualboxで設定した場合、内部ネットワークを指定した時のデフォルトが <em>intnet</em> なのでintnetで良いでしょう。</p>
+
+<p>で、これで内部ネットワークの設定が出来るのですが初回の <em>vagrant up</em> 直後はNATによる設定で外に行けるはずなのに繋がらなかったりするので、</p>
+
+<p><a href="http://docs.vagrantup.com/v2/provisioning/shell.html">Shell Provisioner</a>でnetworkの再起動をしてます。もっとスマートなやりかたあればいいんだけど。</p>
+
+<p class="post-footer"><span class="date">2013-12-28</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
       </div>
       <div class="autopagerize_insert_before"></div>

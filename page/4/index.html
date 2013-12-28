@@ -61,6 +61,21 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/03/09/20130309-1/" title="">p5-JQueryPresentationHelper作ってみた</a></h2>
+<p>やりたかったこと。</p>
+
+<ul>
+<li>use Hoge でメソッドが生えるモジュールの習作が作りたかった</li>
+<li><a href="http://code.google.com/p/jquery-presentation/">jquery-presentation</a>:<a href="http://dl.dropbox.com/u/268240/googleCode/jquery-presentation/index.html">demo</a>をmarkdownで書けるようにしたかった</li>
+</ul>
+
+<p>結果、良くわからないものが中途半端に出来てしまって、でも放置してもあれなのでとりあえずgithubにアップ。</p>
+
+<p>git clone を前提としたもっとゆるい感じで作った方が良い感じにおさまった気がしてます。</p>
+
+<p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
+
+<p class="post-footer"><span class="date">2013-03-09</span></p>
 <h2><a href="/2013/02/14/20130214/" title="">すぐにpixivのランキングイラストを見れるGoogleChromeの拡張を作った。</a></h2>
 <p>生きていればつらいことがある。
 しかし、つらいからと言って簡単に投げ出す事は出来ないということも多い。</p>
@@ -205,135 +220,6 @@
 <p>他のやり方だとまた違ってくるのでしょうか？</p>
 
 <p class="post-footer"><span class="date">2012-11-07</span></p>
-<h2><a href="/2012/11/03/20121103/" title="">スレーブ遅延</a></h2>
-<p>今の案件に触れてからの自分の低能ぶりの凄まじさに自ら恐怖を禁じ得ず、椅子から転げ落ちて失禁しそうなmix3です。</p>
-
-<h3>レプリケーション</h3>
-
-<p>今の案件ではDBにMySQLを使いレプリケーションを使って負荷分散しております。（レプリケーション必要無いぐらいの負荷だよね、とかインフラの方に言われてまた失禁しそうです）</p>
-
-<p>レプリケーションというのはリアルタイムに複製する技術のこと？上手く説明出来ませんが、まあWebサービスなんかだと書き込みより読み込みの方が圧倒的に割合が大きいらしく、マスターとその複製のスレーブにDBを分けて、書き込みはマスターへ、読み込みは複製のスレーブへ処理を振り分ける事で負荷を分散したりします。</p>
-
-<h3>スレーブ遅延</h3>
-
-<p>レプリケーションというのはリアルタイムな複製技術なので、基本的にはマスターとスレーブは同期が取れているハズですが、サーバの負荷状況によっては同期がとれていない状態になったりします。スレーブ遅延というものです。</p>
-
-<h3>レプリケーション下での更新処理</h3>
-
-<p>たとえばインクリメント的なアトミックな更新であればスレーブは関わらないので問題ないと思います。</p>
-
-<pre><code>
-UPDATE table SET column + 1 WHERE id = ?
-</code></pre>
-
-<p>そうではなくスレーブから読み込みをし、マスターに書き込みをするような処理をしてしまうと、スレーブが遅延していた場合に古い情報をもとに更新をしてしまい不整合が発生するなどあまりよろしくない状態になります</p>
-
-<pre><code>
-SELECT hoge FROM table_1 WHERE id = ?
-スレーブから取ってきたhogeが古いものだと、その後のUPDATEでそのhogeを使うのは当然よろしくない
-
-×UPDATE table_2 SET column = <hoge> WHERE id = ?
-</code></pre>
-
-<p>なので、そういったSELECT>UPDATEのような更新処理の場合は、SELECTもスレーブからではなくマスターからするようにしないといけせん。</p>
-
-<h3>ようするにスレーブ遅延による不整合が発生したということ</h3>
-
-<p>です。気をつけましょう。</p>
-
-<h3>MySQL::Sandbox と Percona Toolkit(旧Maatkit)のpt-slave-delay</h3>
-
-<p>こういうスレーブ遅延によるバグは開発環境では気づきにくかったりします。負荷の掛かっていない開発環境ではスレーブ遅延は発生しづらいでしょうし、そもそもDB構成が本番と違っていてレプリケーションされてなかったりすることも多いでしょう。</p>
-
-<p>が、最近は便利になった物で、cpanに上がっているMySQL::SandboxとPercona Toolkit(旧Maatkit)なるツールを使うと割と簡単にレプリケーション環境とスレーブ遅延を再現出来ます。というかMySQL::SandboxもPercona Toolkit(旧Maatkit)結構前からあるので最初から使っておけという感じですね。（正月にデータが吹っ飛ぶ前は実は使ってたりしてたんですけどね...）</p>
-
-<h3>MySQL::Sandbox</h3>
-
-<ul>
-<li><p>Install</p>
-
-<ul>
-<li>cpanm MySQL::Sandbox</li>
-</ul></li>
-<li><p>How to use</p>
-
-<ul>
-<li>SANDBOX_AS_ROOT=1 make_replication_sandbox -r master_data --how_many_slaves 1 --sandbox_base_port 11111 download/mysql-5.1.66-linux-x86_64-glibc23.tar.gz</li>
-<li>rootで作業するとSANDBOX_AS_ROOT=1を使わないと怒られるけどそもそもrootで作業するなという話</li>
-<li>sandboxes/master_data/以下にマスター(port: 11111, socket: /tmp/mysql_sandbox11111.sock)スレーブ(port: 11112, socket: /tmp/mysql_sandbox11112.sock)が出来る</li>
-<li>perl -MDBI -e 'DBI->connect("dbi:mysql:test:mysql_socket=/tmp/mysql_sandbox11111.sock", "msandbox", "msandbox")'</li>
-<li>port指定での接続方法は分からなかった。できなくは無いと思うけど</li>
-</ul></li>
-<li><p>init script</p>
-
-<ul>
-<li>以下のような感じで書いてみたがうまくいかん</li>
-<li>落とし忘れるとsocketファイルが残って次回起動時に残念な事になるので出来ればなんとかしたい</li>
-</ul></li>
-</ul>
-
-<pre><code>
-#!/bin/sh
-
-# chkconfig: 2345 65 35
-# description: sandbox_action
-
-# Source function library.
-. /etc/rc.d/init.d/functions
-
-# Get config.
-. /etc/sysconfig/network
-
-# Check that networking is up.
-if [ ${NETWORKING} = "no" ]
-then
-  exit 0
-fi
-
-prog="sandbox_action"
-
-case "$1" in
-  start)
-    echo -n "Starting $prog: "
-    sandbox_action start
-    success
-    echo
-  ;;
-  stop)
-    echo -n "Stopping $prog: "
-    sandbox_action stop
-    success
-    echo
-  ;;
-  status)
-    sandbox_action status
-  ;;
-  *)
-    echo $"Usage: $prog {start|stop|status}"
-    exit 1
-esac
-
-exit 0
-</code></pre>
-
-<h3>Percona Toolkit(旧Maatkit)</h3>
-
-<ul>
-<li><p>Install</p>
-
-<ul>
-<li>Perconaからtarを落としてきて、perl Makefile.PL, make &amp;&amp; make install</li>
-<li>rpmは依存関係がうるさいのでtarからのほうが良いと思う</li>
-</ul></li>
-<li><p>How to use</p>
-
-<ul>
-<li>pt-slave-delay -u msandbox -p msandbox --socket /tmp/mysql_sandbox11112.sock</li>
-<li>--daemonize オプションもある</li>
-</ul></li>
-</ul>
-
-<p class="post-footer"><span class="date">2012-11-03</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -464,6 +350,8 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/SQLite/">SQLite</a></span>
 <span class="tagcloud0"><a href="/tag/Scala/">Scala</a></span>
 <span class="tagcloud0"><a href="/tag/Teng/">Teng</a></span>
+<span class="tagcloud0"><a href="/tag/Vagrant/">Vagrant</a></span>
+<span class="tagcloud0"><a href="/tag/Virtualbox/">Virtualbox</a></span>
 <span class="tagcloud0"><a href="/tag/Xslate/">Xslate</a></span>
 <span class="tagcloud0"><a href="/tag/bless/">bless</a></span>
 <span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>

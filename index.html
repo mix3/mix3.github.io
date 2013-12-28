@@ -61,6 +61,60 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/12/28/20131228/" title="">Vagrant with Virtualbox tips - internal network setting</a></h2>
+<p>ちょっと詰まったことがあったのでメモ書き これ書いてる時点でVagrantのバージョンは <em>1.4.1</em> となります</p>
+
+<p>Virtualboxのネットワークアダプタにはいくつか種類があり</p>
+
+<ul>
+<li>NAT
+<ul>
+<li>ゲストOS -> 外</li>
+</ul></li>
+<li>内部ネットワーク
+<ul>
+<li>ゲストOS &lt;-> ゲストOS</li>
+</ul></li>
+<li>ホストオンリーアダプタ
+<ul>
+<li>ホスト -> ゲストOS</li>
+</ul></li>
+</ul>
+
+<p>あたりを組み合わせて遊んだりするのですが、Vagrant で内部ネットワークを設定する方法が分かりづらかったのでメモ</p>
+
+<pre><code>VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "box_name"
+    config.vm.define :host1 do |host1|
+    host1.vm.hostname = "host1"
+    host1.vm.network :private_network, ip: "192.168.1.111", virtualbox__intnet: "intnet"
+  end
+    config.vm.define :host2 do |host2|
+    host2.vm.hostname = "host2"
+    host2.vm.network :private_network, ip: "192.168.1.112", virtualbox__intnet: "intnet"
+  end
+  config.vm.provision "shell", inline: "/etc/init.d/network restart"
+end
+</code></pre>
+
+<p>抜粋するとこんな感じ</p>
+
+<p><a href="http://docs.vagrantup.com/v2/networking/private_network.html">Private Networks - Networking - Vagrant Documentation</a> とか見てると</p>
+
+<pre><code>virtualbox__intnet: true
+</code></pre>
+
+<p>とか書いてるけどそのまま設定すると「（trueが）文字列じゃねーよゴルァ！」と怒られるので、何かしら文字列を指定してあげる。</p>
+
+<p>Virtualboxで設定した場合、内部ネットワークを指定した時のデフォルトが <em>intnet</em> なのでintnetで良いでしょう。</p>
+
+<p>で、これで内部ネットワークの設定が出来るのですが初回の <em>vagrant up</em> 直後はNATによる設定で外に行けるはずなのに繋がらなかったりするので、</p>
+
+<p><a href="http://docs.vagrantup.com/v2/provisioning/shell.html">Shell Provisioner</a>でnetworkの再起動をしてます。もっとスマートなやりかたあればいいんだけど。</p>
+
+<p class="post-footer"><span class="date">2013-12-28</span></p>
 <h2><a href="/2013/12/22/20131222_02/" title="">ndenv を homebrew で入れる話 または如何にして心配するのを止めてRequireJSを愛するようになったか</a></h2>
 <p>というようなことを元々は <a href="http://tech.kayac.com/archive/techkayaccom_advent_calendar_2013.html">teck.kayac.com Advent Calender 2013</a> の17日目 の記事として考えてたんだけど、結局なんか無性にWicketの事を書きたくなっちゃったので、お蔵入りになった記事をこっちに書く事にする。</p>
 
@@ -749,119 +803,6 @@ func handler(w http.ResponseWriter, r *http.Request, s Stash) {
 <p>isucon関係者、参加者のみなさま、本当にお疲れさまでした。</p>
 
 <p class="post-footer"><span class="date">2013-11-13</span></p>
-<h2><a href="/2013/10/23/20131023/" title="">Photon Cloud の MacOSX SDK の Demo を動かす</a></h2>
-<p><a href="http://www.nintendo.co.jp/ds/azwj/02-4.html">アシュリー</a>たんが可愛すぎて生きるのが辛い 任天堂こんな可愛いキャラクタいつの間に生み出してたんや mix3です</p>
-
-<p>Photon Cloud が何とか良くわかってないんだけど、とりあえず試したかった</p>
-
-<p>ちなみに Linux SDK は さくらVPS で 試したところ make すら出来ませんでした</p>
-
-<p>Linux SDK には勝てなかったよ…</p>
-
-<h3>MacOSX SDK の Demo を動かす</h3>
-
-<ul>
-<li>MacOSX SDK をサイトからダウンロードして unzip</li>
-<li>Demos/demo_loadBalancing/iMac/demo_iMac_loadBalancing_cpp.xcodeproj を XCode で開きビルドする</li>
-<li>$ Demos/demo_loadBalancing/iMac/build/debug/demo_iMac_loadBalancing_cpp</li>
-</ul>
-
-<pre><code>
-always:
-0 - exit
---------------------
-outside a game room:
-1 - create game
-2 - join random game
---------------------
-inside a game room:
-1 - leave game
---------------------
-connecting
-2013-10-23 02:06:56,558781 ERROR   NetworkLogic.cpp               connectionErrorReturn()                                      line:   217 - code: 1039
-connection failed with error 1039
-2013-10-23 02:06:56,559703 INFO    NetworkLogic.cpp               disconnectReturn()                                           line:   281 -
-disconnected
-</code></pre>
-
-<ul>
-<li>connection failed するので NetworkLogic.cppを弄る
-<ul>
-<li>80行目 : mLoadBalancingClient(*this, L"if connecting to the exitgamescloud, replace this string with the application id, that can be found after logging in at http://exitgamescloud.com/Dashboard", appVersion, PLAYER_NAME)</li>
-<li>100行目 mLoadBalancingClient.connect(L"localhost:5055"); // specify the ip and port of your local masterserver here; call the parameterless overload instead, if you want to connect to the  exitgamescloud</li>
-<li>80行目はL"<strong>YOUR_APP_ID</strong>"に変更, 100行目は Cloud を使うので空に変更</li>
-</ul></li>
-<li>再度ビルド</li>
-<li>$ Demos/demo_loadBalancing/iMac/build/debug/demo_iMac_loadBalancing_cpp</li>
-</ul>
-
-<pre><code>
-always:
-0 - exit
---------------------
-outside a game room:
-1 - create game
-2 - join random game
---------------------
-inside a game room:
-1 - leave game
---------------------
-connecting
-2013-10-23 02:18:49,198122 INFO    LoadBalancingClient.cpp        onStatusChanged()                                            line:   510 - connected to masterserver
-2013-10-23 02:18:49,507223 INFO    LoadBalancingPeer.cpp          opAuthenticate()                                             line:   100 - OperationRequest - operationCode: 230 {224="YOUR_APP_ID", 220="1.0", 225="OS X"}
-2013-10-23 02:18:49,809279 INFO    EnetPeer.cpp                   dispatchIncomingCommands()                                   line:   290 - command to dispatch not yet needed
-2013-10-23 02:18:49,810149 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 230, returnCode: 0 {}
-2013-10-23 02:18:49,810900 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
-2013-10-23 02:18:50,112417 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 229, returnCode: 0 {}
-2013-10-23 02:18:50,113866 INFO    NetworkLogic.cpp               connectReturn()                                              line:   268 -
-connected
-2013-10-23 02:18:50,114394 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 230
-2013-10-23 02:18:54,824511 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
-1creating game "-517133284"
-2013-10-23 02:18:56,329376 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 227, returnCode: 0 {230="95.211.58.243:5056", 255="-517133284"}
-2013-10-23 02:18:57,333041 INFO    LoadBalancingClient.cpp        onStatusChanged()                                            line:   505 - connected to gameserver
-2013-10-23 02:18:57,640726 INFO    LoadBalancingPeer.cpp          opAuthenticate()                                             line:   100 - OperationRequest - operationCode: 230 {224="YOUR_APP_ID", 220="1.0", 225="OS X"}
-2013-10-23 02:18:58,042258 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 230, returnCode: 0 {}
-2013-10-23 02:18:58,444147 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 227, returnCode: 0 {254=1, 248={250=[]}}
-2013-10-23 02:18:58,445078 INFO    NetworkLogic.cpp               createRoomReturn()                                           line:   288 -
-2013-10-23 02:18:58,445820 INFO    NetworkLogic.cpp               createRoomReturn()                                           line:   296 - localPlayerNr: 1
-game room "-517133284" has been created
-regularly sending dummy events now
-2013-10-23 02:18:58,446940 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 255
-2013-10-23 02:18:58,447675 INFO    NetworkLogic.cpp               joinRoomEventAction()                                        line:   242 - OS X joined the game
-
-player 1 OS X has joined the game
-sssssssssssssssssssssssssssssssssssssssssssssssssssssss1ss
-leaving game room
-2013-10-23 02:19:04,472288 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 254, returnCode: 0 {}
-2013-10-23 02:19:05,478600 INFO    LoadBalancingClient.cpp        onStatusChanged()                                            line:   510 - connected to masterserver
-2013-10-23 02:19:05,786180 INFO    LoadBalancingPeer.cpp          opAuthenticate()                                             line:   100 - OperationRequest - operationCode: 230 {224="YOUR_APP_ID", 220="1.0", 225="OS X"}
-2013-10-23 02:19:06,088374 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
-2013-10-23 02:19:06,089500 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 230, returnCode: 0 {}
-2013-10-23 02:19:06,390775 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 229, returnCode: 0 {}
-2013-10-23 02:19:06,391676 INFO    NetworkLogic.cpp               leaveRoomReturn()                                            line:   336 -
-game room has been successfully left
-2013-10-23 02:19:06,392076 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 230
-0terminating application
-2013-10-23 02:19:11,103029 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
-2013-10-23 02:19:11,404197 INFO    NetworkLogic.cpp               disconnectReturn()                                           line:   281 -
-disconnected
-</code></pre>
-
-<p>という感じで動くことを確認 ターミナルを二つ開いて</p>
-
-<ul>
-<li>Aが create game</li>
-<li>Bが random join game（gameが一つしかないので多分確定でAのいるところへ行く）</li>
-<li>Bが leave game</li>
-<li>Aが leave game</li>
-</ul>
-
-<p>みたいなことが出来ることも確認できた</p>
-
-<p>これで何かする予定もないので、これぐらいで今は満足満足</p>
-
-<p class="post-footer"><span class="date">2013-10-23</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 &lt;&lt;
@@ -992,6 +933,8 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/SQLite/">SQLite</a></span>
 <span class="tagcloud0"><a href="/tag/Scala/">Scala</a></span>
 <span class="tagcloud0"><a href="/tag/Teng/">Teng</a></span>
+<span class="tagcloud0"><a href="/tag/Vagrant/">Vagrant</a></span>
+<span class="tagcloud0"><a href="/tag/Virtualbox/">Virtualbox</a></span>
 <span class="tagcloud0"><a href="/tag/Xslate/">Xslate</a></span>
 <span class="tagcloud0"><a href="/tag/bless/">bless</a></span>
 <span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>

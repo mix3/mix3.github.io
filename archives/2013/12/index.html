@@ -61,6 +61,60 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/12/28/20131228/" title="">Vagrant with Virtualbox tips - internal network setting</a></h2>
+<p>ちょっと詰まったことがあったのでメモ書き これ書いてる時点でVagrantのバージョンは <em>1.4.1</em> となります</p>
+
+<p>Virtualboxのネットワークアダプタにはいくつか種類があり</p>
+
+<ul>
+<li>NAT
+<ul>
+<li>ゲストOS -> 外</li>
+</ul></li>
+<li>内部ネットワーク
+<ul>
+<li>ゲストOS &lt;-> ゲストOS</li>
+</ul></li>
+<li>ホストオンリーアダプタ
+<ul>
+<li>ホスト -> ゲストOS</li>
+</ul></li>
+</ul>
+
+<p>あたりを組み合わせて遊んだりするのですが、Vagrant で内部ネットワークを設定する方法が分かりづらかったのでメモ</p>
+
+<pre><code>VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "box_name"
+    config.vm.define :host1 do |host1|
+    host1.vm.hostname = "host1"
+    host1.vm.network :private_network, ip: "192.168.1.111", virtualbox__intnet: "intnet"
+  end
+    config.vm.define :host2 do |host2|
+    host2.vm.hostname = "host2"
+    host2.vm.network :private_network, ip: "192.168.1.112", virtualbox__intnet: "intnet"
+  end
+  config.vm.provision "shell", inline: "/etc/init.d/network restart"
+end
+</code></pre>
+
+<p>抜粋するとこんな感じ</p>
+
+<p><a href="http://docs.vagrantup.com/v2/networking/private_network.html">Private Networks - Networking - Vagrant Documentation</a> とか見てると</p>
+
+<pre><code>virtualbox__intnet: true
+</code></pre>
+
+<p>とか書いてるけどそのまま設定すると「（trueが）文字列じゃねーよゴルァ！」と怒られるので、何かしら文字列を指定してあげる。</p>
+
+<p>Virtualboxで設定した場合、内部ネットワークを指定した時のデフォルトが <em>intnet</em> なのでintnetで良いでしょう。</p>
+
+<p>で、これで内部ネットワークの設定が出来るのですが初回の <em>vagrant up</em> 直後はNATによる設定で外に行けるはずなのに繋がらなかったりするので、</p>
+
+<p><a href="http://docs.vagrantup.com/v2/provisioning/shell.html">Shell Provisioner</a>でnetworkの再起動をしてます。もっとスマートなやりかたあればいいんだけど。</p>
+
+<p class="post-footer"><span class="date">2013-12-28</span></p>
 <h2><a href="/2013/12/22/20131222_02/" title="">ndenv を homebrew で入れる話 または如何にして心配するのを止めてRequireJSを愛するようになったか</a></h2>
 <p>というようなことを元々は <a href="http://tech.kayac.com/archive/techkayaccom_advent_calendar_2013.html">teck.kayac.com Advent Calender 2013</a> の17日目 の記事として考えてたんだけど、結局なんか無性にWicketの事を書きたくなっちゃったので、お蔵入りになった記事をこっちに書く事にする。</p>
 
@@ -330,6 +384,8 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/SQLite/">SQLite</a></span>
 <span class="tagcloud0"><a href="/tag/Scala/">Scala</a></span>
 <span class="tagcloud0"><a href="/tag/Teng/">Teng</a></span>
+<span class="tagcloud0"><a href="/tag/Vagrant/">Vagrant</a></span>
+<span class="tagcloud0"><a href="/tag/Virtualbox/">Virtualbox</a></span>
 <span class="tagcloud0"><a href="/tag/Xslate/">Xslate</a></span>
 <span class="tagcloud0"><a href="/tag/bless/">bless</a></span>
 <span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>

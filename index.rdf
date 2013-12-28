@@ -10,6 +10,66 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>Vagrant with Virtualbox tips - internal network setting</title>
+<description>
+<![CDATA[
+<p>ちょっと詰まったことがあったのでメモ書き これ書いてる時点でVagrantのバージョンは <em>1.4.1</em> となります</p>
+
+<p>Virtualboxのネットワークアダプタにはいくつか種類があり</p>
+
+<ul>
+<li>NAT
+<ul>
+<li>ゲストOS -> 外</li>
+</ul></li>
+<li>内部ネットワーク
+<ul>
+<li>ゲストOS &lt;-> ゲストOS</li>
+</ul></li>
+<li>ホストオンリーアダプタ
+<ul>
+<li>ホスト -> ゲストOS</li>
+</ul></li>
+</ul>
+
+<p>あたりを組み合わせて遊んだりするのですが、Vagrant で内部ネットワークを設定する方法が分かりづらかったのでメモ</p>
+
+<pre><code>VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "box_name"
+    config.vm.define :host1 do |host1|
+    host1.vm.hostname = "host1"
+    host1.vm.network :private_network, ip: "192.168.1.111", virtualbox__intnet: "intnet"
+  end
+    config.vm.define :host2 do |host2|
+    host2.vm.hostname = "host2"
+    host2.vm.network :private_network, ip: "192.168.1.112", virtualbox__intnet: "intnet"
+  end
+  config.vm.provision "shell", inline: "/etc/init.d/network restart"
+end
+</code></pre>
+
+<p>抜粋するとこんな感じ</p>
+
+<p><a href="http://docs.vagrantup.com/v2/networking/private_network.html">Private Networks - Networking - Vagrant Documentation</a> とか見てると</p>
+
+<pre><code>virtualbox__intnet: true
+</code></pre>
+
+<p>とか書いてるけどそのまま設定すると「（trueが）文字列じゃねーよゴルァ！」と怒られるので、何かしら文字列を指定してあげる。</p>
+
+<p>Virtualboxで設定した場合、内部ネットワークを指定した時のデフォルトが <em>intnet</em> なのでintnetで良いでしょう。</p>
+
+<p>で、これで内部ネットワークの設定が出来るのですが初回の <em>vagrant up</em> 直後はNATによる設定で外に行けるはずなのに繋がらなかったりするので、</p>
+
+<p><a href="http://docs.vagrantup.com/v2/provisioning/shell.html">Shell Provisioner</a>でnetworkの再起動をしてます。もっとスマートなやりかたあればいいんだけど。</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/2013/12/28/20131228/</guid>
+<pubDate>Sat, 28 Dec 2013 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>ndenv を homebrew で入れる話 または如何にして心配するのを止めてRequireJSを愛するようになったか</title>
 <description>
 <![CDATA[
@@ -1403,52 +1463,6 @@ mix3 &gt; iku: ふぁ！？
 </description>
 <guid isPermaLink="true">http://mix3.github.io/2013/10/05/20131005/</guid>
 <pubDate>Sat, 05 Oct 2013 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>信じて送り出したfcgiプロセスがulimitの設定によって次々と殺されて行く話</title>
-<description>
-<![CDATA[
-<p>ではありません。</p>
-
-<p><a href="http://lestrrat.ldblog.jp/archives/25360109.html">livedoorブログ</a>がpsgiに移行したりなんかするこのご時世になぜかmod_rewriteとfcgiを使って頑張っているmix3です。</p>
-
-<h3>ulimitの話</h3>
-
-<p>とある事情でapacheのinit.dにulimitを設定していて、メモリを使いすぎる、とかCPU使いすぎるとfcgiプロセスを殺してもらうようにしていたのですが、</p>
-
-<p>「それ子(fcgi process)だけじゃなくて親(httpd)まで殺しちゃわない？」</p>
-
-<p>と <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんの有り難いお言葉が飛び出して大慌てでulimitを外すということが発生しました。</p>
-
-<p>しかもgracefulだと設定変更効かないからロードバランサから外して一台ずつリスタート掛けて行かなければならず…</p>
-
-<h3>再度設定する場合にどうするのか</h3>
-
-<p>とある事情は変わらないのでulimitの設定を戻さないと行けないが、どうすれば良いのか思いつかないので <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんに考えて頂いたところ、</p>
-
-<ul>
-<li>index.fcgiをindex.fcgi.plとか適当に変える</li>
-<li>index.fcgiは中身shスクリプトにしてそこにulimitを書く</li>
-</ul>
-
-<p>というのはどうか？と提案を頂きまして、いけそうな感じなのでそれで行こうかなぁとなっています。 <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんありがとうございました。</p>
-
-<h3>ulimitの設定どうやって確認するの？</h3>
-
-<p>と、ロードバランサから1台外してinit.d からulimitを消してリスタートしたところでふと思い聞いたところ</p>
-
-<pre><code>cat /proc/$(cat /var/run/httpd.pid)/limits
-</code></pre>
-
-<p>「こういう感じかな」と教えていただきました。備忘録。</p>
-
-<hr />
-
-<p>という記事を8月中ぐらいに書いていて放置プレイしてたので改めて残しておく</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/2013/08/30/20130830/</guid>
-<pubDate>Fri, 30 Aug 2013 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>
