@@ -10,6 +10,22 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>あけまして</title>
+<description>
+<![CDATA[
+<p>おめでとうございます</p>
+
+<script src="http://source.pixiv.net/source/embed.js" data-id="40785050_59a1632c438aa0ce5c78b15331e9b533" data-size="large" data-border="off" charset="utf-8"></script>
+
+<noscript><p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=40785050" target="_blank">ヲ正月</a> by <a href="http://www.pixiv.net/member.php?id=88339" target="_blank">mix3</a> on <a href="http://www.pixiv.net/" target="_blank">pixiv</a></p></noscript>
+
+<p>今年もよろしくお願いします</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/2014/01/05/20140105/</guid>
+<pubDate>Sun, 05 Jan 2014 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>Vagrant with Virtualbox tips - internal network setting</title>
 <description>
 <![CDATA[
@@ -1364,105 +1380,6 @@ configure_option -R OPTION VALUE -- replace
 </description>
 <guid isPermaLink="true">http://mix3.github.io/2013/10/07/20131007/</guid>
 <pubDate>Mon, 07 Oct 2013 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>自分がもしIRCボットっぽいもの作ったとしたら</title>
-<description>
-<![CDATA[
-<p>こうなるなぁというメモ</p>
-
-<h3>ただ世の中にはボット用のモジュールやらなんやらは既にある</h3>
-
-<p>IRCボットとか誰もが考えるし適当に作って捨てて行くので当然そのうちフレームワークっぽいものも出てくる 例えば<a href="http://www.songmu.jp/riji/entry/2013-09-09-unazusan.html">UnazuSan</a>とか</p>
-
-<p>こういうは用途に合っていれば良いし、正規表現だしグループで捕まえたのを後方参照出来るしで大体がカバー出来そうだけど、</p>
-
-<p>例えば「開発環境で使ってるバッチスクリプトをオプション指定しつつ実行するをIRCからやりたい」とか糞みたいな要求には向かなそうだなぁとか思ったり</p>
-
-<h3>無ければ作れば良いじゃない</h3>
-
-<pre><code>#!/usr/bin/env perl
-
-use Ikusan
-  'server url',
-    port       =&gt; &lt;port&gt;,
-    enable_ssl =&gt; 1,
-    password   =&gt; &lt;password&gt;,
-    nickname   =&gt; &lt;nickname&gt;,
-    channels   =&gt; { '#channel_name' =&gt; {} };
-
-# undef_message "およよ…";
-
-register qr/regexp?/ =&gt; sub {
-    my (%opts) = @_;
-    return $opts{error} ? (1, "エラー") : (0, "オッケー");
-} =&gt; qw/
-    error
-/;
-
-register simple =&gt; sub {
-    my (%opts) = @_;
-    return $opts{error} ? 1 : 0;
-} =&gt; qw/
-    error
-/;
-
-register "die" =&gt; sub { die "ぱっつんぱっつん" };
-
-use LWP::UserAgent;
-
-register pixiv =&gt; sub {
-    my $ua  = LWP::UserAgent-&gt;new;
-    my $res = $ua-&gt;get("http://www.pixiv.net/");
-    my @url = ($res-&gt;content =~ /"(member_illust\.php.+?)"/g);
-    my $ret = "http://www.pixiv.net/" . $url[int(rand(scalar(@url)))];
-    return 0, $ret;
-};
-
-register qr/サタデーナイト/ =&gt; sub {
-    return 0, "フィーバー!!";
-};
-
-fever;
-</code></pre>
-
-<p>こんな感じで AnySan に渡すオプションを指定しつつ use Ikusan して regsiter で sub 登録して最後に fever すれば</p>
-
-<pre><code>mix3 &gt; iku: regex
- iku &gt; [OK] オッケー
-mix3 &gt; iku: regexp
- iku &gt; [OK] オッケー
-mix3 &gt; iku: regex --error
- iku &gt; [ERR] エラー
-mix3 &gt; iku: regexp --error
- iku &gt; [ERR] エラー
-mix3 &gt; iku: simple
- iku &gt; [OK]
-mix3 &gt; iku: simple --error
- iku &gt; [ERR]
-mix3 &gt; iku: die
- iku &gt; [ERR] ぱっつんぱっつん at bin/ikusan.pl line 27.
-mix3 &gt; iku: pixiv
- iku &gt; [OK] http://www.pixiv.net/member_illust.php?mode=medium&amp;amp;illust_id=38896869
-mix3 &gt; iku: サタデーナイト
- iku &gt; [OK] フィーバー!!
-mix3 &gt; iku: ふぁ！？
- iku &gt; およよ…
-</code></pre>
-
-<p>という感じになるみたいな？ regsiter で3つ目以降の引数は配列でGetOptionsに渡すようにして、sub に渡ってくるみたいな？</p>
-
-<p>実際には my $ret = &#8245;perl path/to/script.pl --option $opts{option}&#8245;; とかしてバッチスクリプトに右から左へオプション流すだけなのを想像してる</p>
-
-<p><a href="https://gist.github.com/mix3/74d53023818899d49d48">gist</a></p>
-
-<h3>熱は出る、咳は出る、鼻水は出る</h3>
-
-<p>と悲惨な最近なので、現実逃避してたら衣玖さんボットを作りたくなったのでしたマル</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/2013/10/05/20131005/</guid>
-<pubDate>Sat, 05 Oct 2013 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>

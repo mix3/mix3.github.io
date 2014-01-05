@@ -61,6 +61,39 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2011/06/12/20110612/" title="">jquery-presentationを弄ってみた</a></h2>
+<p>最近自分の進むべき道の事について考えたり考えなかったりしているmix3です。</p>
+
+<h3>GoogleDocsも良いけれど</h3>
+
+<p>社内の勉強会でとある『未完』に終わったお話したのですが、そのときパワポに何を使おうか考えて普段はGoogleDocsを使ってるのですが、こんなパワポを見てHTML形式も良いなと思い、HTMLベースのパワポツールを探してみたところ以下のものが自分の琴線に触れました。
+琴線に触れたもの</p>
+
+<ul>
+<li>jquery-presentation - jQuery based presentation framework. [DEMO]</li>
+<li>HTML をプレゼン形式に表示する jQuery プラグインを作ってみた [DEMO]</li>
+<li>「イカワイパー」なHTMLベースのプレゼンツール「SliDegeso」を作ってみたでゲソ [DEMO]</li>
+<li>slippy [DEMO]</li>
+</ul>
+
+<p>イカに凄く惹かれたのですが上手くワイパーの動作をしてくれず見送り。一番シンプルそうなjquery-presentationを今回は使ってみました。slippyも結構良い感じっぽいので次回はそれを使ってみたいと思います。</p>
+
+<h3>jquery-presentationはちょっとシンプル過ぎる</h3>
+
+<p>jquery-presentationは実はページ送り（戻り）しか出来ない超絶シンプルなツールです。デフォルトのページ送りのエフェクトや、センター表示、ページ番号管理表示などはありますがそれだけです。「一部表示を隠して順に表示する」といったパワポの基本的な事が出来なかったりします。なのでその程度のことぐらいは出来てほしいなと思い少し手を入れました。こんな感じです。</p>
+
+<p><a href="http://dl.dropbox.com/u/5299588/jquery-presentation/index.html">デモはこちら</a></p>
+
+<script src="https://gist.github.com/1019885.js"> </script>
+
+<p>表示する順序や、visibility:hidden/display:noneの使い分けまでやりたいなと思いつつ片手間に弄ったので隠して表示が出来る程度にしています。やりすぎると「他のツール使え」ということになりますしね。</p>
+
+<p>ということで発表自体は非常に残念なことになったので精進して行きたいです。
+ちなみに</p>
+
+<p>HTMLベースのパワポの弱点としてスライドシェアに上げにくい（PDFにしにくい）というものがあります。スライドシェアに上げる前提の場合はHTMLベースは避けた方が良いでしょう。</p>
+
+<p class="post-footer"><span class="date">2011-06-12</span></p>
 <h2><a href="/2011/05/04/20110504_01/" title="">Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory) でCRUDアプリを作ってみた</a></h2>
 <p>Mojolicious::Liteは一つのファイルの中に全部突っ込んでWebアプリが作れるということなので、今自分が気になってるものを習作の意味を込めて全部詰め込んでCRUDアプリを作ってみました。jQueryも入れたかったけど書いていてカオスになったのでSNBinderの補助とページャ以外は無しにしました。</p>
 
@@ -344,6 +377,7 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2014/01/">2014年01月</a></li>
   <li><a href="/archives/2013/12/">2013年12月</a></li>
   <li><a href="/archives/2013/11/">2013年11月</a></li>
   <li><a href="/archives/2013/10/">2013年10月</a></li>
@@ -473,7 +507,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud13"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
-<span class="tagcloud0"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
+<span class="tagcloud8"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
 <span class="tagcloud8"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
 </div></p>
     </div>

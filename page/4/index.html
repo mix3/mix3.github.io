@@ -61,6 +61,30 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/03/09/20130309-2/" title="">Plack::App::Directoryで画像を展開する</a></h2>
+<p>Perlのネガティブキャンペーンが流行ってる今日この頃ですが私は元気です（震え声）</p>
+
+<p>p5-JQueryPresentationHelperなんてなかったんや</p>
+
+<h3>Plack::App::Directoryで画像とかは展開してほしい</h3>
+
+<p>Plack::App::Directoryでカレントディレクトリ以下を見えるようにするワンライナーをbashrcとかでエイリアスにしておくとか良くあると思います。凄く便利なのでそれはそれとして良いのですが、画像とかは出来れば展開してそのまま見えてほしいかなと思う事もあります。</p>
+
+<p>なので、どうすれば良いかなとPlack::App::Directoryの中見てたのですが、もりもりっとtrタグを羅列してるだけっぽかったので、HTML出力を正規表現でちょちょっと弄ればそれっぽくなりそうだと思ったのでやってみました。</p>
+
+<script src="https://gist.github.com/mix3/5109843.js"></script>
+
+<p>ファイルを出力するときはPlack::Util::IOWithPathのオブジェクトを返してるようなので、そうでないときだけ正規表現でちょちょっと弄る感じですると良い感じに画像表示してくれました。</p>
+
+<p>swfも見えてほしいなぁという声が聞こえてきたのでswfobject.jsで見えるようにしてみました。</p>
+
+<script src="https://gist.github.com/mix3/5116797.js"></script>
+
+<p>タイルで見えるともっと良いね！という声が聞こえてきましたが、Plack::App::Directoryを使う限り無理なので、それは新規で別モジュール作った方が良いなと思いました。</p>
+
+<p>ちなみにswfobject.jsは2.2でもまだ微妙にセキュリティリスクがあるらしい <a href="http://t-ashula.hateblo.jp/entry/2012/01/11/233156">ほむらちゃほむほむ - swfobject.js がアレな話</a> ので外から見えるところで使うのは止めた方が良いかなと思います。</p>
+
+<p class="post-footer"><span class="date">2013-03-09</span></p>
 <h2><a href="/2013/03/09/20130309-1/" title="">p5-JQueryPresentationHelper作ってみた</a></h2>
 <p>やりたかったこと。</p>
 
@@ -190,36 +214,6 @@
 <h3>それでは良いお年を！</h3>
 
 <p class="post-footer"><span class="date">2012-12-30</span></p>
-<h2><a href="/2012/11/07/20121107/" title="">巨大ファイルの削除</a></h2>
-<p>DBサーバのslow_queryログがローテートされておらず単一ファイルで100G超えしていて辛いmix3です。</p>
-
-<h3>巨大なファイルを rm するのは危険</h3>
-
-<p>実際に試していないのでどうなるのか分からないですが、おそらく消し終わるまで間IOが占有されてDBのパフォーマンスに影響が出ちゃうのでしょう。</p>
-
-<p>rm はやらないほうが良いねとなりました。</p>
-
-<h3>: > /path/to/file</h3>
-
-<p>じゃあどうすればという事で調べていたら</p>
-
-<pre><code>
-: > /path/to/file
-</code></pre>
-
-<p>を使ってはどうか？というようなものを見かけました</p>
-
-<p><a href="http://serverfault.com/questions/336917/is-there-a-way-to-delete-100gb-file-on-linux-without-thrashing-io-load">Is there a way to delete 100GB file on Linux without thrashing IO / load?</a></p>
-
-<p>容量に余裕のある別サーバで $ dd if=/dev/zero of=tempfile bs=1024000 count=100000 とかしてファイルを作って試したところ、readが発生するもののパフォーマンスにはあまり影響は無い感じで使えそうということに。</p>
-
-<h3>ちなみに</h3>
-
-<p>: > /path/to/file は空ファイルを作るときの方法のようで、<a href="http://d.hatena.ne.jp/japanrock_pg/20100212/1265972572">Linuxでファイルを空にする5つの方法</a> とかで見かけました</p>
-
-<p>他のやり方だとまた違ってくるのでしょうか？</p>
-
-<p class="post-footer"><span class="date">2012-11-07</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -249,6 +243,7 @@
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2014/01/">2014年01月</a></li>
   <li><a href="/archives/2013/12/">2013年12月</a></li>
   <li><a href="/archives/2013/11/">2013年11月</a></li>
   <li><a href="/archives/2013/10/">2013年10月</a></li>
@@ -378,7 +373,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud13"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
-<span class="tagcloud0"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
+<span class="tagcloud8"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
 <span class="tagcloud8"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
 </div></p>
     </div>
