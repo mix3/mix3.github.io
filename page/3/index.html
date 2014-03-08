@@ -61,6 +61,68 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/10/07/20131007/" title="">phpenv+php-buildでphpをinstallしまくる</a></h2>
+<p>正確にはfpmとnginxで複数バージョンでも幸せになれる開発環境作り mix3です</p>
+
+<p>phpenvとphp-buildは以下のサイトを見てインストールするための環境は出来てる前提のお話</p>
+
+<p><a href="http://d.hatena.ne.jp/hnw/20130626">php-buildで複数バージョンのPHP-FPMを用意する</a></p>
+
+<h3>tidyで怒られる</h3>
+
+<p>homebrewで入れた場所が見れてないっぽくてこんなとき --with-tidy オプションにパス指定したいわけですが</p>
+
+<p>php-buildでconfigureオプションを弄りたい場合は以下のファイルを弄る感じになるみたい</p>
+
+<ul>
+<li>~/.phpenv/plugins/php-build/share/php-build/default_configure_options
+<ul>
+<li>デフォルトのcongifureオプション設定</li>
+</ul></li>
+<li>~/.phpenv/plugins/php-build/share/php-build/definitions/*
+<ul>
+<li>バージョン別のインストール設定</li>
+</ul></li>
+</ul>
+
+<p>良く見かけるのは~/.phpenv/plugins/php-build/share/php-build/default_configure_optionsを書き換えちゃうというものですが</p>
+
+<p>オプションそんな知らないし他バージョンのインストールに影響するのとかどうなんだと思うので、だったらphp-buildが提供するdefaultを崩さない感じでやりたいなと</p>
+
+<p>そんなときは</p>
+
+<pre><code>configure_option    OPTION VALUE -- add
+configure_option -D OPTION       -- delete
+configure_option -R OPTION VALUE -- replace
+</code></pre>
+
+<p>こんな感じになってるっぽいので目的のバージョンのdefinitionsを別名でコピって configure_option -R "--with-tidy" "/usr/local" を追記すれば良いっぽかった</p>
+
+<h3>5.5snapshot入れようとするとbisonで怒られる</h3>
+
+<p>バージョンが古いっぽいとかな感じだったのでbrew install bisonして入れてもまだ古いと怒られてしまった</p>
+
+<p>これもまたhomebrewで入れたのが見えてない感じでそれもそのはず /usr/local/Celler/bison/{version} に入れられた後 /usr/local/opt/bison にリンクが貼られていた</p>
+
+<p>例のごとくMac標準と競合してトラブルのもとだからという奴で LDFLAGS:  -L/usr/local/opt/bison/lib 指定しろよ的な奴だが、</p>
+
+<p>php-buildでLDFLAGSの指定の仕方とかわからんちんだったので、トラブルとか知るかと /usr/local 以下にリンク貼ってしまってインストール</p>
+
+<p>brew で入れた bison 3.0 だとバージョン高すぎるようだったので <a href="http://blog.sarabande.jp/post/53780323365">homebrew で標準のバージョンよりも古い bison をインストールする</a> を見ながら 2.7 を入れると今度こそインストール完了</p>
+
+<p>バージョンを確認したら 5.6.0-dev だった なんでやねーん</p>
+
+<p>github の master から入れてたので <a href="http://snaps.php.net/php5.5-latest.tar.bz2">php5.5-latest</a> から直接入れてみたけどやっぱり 5.6.0-dev だった なんでやねーん</p>
+
+<h3>ということで</h3>
+
+<p>5.5の最新は5.6でしたというオチがついたところでちゃうねんそうやないねん</p>
+
+<p>うちが本当にやりたかったのはAdminGeneratorって最近のどうなってるんかなって知りたかってんって</p>
+
+<p>【追記】php5.5-latestのほうはその前のインストールでダウンロードされたものが残っていてそのまま使われてしまったのが原因ぽかった でも5.5snapshotはやっぱり5.6だった</p>
+
+<p class="post-footer"><span class="date">2013-10-07</span></p>
 <h2><a href="/2013/10/05/20131005/" title="">自分がもしIRCボットっぽいもの作ったとしたら</a></h2>
 <p>こうなるなぁというメモ</p>
 
@@ -349,41 +411,6 @@ response.write(image);
 <p>ということでphantomjs便利なんじゃないかなというお話でした。</p>
 
 <p class="post-footer"><span class="date">2013-04-13</span></p>
-<h2><a href="/2013/03/16/20130316/" title="">おれおれWebフレームワーク - Chaco</a></h2>
-<p>これ書くタイミング間違えてる気がするけどまあいいや</p>
-
-<p>なんとなく作ってみるなど。別に他フレームワークと差別化して使うようなものでもなく習作的な感じ。</p>
-
-<p>*::LiteとかDancerとか使えばワンソースでお手軽にWebアプリ書けるわけですが、実際に簡単なアプリ書くとなると、Liteなんだけどなんとなく仰々しい気がしてきたり。（Liteと言っても結局各フレームワークが持つ色々な機能は提供されているのでそう感じるのかな？）</p>
-
-<p>でもだからといって</p>
-
-<pre><code>my $app = sub {
-    my $env = shift;
-    [200, ['Content-Type' =&gt; 'text/plain'] ['Hello World'] ];
-};
-
-$app;
-</code></pre>
-
-<p>とかをモリモリ書いちゃうのもどう考えたって違う。</p>
-
-<p>ということで、Plack::*,Router::Simple(Router::Simple::Sinatraish),Text::Xslate,Data::Section::Simpleでそれっぽく書けるようなものを作ってみた。あまりにも決め打ちすぎるので、設定を渡せるようにしたりして融通効くようにしたいかな。あんまり迷惑にならなそうなところで使ってみてます。</p>
-
-<p>「劣化<a href="https://github.com/tokuhirom/MojaMoja">MojaMoja</a>」とか「劣化<a href="https://github.com/yusukebe/Hitagi">Hitagi</a>」とか「劣化<a href="http://blog.nomadscafe.jp/2010/07/nopastesinatrawaf.html">Shirahata</a>」とか思いつつ、劣化ということすらおこがましい状態。そりゃ大半コピーアンドペーストだもの仕方ないね。</p>
-
-<p>強いて特徴を上げるならフォワードっぽいこと出来るようにしてみた（$ENV{PATH_INFO}をlocalで書き換える力技なので問題あるとは思う）けどSinatra的ルーティングでフォワードは用途を勘違いしてる感が否めないので正直いらないと思います。マル。</p>
-
-<p>ちなみに<a href="https://github.com/mix3/Chaco">Chaco</a>はチャコと読みます。以前実家にいた、今は亡き黒のラブラドールレトリーバーの名前です。</p>
-
-<pre><code>use Chaco;
-# ...
-run;
-</code></pre>
-
-<p>で、元気に走り回るチャコの姿を思い浮かべながら書いてました。<a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=4507497">以前書いた絵</a>の日付みてもう４年近くも経ってるんですね…</p>
-
-<p class="post-footer"><span class="date">2013-03-16</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -413,6 +440,7 @@ run;
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2014/03/">2014年03月</a></li>
   <li><a href="/archives/2014/01/">2014年01月</a></li>
   <li><a href="/archives/2013/12/">2013年12月</a></li>
   <li><a href="/archives/2013/11/">2013年11月</a></li>
@@ -507,7 +535,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud8"><a href="/tag/MobaSiF/">MobaSiF</a></span>
 <span class="tagcloud0"><a href="/tag/Mojolicious/">Mojolicious</a></span>
 <span class="tagcloud0"><a href="/tag/Mouse/">Mouse</a></span>
-<span class="tagcloud13"><a href="/tag/MySQL/">MySQL</a></span>
+<span class="tagcloud12"><a href="/tag/MySQL/">MySQL</a></span>
 <span class="tagcloud0"><a href="/tag/PhotonCloud/">PhotonCloud</a></span>
 <span class="tagcloud0"><a href="/tag/Play/">Play</a></span>
 <span class="tagcloud0"><a href="/tag/Qudo/">Qudo</a></span>
@@ -520,17 +548,18 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/Xslate/">Xslate</a></span>
 <span class="tagcloud0"><a href="/tag/bless/">bless</a></span>
 <span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>
+<span class="tagcloud0"><a href="/tag/bot/">bot</a></span>
 <span class="tagcloud0"><a href="/tag/cpan%20author/">cpan author</a></span>
 <span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
 <span class="tagcloud0"><a href="/tag/golang/">golang</a></span>
 <span class="tagcloud0"><a href="/tag/isucon/">isucon</a></span>
 <span class="tagcloud0"><a href="/tag/java/">java</a></span>
 <span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>
-<span class="tagcloud13"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
+<span class="tagcloud12"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
 <span class="tagcloud0"><a href="/tag/packer/">packer</a></span>
 <span class="tagcloud24"><a href="/tag/perl/">perl</a></span>
 <span class="tagcloud0"><a href="/tag/phantomjs/">phantomjs</a></span>
-<span class="tagcloud13"><a href="/tag/php/">php</a></span>
+<span class="tagcloud12"><a href="/tag/php/">php</a></span>
 <span class="tagcloud0"><a href="/tag/vagrant/">vagrant</a></span>
 <span class="tagcloud0"><a href="/tag/wicket/">wicket</a></span>
 <span class="tagcloud8"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
@@ -540,7 +569,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/%E3%83%86%E3%82%B9%E3%83%88/">テスト</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%A8%AD%E5%AE%9A/">ネットワーク設定</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%8B%E3%83%B3%E3%82%B0/">パーティショニング</a></span>
-<span class="tagcloud13"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
+<span class="tagcloud12"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
 <span class="tagcloud8"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>

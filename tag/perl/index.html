@@ -61,6 +61,90 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2014/03/08/20140308/" title="">revel入門</a></h2>
+<p>絶賛人生の迷子中、mix3です</p>
+
+<h3>golangでWebアプリ</h3>
+
+<p>を作ってレビューしてもらったらそれはもうフルボッコでそれこそ雄山のあれな感じでした</p>
+
+<p><img src="/images/20140308/oisinbo_yuzan_arai.gif" alt="このWebアプリを作ったのは誰だぁっ" title="このWebアプリを作ったのは誰だぁっ" /></p>
+
+<p><a href="/2013/11/13/20131113/">isucon3</a>を元に手探りでやったため突っ込みどころを残してしまったようです</p>
+
+<ul>
+<li>panic使ってerror潰すのやめろ</li>
+<li>パス解決にCallerいらねーだろ
+<ul>
+<li>一応カレントディレクトリを判断したいという意図だったけどいらないらしい</li>
+</ul></li>
+<li>動かし方 go run hoge.go じゃなくて go build hoge.go; ./hoge ってちゃんと書け</li>
+</ul>
+
+<p>などなど</p>
+
+<p>golangのWebアプリの良いサンプル、一応最初に自分で探してはみたものの良い感じのを見つけられず、後で「<a href="https://github.com/campoy/todo">campoy/todo</a>が参考になるんじゃない？」と教えてもらいました</p>
+
+<p>最初に知りたかった… ちなみにパス解決の突っ込み</p>
+
+<p><a href="https://gist.github.com/mix3/9430209">https://gist.github.com/mix3/9430209</a></p>
+
+<pre><code>mix3 ~/tmp/caller_sample $ go run main.go
+2014/03/08 21:56:14 loading config (with caller) file: /private/tmp/caller_sample/config/config.json
+2014/03/08 21:56:14 OK
+2014/03/08 21:56:14 loading config file: config/config.json
+2014/03/08 21:56:14 OK
+
+mix3 ~/tmp $ go run caller_sample/main.go
+2014/03/08 21:56:38 loading config (with caller) file: /private/tmp/caller_sample/config/config.json
+2014/03/08 21:56:38 OK
+2014/03/08 21:56:38 loading config file: config/config.json
+2014/03/08 21:56:38 open config/config.json: no such file or directory
+exit status 1
+</code></pre>
+
+<p>こんな感じで実行パスに左右されないパス解決が出来るので使い方間違ってなければ意味はある書き方だとは思うんですが、まあ今回は必要ないよってことですかね</p>
+
+<h3><a href="http://robfig.github.io/revel/index.html">revel</a>使いましょ</h3>
+
+<p>そんな感じで <strong>センスの無い</strong> やつが手探りでやると悲惨なことになるのでWAFに乗っかった方がきっと良いと判断されたっぽい（実はそこらへん曖昧だったり…）のでとりあえず<a href="http://robfig.github.io/revel/index.html">revel</a>にのっかることにしました</p>
+
+<p>使い方は公式<a href="http://robfig.github.io/revel/index.html">http://robfig.github.io/revel/index.html</a>のtutorialとmanualとsample眺めてればなんとなく分かる感じです</p>
+
+<p>以下<a href="http://robfig.github.io/revel/samples/booking.html">revel/samples/booking</a>にはgorpとsqliteを使ったサンプルコードがあるのだけど、「mysqlにするにはどうすれば？」と少し悩んだのでメモ</p>
+
+<h4>conf/app.conf のsqliteの設定をmysqlのものに変更</h4>
+
+<pre><code>db.import = github.com/go-sql-driver/mysql
+db.driver = mysql
+db.spec   = root@tcp(localhost:3306)/alphawing
+</code></pre>
+
+<h4>app/controllers/gorp.go のimportしているドライバをmysqlのものに変更</h4>
+
+<pre><code>_ "github.com/go-sql-driver/mysql"
+</code></pre>
+
+<h4>app/controllers/gorp.go の gorp.DbMap{} を mysqlのものに変更</h4>
+
+<pre><code>Dbm = &amp;gorp.DbMap{Db: db.Db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
+</code></pre>
+
+<p>だいたいこれくらい弄るとmysqlで動く様になるはず</p>
+
+<p>ちなみにsampleだからだと思うのだけど<a href="https://github.com/robfig/revel/blob/master/samples/booking/app/controllers/init.go">以下のような感じ</a>でコントローラ処理の前後にBegin,Commit,Rollback を入れ込んでて吹いた</p>
+
+<pre><code>func init() {
+    revel.OnAppStart(InitDB)
+    revel.InterceptMethod((*GorpController).Begin, revel.BEFORE)
+    revel.InterceptMethod((*GorpController).Commit, revel.AFTER)
+    revel.InterceptMethod((*GorpController).Rollback, revel.FINALLY)
+}
+</code></pre>
+
+<p>modelsでちゃんとやりたいときにはどうしたらいんだろうか…</p>
+
+<p class="post-footer"><span class="date">2014-03-08</span></p>
 <h2><a href="/2013/07/28/20130728/" title="">テスト書くのって難しい</a></h2>
 <p>布都ちゃんが可愛すぎて生きるのが辛い。mix3です。</p>
 
@@ -466,6 +550,7 @@ mouse         222222/s 4707%     258%     100%           67%    4%       0%    -
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2014/03/">2014年03月</a></li>
   <li><a href="/archives/2014/01/">2014年01月</a></li>
   <li><a href="/archives/2013/12/">2013年12月</a></li>
   <li><a href="/archives/2013/11/">2013年11月</a></li>
@@ -560,7 +645,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud8"><a href="/tag/MobaSiF/">MobaSiF</a></span>
 <span class="tagcloud0"><a href="/tag/Mojolicious/">Mojolicious</a></span>
 <span class="tagcloud0"><a href="/tag/Mouse/">Mouse</a></span>
-<span class="tagcloud13"><a href="/tag/MySQL/">MySQL</a></span>
+<span class="tagcloud12"><a href="/tag/MySQL/">MySQL</a></span>
 <span class="tagcloud0"><a href="/tag/PhotonCloud/">PhotonCloud</a></span>
 <span class="tagcloud0"><a href="/tag/Play/">Play</a></span>
 <span class="tagcloud0"><a href="/tag/Qudo/">Qudo</a></span>
@@ -573,17 +658,18 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/Xslate/">Xslate</a></span>
 <span class="tagcloud0"><a href="/tag/bless/">bless</a></span>
 <span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>
+<span class="tagcloud0"><a href="/tag/bot/">bot</a></span>
 <span class="tagcloud0"><a href="/tag/cpan%20author/">cpan author</a></span>
 <span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
 <span class="tagcloud0"><a href="/tag/golang/">golang</a></span>
 <span class="tagcloud0"><a href="/tag/isucon/">isucon</a></span>
 <span class="tagcloud0"><a href="/tag/java/">java</a></span>
 <span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>
-<span class="tagcloud13"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
+<span class="tagcloud12"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
 <span class="tagcloud0"><a href="/tag/packer/">packer</a></span>
 <span class="tagcloud24"><a href="/tag/perl/">perl</a></span>
 <span class="tagcloud0"><a href="/tag/phantomjs/">phantomjs</a></span>
-<span class="tagcloud13"><a href="/tag/php/">php</a></span>
+<span class="tagcloud12"><a href="/tag/php/">php</a></span>
 <span class="tagcloud0"><a href="/tag/vagrant/">vagrant</a></span>
 <span class="tagcloud0"><a href="/tag/wicket/">wicket</a></span>
 <span class="tagcloud8"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
@@ -593,7 +679,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/%E3%83%86%E3%82%B9%E3%83%88/">テスト</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%A8%AD%E5%AE%9A/">ネットワーク設定</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%8B%E3%83%B3%E3%82%B0/">パーティショニング</a></span>
-<span class="tagcloud13"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
+<span class="tagcloud12"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
 <span class="tagcloud8"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
