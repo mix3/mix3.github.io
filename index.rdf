@@ -10,6 +10,48 @@
 <description>ギークにも絵描きにもなれない者の末路</description>
 
 <item>
+<title>p5-IkuSanを煩悩のままに公開</title>
+<description>
+<![CDATA[
+<p>人生の迷子の行き着く先は富士の樹海ではないかと最近良く考えています。mix3です。</p>
+
+<h3><a href="http://search.cpan.org/~himachoco/IkuSan-0.01/lib/IkuSan.pm">p5-IkuSan</a></h3>
+
+<p>IRCボットいい加減今のプロジェクトに欲しくなったので、自分がIRCボット作ったらこうするなというのを<a href="/2013/10/05/20131005/">以前書いた</a>のだが、今回は実際にそれを作ったという話です。</p>
+
+<p>ただ単に作るだけだと別に<a href="http://search.cpan.org/~songmu/UnazuSan-0.02/lib/UnazuSan.pm">UnazuSan</a>で良いじゃないってなっちゃうので、以下の機能を盛り込みました</p>
+
+<h4>Getopt::Longの引数が取れる</h4>
+
+<p><a href="/2013/10/05/20131005/">以前の記事</a>参照</p>
+
+<h4>並列にタスク処理が出来る</h4>
+
+<p>最初Gearman使って頑張ってたのだけれど <a href="https://twitter.com/#!/karupanerura">@karupanerura</a> さん作、<a href="http://search.cpan.org/~karupa/AnyEvent-ForkManager-0.01/lib/AnyEvent/ForkManager.pm">AnyEvent::ForkManager</a>というのがあるのを見つたのでそれを使うように。worker数を指定出来る様にして並列に処理出来る様にしました</p>
+
+<p>あんまり気にしなくても良いとは思うけれども処理中だからってボットが無反応になるのはなんとなく嫌だったので</p>
+
+<h4>タスク処理中、dieしたら共通処理出来る様に</h4>
+
+<p><a href="http://search.cpan.org/~doy/Try-Tiny-0.20/lib/Try/Tiny.pm">Try::Tiny</a>を使って囲ってるだけなので別にいらないと言えばいらない（自前でtry catchするのでも良い）が、どうせボットが返すエラー文言なんて一律で同じように返したって全然良いと思うので、共通処理を設定出来る様にしておきました</p>
+
+<h3>ということで</h3>
+
+<p><a href="http://search.cpan.org/~himachoco/IkuSan-0.01/lib/IkuSan.pm">p5-IkuSan</a>が出来ました</p>
+
+<p>一応<a href="http://search.cpan.org/">CPAN</a>に上げるつもりだったので、今まで使ったことなかった<a href="http://search.cpan.org/~tokuhirom/Minilla/lib/Minilla.pm">Minilla</a>を使ってみたり、<a href="https://github.com/tokuhirom/plenv">plenv</a>と<a href="http://search.cpan.org/~miyagawa/Carton-v1.0.12/lib/Carton.pm">Carton</a>を経由して<a href="http://cr.yp.to/daemontools.html">daemontools</a>で起動出来るようにするというplackアプリの起動で良くある感じのアレをちゃんとやってみたり、その際にCarton経由しつつsystem perl使おうとするとCartonの方で環境変数PERL5OPTが設定されてしまうのでunsetするなりしないと読むモジュールが違って悲しい思いをするということを知ったり、perl5.19.10とか使うとNet::SSLeayあたりでpanicとかなんとか言われて動かなかったり（原因不明）forkしてる関係で子プロセスからsend_messageやらなんやらしようとして死にまくったりして、<a href="http://search.cpan.org/~yappo/App-Ikachan-v0.2.1/lib/App/Ikachan.pm">ikachan</a>リスペクトで頑張ってみたり、<a href="https://github.com/mix3/p5-IkuSan#readme">衣玖さんはやっぱり可愛い</a>んだなと再認識したりしました。CPANの方にもちゃんと画像出る様にしたい。</p>
+
+<p>あと以下の発言が実現出来てワタクシ非常に満足しております。煩悩はチカラなり。</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>（Ikusanっていう名前の入ったcpanモジュール作りたいだけです）</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/440167221289955328">March 2, 2014</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/2014/04/12/20140412/</guid>
+<pubDate>Sat, 12 Apr 2014 00:00:00 +0900</pubDate>
+</item>
+<item>
 <title>revel入門</title>
 <description>
 <![CDATA[
@@ -1305,103 +1347,6 @@ disconnected
 </description>
 <guid isPermaLink="true">http://mix3.github.io/2013/10/19/20131019/</guid>
 <pubDate>Sat, 19 Oct 2013 00:00:00 +0900</pubDate>
-</item>
-<item>
-<title>続 phpenv+php-buildでphpをinstallしまくる</title>
-<description>
-<![CDATA[
-<h3>最終的には以下のような感じになりました</h3>
-
-<p>5.3</p>
-
-<pre><code>configure_option "--enable-intl"
-configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
-configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
-configure_option -R "--with-tidy" "/usr/local"
-install_package "http://snaps.php.net/php5.3-latest.tar.bz2"
-install_pyrus
-install_xdebug "2.2.0"
-install_apc "3.1.13"
-</code></pre>
-
-<p>5.4</p>
-
-<pre><code>configure_option "--enable-intl"
-configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
-configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
-configure_option -R "--with-tidy" "/usr/local"
-install_package "http://snaps.php.net/php5.4-latest.tar.bz2"
-install_pyrus
-install_xdebug "2.2.1"
-install_apc "3.1.13"
-</code></pre>
-
-<p>5.5</p>
-
-<pre><code>configure_option "--enable-intl"
-configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
-configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
-configure_option -R "--with-tidy" "/usr/local"
-install_package "http://www.php.net/distributions/php-5.5.4.tar.bz2"
-install_pyrus
-install_xdebug "2.2.3"
-enable_builtin_opcache
-</code></pre>
-
-<ul>
-<li>--enable-intl のために --with-icu-dir --with-libxml-dir が必要
-<ul>
-<li>あとさらに C++ でないとダメなときがあるっぽい <a href="https://gist.github.com/nojimage/6723904">nojimage / fixes-5.3.sh</a></li>
-<li>gistそのままだとシェバングがアレだったり、Macだからだと思うけど sed でだめなので <a href="https://gist.github.com/mix3/6904829">mix3 / fixes-5.3.sh</a></li>
-</ul></li>
-<li>--with-tidy のパス指定は相変わらず "/usr/local"
-<ul>
-<li>brew --prefix だとなぜか上手く行かない</li>
-</ul></li>
-<li>5.3 5.4 ではAPCを有効にするため install_apc を指定(pluginが最初から用意されてる)</li>
-<li>5.5 では 5.5用のAPC が無い(というか開発されてない？)らしいので apcは入れない
-<ul>
-<li>Zend OPcache なるものがあるらしく enable_builtin_opcache が 5.5.* の definitions で最初から指定されてる</li>
-</ul></li>
-<li>5.5 だけ latest 指定でないのはfpmを使うと謎のセグフォして困ったから バグなのかなんなのかは不明</li>
-</ul>
-
-<p>--enable-intl 少しハマってググってたら同じくハマってた人 --disable-intlしろとか言われてて「そうじゃねぇよ」ってなってて笑った</p>
-
-<blockquote class="twitter-tweet"><p>intlのために <a href="http://t.co/241ee9MM6R">http://t.co/241ee9MM6R</a> ここに来て <a href="https://t.co/TwSABxyxhU">https://t.co/TwSABxyxhU</a> ここに来た</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/387982384060051456">October 9, 2013</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<blockquote class="twitter-tweet"><p><a href="https://t.co/HeGEH3q3RL">https://t.co/HeGEH3q3RL</a> symfony2使ってるから --enable-intl してるのに --disable-intl しろ言われててワロタ</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/387984437742280704">October 9, 2013</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p>php.ini の date.timezone を毎回インストール後に弄るのあれなので php-build のトリガー機能を使って、インストール後自動で $PREFIX/etc/conf.d/date.ini を作ってそこに date.timezone の記述してみた</p>
-
-<p>~/.phpenv/plugins/php-build/share/php-build/after-install.d/date.sh
-    #!/bin/bash</p>
-
-<pre><code>set -e
-
-if [ -n "$PHP_BUILD_DEBUG" ]; then
-    set -x
-fi
-
-date_ini="$PREFIX/etc/conf.d/date.ini"
-
-if [ ! -f "$date_ini" ]; then
-    echo "[Date]" &gt; $date_ini
-    echo "date.timezone = Asia/Tokyo" &gt;&gt; $date_ini
-fi
-</code></pre>
-
-<p>これでオラオラとインストールしまくった　めでたしめでたし</p>
-
-<p>phpはなんでこんなにインストールが面倒なんや…</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/2013/10/12/20131012/</guid>
-<pubDate>Sat, 12 Oct 2013 00:00:00 +0900</pubDate>
 </item>
 </channel>
 </rss>

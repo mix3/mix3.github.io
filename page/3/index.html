@@ -61,6 +61,97 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/10/12/20131012/" title="">続 phpenv+php-buildでphpをinstallしまくる</a></h2>
+<h3>最終的には以下のような感じになりました</h3>
+
+<p>5.3</p>
+
+<pre><code>configure_option "--enable-intl"
+configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
+configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
+configure_option -R "--with-tidy" "/usr/local"
+install_package "http://snaps.php.net/php5.3-latest.tar.bz2"
+install_pyrus
+install_xdebug "2.2.0"
+install_apc "3.1.13"
+</code></pre>
+
+<p>5.4</p>
+
+<pre><code>configure_option "--enable-intl"
+configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
+configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
+configure_option -R "--with-tidy" "/usr/local"
+install_package "http://snaps.php.net/php5.4-latest.tar.bz2"
+install_pyrus
+install_xdebug "2.2.1"
+install_apc "3.1.13"
+</code></pre>
+
+<p>5.5</p>
+
+<pre><code>configure_option "--enable-intl"
+configure_option "--with-icu-dir" "$(brew --prefix icu4c)"
+configure_option "--with-libxml-dir" "$(brew --prefix libxml2)"
+configure_option -R "--with-tidy" "/usr/local"
+install_package "http://www.php.net/distributions/php-5.5.4.tar.bz2"
+install_pyrus
+install_xdebug "2.2.3"
+enable_builtin_opcache
+</code></pre>
+
+<ul>
+<li>--enable-intl のために --with-icu-dir --with-libxml-dir が必要
+<ul>
+<li>あとさらに C++ でないとダメなときがあるっぽい <a href="https://gist.github.com/nojimage/6723904">nojimage / fixes-5.3.sh</a></li>
+<li>gistそのままだとシェバングがアレだったり、Macだからだと思うけど sed でだめなので <a href="https://gist.github.com/mix3/6904829">mix3 / fixes-5.3.sh</a></li>
+</ul></li>
+<li>--with-tidy のパス指定は相変わらず "/usr/local"
+<ul>
+<li>brew --prefix だとなぜか上手く行かない</li>
+</ul></li>
+<li>5.3 5.4 ではAPCを有効にするため install_apc を指定(pluginが最初から用意されてる)</li>
+<li>5.5 では 5.5用のAPC が無い(というか開発されてない？)らしいので apcは入れない
+<ul>
+<li>Zend OPcache なるものがあるらしく enable_builtin_opcache が 5.5.* の definitions で最初から指定されてる</li>
+</ul></li>
+<li>5.5 だけ latest 指定でないのはfpmを使うと謎のセグフォして困ったから バグなのかなんなのかは不明</li>
+</ul>
+
+<p>--enable-intl 少しハマってググってたら同じくハマってた人 --disable-intlしろとか言われてて「そうじゃねぇよ」ってなってて笑った</p>
+
+<blockquote class="twitter-tweet"><p>intlのために <a href="http://t.co/241ee9MM6R">http://t.co/241ee9MM6R</a> ここに来て <a href="https://t.co/TwSABxyxhU">https://t.co/TwSABxyxhU</a> ここに来た</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/387982384060051456">October 9, 2013</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<blockquote class="twitter-tweet"><p><a href="https://t.co/HeGEH3q3RL">https://t.co/HeGEH3q3RL</a> symfony2使ってるから --enable-intl してるのに --disable-intl しろ言われててワロタ</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/387984437742280704">October 9, 2013</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>php.ini の date.timezone を毎回インストール後に弄るのあれなので php-build のトリガー機能を使って、インストール後自動で $PREFIX/etc/conf.d/date.ini を作ってそこに date.timezone の記述してみた</p>
+
+<p>~/.phpenv/plugins/php-build/share/php-build/after-install.d/date.sh
+    #!/bin/bash</p>
+
+<pre><code>set -e
+
+if [ -n "$PHP_BUILD_DEBUG" ]; then
+    set -x
+fi
+
+date_ini="$PREFIX/etc/conf.d/date.ini"
+
+if [ ! -f "$date_ini" ]; then
+    echo "[Date]" &gt; $date_ini
+    echo "date.timezone = Asia/Tokyo" &gt;&gt; $date_ini
+fi
+</code></pre>
+
+<p>これでオラオラとインストールしまくった　めでたしめでたし</p>
+
+<p>phpはなんでこんなにインストールが面倒なんや…</p>
+
+<p class="post-footer"><span class="date">2013-10-12</span></p>
 <h2><a href="/2013/10/07/20131007/" title="">phpenv+php-buildでphpをinstallしまくる</a></h2>
 <p>正確にはfpmとnginxで複数バージョンでも幸せになれる開発環境作り mix3です</p>
 
@@ -299,118 +390,6 @@ mix3 &gt; iku: ふぁ！？
 <p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
 
 <p class="post-footer"><span class="date">2013-07-28</span></p>
-<h2><a href="/2013/04/13/20130413/" title="">phantomjsで遊ぶ</a></h2>
-<p>うわっ…私のチーム、レベル低すぎ…？ mix3です。リードエンジニアとしてどうにかしろって話ですが、コミュ
-障の自分には荷が重いです…</p>
-
-<h3><a href="http://d.hatena.ne.jp/karasuyamatengu/20110126/1296066287">PhantomJS: 最小限なheadlessのWebKitベースのJavaScriptツール</a></h3>
-
-<p>だそうです。正直良くわかりませんが、nodeのようにサーバーサイドで書けるイメージ。</p>
-
-<p>$ cat hello.js</p>
-
-<pre><code>console.log('Hello, world!');
-phantom.exit();
-</code></pre>
-
-<p>$ phantomjs hello.js</p>
-
-<pre><code>Hello, world!
-</code></pre>
-
-<p>とか</p>
-
-<p>$ cat google_capture.js</p>
-
-<pre><code>var page = require('webpage').create();
-page.open('http://www.google.com', function (status) {
-    page.render('google_capture.png');
-    phantom.exit();
-});
-</code></pre>
-
-<p><a href="/images/20130413/google_capture.png"><img src="/images/20130413/google_capture.png" width="200" /></a><br /></p>
-
-<p>とか</p>
-
-<p>$ cat hello_server.js</p>
-
-<pre><code>var system = require('system');
-
-if (system.args.length !== 2) {
-    console.log('Usage: hello_server.js &lt;portnumber&gt;');
-    phantom.exit(1);
-} else {
-    port = system.args[1];
-    server = require('webserver').create();
-
-    service = server.listen(port, function (request, response) {
-        response.statusCode = 200;
-        response.write('&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;');
-        response.close();
-    });
-
-    if (!service) {
-        console.log('Error: Could not create web server listening on port ' + port);
-        phantom.exit();
-    }
-}
-</code></pre>
-
-<p>$ phantomjs hello_server.js</p>
-
-<p>$ curl http://localhost:2525</p>
-
-<pre><code>&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;
-</code></pre>
-
-<p>などなど。単純なCLIプログラムや、Webページにアクセスしてキャプチャ取ったり、サーバプログラムも書けたりします。</p>
-
-<p>ローカルファイルも扱えるので、例えばあるディレクトリ以下の画像を並べて表示するサーバを立てつつ、それを</p>
-
-<pre><code>page.open('http://localhost:[port]', function () {
-    page.render(...);
-});
-</code></pre>
-
-<p>とかするとあら不思議。コマンド一発で複数画像を１枚画像に出来たりします。</p>
-
-<h3>なんでこんなもん触ってるかというと</h3>
-
-<p>ソーシャルゲームに携わっていて思う事なのですが、イベント中だと特にそうですが時間で文言が変わるということは良くあることです。そしてこういうものは当然リリース前にスケジュールはきっちり決まっていて（もちろん差し込みで仕込み直すこともありますが）がっつりテストすることになります。が、開発段階でも当然自分で目視チェックすることになるのですがこれが非常に面倒くさい。なぜ面倒くさいかというとモジュールの単体テストとは違いローカルプロキシ越しにブラウザで確認したり実機で確認したりすることになり、自動テストになかなか上手く落とし込めないからです。（見た目の部分は特に変更が出易いのでそういう意味でもテストに落としづらいというのはあると思います）他のプロジェクトだと一部定型的な部分はモデルに落とし込んでテスト出来るようにしていたりするようですが、当然限界もあり。</p>
-
-<p>ということで、今のところ画像、文言など見た目の部分をテストに落とし込むのは無理だろうなぁと思っておりますが、そうは言ってもチェックが面倒なことは面倒なのでチェックすること自体はいくらか楽にはしたい。特に時間で文言が切り替わるのを見比べられる状態にしたい。</p>
-
-<p>ということでphantomjsでしこしこ以下のようなスクリプト書いてました</p>
-
-<ul>
-<li>指定ページを時間別にキャプチャしてpngで吐き出すスクリプト</li>
-<li>フォルダ以下の*.png画像を横に並べて表示するサーバを立ててそれをキャプチャするスクリプト</li>
-</ul>
-
-<p>参考: <a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">PhantomJS でログインが必要なページでも自由自在にスクレイピング - 凹みTips</a></p>
-
-<p>ほぼほぼキャプチャの部分は<a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">参考</a>をそのまま使わせてもらっているのですが、参考のままだと画像などがキャプチャされないことがあったので、setTimeoutを使ってキャプチャのタイミングを遅らせるなどの簡単な工夫をしています。</p>
-
-<p>後、サーバがバイナリを出力するときは、ローカルからファイルを読み込む時に 'b' を指定するのとresponse.writeするまえにresponse.setEncoding('binary')しないといけないようなので注意が必要です。</p>
-
-<pre><code>var image = fs.read(file_path, 'b');
-response.headers = {
-    'Accept-Ranges': 'bytes',
-    'Content-Type': 'image/png',
-    'Content-Length': image.length
-};
-response.setEncoding('binary');
-response.write(image);
-</code></pre>
-
-<p>こうすることで横並び画像にして文言チェック出来るようになり捗りそうな気配がしています。（まだ作ったばかりで実際に活用するのはこれから）</p>
-
-<p>ちなみに一枚画像にしてしまうのは社内gyazoにあげてディレクターなど他の方にも見てもらえるようにしたかったからですが、今にして思えば別に一枚画像にする必要はなく、画像一括アップロード出来るフォームと横並びにして表示出来る簡単なサーバアプリを書くだけで良いことに気づいたので、ここは今後やりやすい方にシフトする感じで行きたい。</p>
-
-<p>ということでphantomjs便利なんじゃないかなというお話でした。</p>
-
-<p class="post-footer"><span class="date">2013-04-13</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -426,7 +405,7 @@ response.write(image);
  | 
 <a href="/page/5/">5</a>
 <a href="/page/4/" rel="next">&gt;</a>
-<a href="/page/8/">&gt;&gt;</a>
+<a href="/page/9/">&gt;&gt;</a>
 </div>
       </div>
       <div class="autopagerize_insert_before"></div>
@@ -440,6 +419,7 @@ response.write(image);
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2014/04/">2014年04月</a></li>
   <li><a href="/archives/2014/03/">2014年03月</a></li>
   <li><a href="/archives/2014/01/">2014年01月</a></li>
   <li><a href="/archives/2013/12/">2013年12月</a></li>
@@ -529,10 +509,10 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/Chrome/">Chrome</a></span>
 <span class="tagcloud0"><a href="/tag/Hadoop/">Hadoop</a></span>
 <span class="tagcloud0"><a href="/tag/IRC/">IRC</a></span>
-<span class="tagcloud8"><a href="/tag/Linux/">Linux</a></span>
+<span class="tagcloud7"><a href="/tag/Linux/">Linux</a></span>
 <span class="tagcloud0"><a href="/tag/Log/">Log</a></span>
 <span class="tagcloud0"><a href="/tag/Markdown/">Markdown</a></span>
-<span class="tagcloud8"><a href="/tag/MobaSiF/">MobaSiF</a></span>
+<span class="tagcloud7"><a href="/tag/MobaSiF/">MobaSiF</a></span>
 <span class="tagcloud0"><a href="/tag/Mojolicious/">Mojolicious</a></span>
 <span class="tagcloud0"><a href="/tag/Mouse/">Mouse</a></span>
 <span class="tagcloud12"><a href="/tag/MySQL/">MySQL</a></span>
@@ -549,6 +529,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/bless/">bless</a></span>
 <span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>
 <span class="tagcloud0"><a href="/tag/bot/">bot</a></span>
+<span class="tagcloud0"><a href="/tag/cpan/">cpan</a></span>
 <span class="tagcloud0"><a href="/tag/cpan%20author/">cpan author</a></span>
 <span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
 <span class="tagcloud0"><a href="/tag/golang/">golang</a></span>
@@ -562,8 +543,8 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud12"><a href="/tag/php/">php</a></span>
 <span class="tagcloud0"><a href="/tag/vagrant/">vagrant</a></span>
 <span class="tagcloud0"><a href="/tag/wicket/">wicket</a></span>
-<span class="tagcloud8"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
-<span class="tagcloud8"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
+<span class="tagcloud7"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
+<span class="tagcloud7"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91/">オブジェクト指向</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%82%B5%E3%83%BC%E3%83%90%E7%AE%A1%E7%90%86/">サーバ管理</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%86%E3%82%B9%E3%83%88/">テスト</a></span>
@@ -572,8 +553,8 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud12"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
-<span class="tagcloud8"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
-<span class="tagcloud8"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
+<span class="tagcloud7"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
+<span class="tagcloud7"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
 </div></p>
     </div>
   </div>

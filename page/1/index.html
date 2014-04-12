@@ -61,6 +61,42 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2014/04/12/20140412/" title="">p5-IkuSanを煩悩のままに公開</a></h2>
+<p>人生の迷子の行き着く先は富士の樹海ではないかと最近良く考えています。mix3です。</p>
+
+<h3><a href="http://search.cpan.org/~himachoco/IkuSan-0.01/lib/IkuSan.pm">p5-IkuSan</a></h3>
+
+<p>IRCボットいい加減今のプロジェクトに欲しくなったので、自分がIRCボット作ったらこうするなというのを<a href="/2013/10/05/20131005/">以前書いた</a>のだが、今回は実際にそれを作ったという話です。</p>
+
+<p>ただ単に作るだけだと別に<a href="http://search.cpan.org/~songmu/UnazuSan-0.02/lib/UnazuSan.pm">UnazuSan</a>で良いじゃないってなっちゃうので、以下の機能を盛り込みました</p>
+
+<h4>Getopt::Longの引数が取れる</h4>
+
+<p><a href="/2013/10/05/20131005/">以前の記事</a>参照</p>
+
+<h4>並列にタスク処理が出来る</h4>
+
+<p>最初Gearman使って頑張ってたのだけれど <a href="https://twitter.com/#!/karupanerura">@karupanerura</a> さん作、<a href="http://search.cpan.org/~karupa/AnyEvent-ForkManager-0.01/lib/AnyEvent/ForkManager.pm">AnyEvent::ForkManager</a>というのがあるのを見つたのでそれを使うように。worker数を指定出来る様にして並列に処理出来る様にしました</p>
+
+<p>あんまり気にしなくても良いとは思うけれども処理中だからってボットが無反応になるのはなんとなく嫌だったので</p>
+
+<h4>タスク処理中、dieしたら共通処理出来る様に</h4>
+
+<p><a href="http://search.cpan.org/~doy/Try-Tiny-0.20/lib/Try/Tiny.pm">Try::Tiny</a>を使って囲ってるだけなので別にいらないと言えばいらない（自前でtry catchするのでも良い）が、どうせボットが返すエラー文言なんて一律で同じように返したって全然良いと思うので、共通処理を設定出来る様にしておきました</p>
+
+<h3>ということで</h3>
+
+<p><a href="http://search.cpan.org/~himachoco/IkuSan-0.01/lib/IkuSan.pm">p5-IkuSan</a>が出来ました</p>
+
+<p>一応<a href="http://search.cpan.org/">CPAN</a>に上げるつもりだったので、今まで使ったことなかった<a href="http://search.cpan.org/~tokuhirom/Minilla/lib/Minilla.pm">Minilla</a>を使ってみたり、<a href="https://github.com/tokuhirom/plenv">plenv</a>と<a href="http://search.cpan.org/~miyagawa/Carton-v1.0.12/lib/Carton.pm">Carton</a>を経由して<a href="http://cr.yp.to/daemontools.html">daemontools</a>で起動出来るようにするというplackアプリの起動で良くある感じのアレをちゃんとやってみたり、その際にCarton経由しつつsystem perl使おうとするとCartonの方で環境変数PERL5OPTが設定されてしまうのでunsetするなりしないと読むモジュールが違って悲しい思いをするということを知ったり、perl5.19.10とか使うとNet::SSLeayあたりでpanicとかなんとか言われて動かなかったり（原因不明）forkしてる関係で子プロセスからsend_messageやらなんやらしようとして死にまくったりして、<a href="http://search.cpan.org/~yappo/App-Ikachan-v0.2.1/lib/App/Ikachan.pm">ikachan</a>リスペクトで頑張ってみたり、<a href="https://github.com/mix3/p5-IkuSan#readme">衣玖さんはやっぱり可愛い</a>んだなと再認識したりしました。CPANの方にもちゃんと画像出る様にしたい。</p>
+
+<p>あと以下の発言が実現出来てワタクシ非常に満足しております。煩悩はチカラなり。</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>（Ikusanっていう名前の入ったcpanモジュール作りたいだけです）</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/440167221289955328">March 2, 2014</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p class="post-footer"><span class="date">2014-04-12</span></p>
 <h2><a href="/2014/03/08/20140308/" title="">revel入門</a></h2>
 <p>絶賛人生の迷子中、mix3です</p>
 
@@ -273,97 +309,6 @@ brew install ndenv node-build --HEAD
 </ul>
 
 <p class="post-footer"><span class="date">2013-12-22</span></p>
-<h2><a href="/2013/12/22/20131222_01/" title="">退勤時間の自動検出ソリューション</a></h2>
-<p>というようなことを元々は <a href="http://tech.kayac.com/archive/techkayaccom_advent_calendar_2013.html">teck.kayac.com Advent Calender 2013</a> の17日目 の記事として考えてたんだけど、結局なんか無性にWicketの事を書きたくなっちゃったので、お蔵入りになった記事をこっちに書く事にする。</p>
-
-<p>カレンダーのノリで書いてたのをそのまま持ってくると大分寒い感じがするが、面倒なので不自然なカレンダー要素を消す意外は無編集で。</p>
-
-<h3>勤怠管理してますか？</h3>
-
-<p>私はと言うとまあお察しください。そう、勤怠管理は面倒です。</p>
-
-<ul>
-<li>何時に出社したか？</li>
-<li>何時ににどれくらい休憩したか？</li>
-<li>何時に退勤したか？</li>
-</ul>
-
-<p>覚えてられないですね。退勤時に記録を付けるときにはもう記憶が曖昧です ＞＜;</p>
-
-<p>ということで退勤時間の自動検出ソリューションとか言って、適当に休憩や退勤の時間を記録するライフ八苦したいと思います。</p>
-
-<h3>いかにして自動的に記録するか</h3>
-
-<p>自分は最近 MacBookPro Retina 13インチ 16GBメモリ 512GB SSD というとても快適な環境で仕事してるのですが（16GBも積んでると<a href="https://www.virtualbox.org/">VirtualBox</a>&amp;<a href="http://www.vagrantup.com/">Vagrant</a>による開発環境が本当に快適）</p>
-
-<ul>
-<li>昼休憩はスクリーンセーバーで日々萌え萌え画像を垂れ流して「 <em>頭おかしい人</em> 」を演出</li>
-<li>出社退社移動中はPC閉じてスリープ</li>
-</ul>
-
-<p>という感じなので、スクリーンセーバーになってた時間とスリープしてた時間が後から分かれば休憩、退勤の時間が分かると言えます。（実際は業務内容と時間を紐づける必要がありますが、今のところ自分の業務内容は一つだけなので考えなくてOK。複数案件抱えてたりしてる人は本当に大変そうです…）</p>
-
-<p>問題はスリープの状態は記録出来ないこと。記録付けたくてもPCが眠ってるのでPC自身がアクション起こせません。</p>
-
-<h3>ということでジョースター卿に教えを乞いました</h3>
-
-<p><img src="/images/20131222/d2bdffc4.png" width="500" alt="ジョースター卿" /></p>
-
-<p><em>なるほど！！！</em> </p>
-
-<p>ということで<a href="http://dic.nicovideo.jp/a/%E9%80%86%E3%81%AB%E8%80%83%E3%81%88%E3%82%8B%E3%82%93%E3%81%A0">ジョースター卿の教え</a>を受けてPC稼働中は常に記録を取り続け、スクリーンセーバーの時は記録しない、という感じにやってあげるとうまく行きそうな気がしてきました。</p>
-
-<h3>具体的には？</h3>
-
-<p>homebrew で mysql を入れた後、適当に create database して適当に以下のようなテーブルを用意して</p>
-
-<pre><code>CREATE TABLE receive (
-    time datetime NOT NULL,
-    PRIMARY KEY (`time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-</code></pre>
-
-<p>以下のようなスクリプトを書いてcronに設定</p>
-
-<pre><code>#!/bin/bash
-
-if [ "" == "$(ps aux | grep ScreenSaverEngine | grep -v grep)" ]; then
-    /usr/local/opt/mysql/bin/mysql -u root beacon_receiver -e "insert into receive values (now());"
-fi
-
-* * * * * /bin/bash ~/.beacon.sh
-</code></pre>
-
-<p>すると<a href="https://gist.github.com/mix3/7973095#file-active_monitor-pl">こんな感じ</a>のスクリプトを用意ししてぺろっと出力すると</p>
-
-<p><img src="/images/20131222/a6f42cb8.png" alt="9時半に出社してる" /></p>
-
-<ul>
-<li>9時半に出社してる</li>
-</ul>
-
-<p><img src="/images/20131222/0130bdfb.png" alt="13時15分ぐらいから昼行ったっぽい" /></p>
-
-<ul>
-<li>13時15分ぐらいから昼飯行ったっぽい
-<ul>
-<li>なんか 13:50 辺りでちょっと復帰してるの気になるけど…</li>
-</ul></li>
-</ul>
-
-<p><img src="/images/20131222/32609ec0.png" alt="20時45分ぐらいに退社してる" /></p>
-
-<ul>
-<li>20時45分ぐらいに退社してる</li>
-</ul>
-
-<p>というのが分かって「 <em>あらやだ便利！</em> 」という感じになりました。ソース一式はこちら⇒<a href="https://gist.github.com/mix3/7973095">https://gist.github.com/mix3/7973095</a></p>
-
-<p>お試しあれ。</p>
-
-<p>なお、日々ちゃんと勤怠管理出来てる人には関係ない話の模様。</p>
-
-<p class="post-footer"><span class="date">2013-12-22</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 &lt;&lt;
@@ -379,7 +324,7 @@ fi
  | 
 <a href="/page/5/">5</a>
 <a href="/page/2/" rel="next">&gt;</a>
-<a href="/page/8/">&gt;&gt;</a>
+<a href="/page/9/">&gt;&gt;</a>
 </div>
       </div>
       <div class="autopagerize_insert_before"></div>
@@ -393,6 +338,7 @@ fi
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2014/04/">2014年04月</a></li>
   <li><a href="/archives/2014/03/">2014年03月</a></li>
   <li><a href="/archives/2014/01/">2014年01月</a></li>
   <li><a href="/archives/2013/12/">2013年12月</a></li>
@@ -482,10 +428,10 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/Chrome/">Chrome</a></span>
 <span class="tagcloud0"><a href="/tag/Hadoop/">Hadoop</a></span>
 <span class="tagcloud0"><a href="/tag/IRC/">IRC</a></span>
-<span class="tagcloud8"><a href="/tag/Linux/">Linux</a></span>
+<span class="tagcloud7"><a href="/tag/Linux/">Linux</a></span>
 <span class="tagcloud0"><a href="/tag/Log/">Log</a></span>
 <span class="tagcloud0"><a href="/tag/Markdown/">Markdown</a></span>
-<span class="tagcloud8"><a href="/tag/MobaSiF/">MobaSiF</a></span>
+<span class="tagcloud7"><a href="/tag/MobaSiF/">MobaSiF</a></span>
 <span class="tagcloud0"><a href="/tag/Mojolicious/">Mojolicious</a></span>
 <span class="tagcloud0"><a href="/tag/Mouse/">Mouse</a></span>
 <span class="tagcloud12"><a href="/tag/MySQL/">MySQL</a></span>
@@ -502,6 +448,7 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/bless/">bless</a></span>
 <span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>
 <span class="tagcloud0"><a href="/tag/bot/">bot</a></span>
+<span class="tagcloud0"><a href="/tag/cpan/">cpan</a></span>
 <span class="tagcloud0"><a href="/tag/cpan%20author/">cpan author</a></span>
 <span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
 <span class="tagcloud0"><a href="/tag/golang/">golang</a></span>
@@ -515,8 +462,8 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud12"><a href="/tag/php/">php</a></span>
 <span class="tagcloud0"><a href="/tag/vagrant/">vagrant</a></span>
 <span class="tagcloud0"><a href="/tag/wicket/">wicket</a></span>
-<span class="tagcloud8"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
-<span class="tagcloud8"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
+<span class="tagcloud7"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
+<span class="tagcloud7"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91/">オブジェクト指向</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%82%B5%E3%83%BC%E3%83%90%E7%AE%A1%E7%90%86/">サーバ管理</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%86%E3%82%B9%E3%83%88/">テスト</a></span>
@@ -525,8 +472,8 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud12"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
 <span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
 <span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
-<span class="tagcloud8"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
-<span class="tagcloud8"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
+<span class="tagcloud7"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
+<span class="tagcloud7"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
 </div></p>
     </div>
   </div>
