@@ -1,0 +1,7 @@
+: cascade layout::base with macro { blog => $blog }
+
+: around content -> {
+	: for $blog.tag_to_article[$tag] -> $article {
+		: archive($article)
+	: }
+: }

@@ -1,0 +1,350 @@
+<!doctype html>
+<html>
+	<head>
+		<title>phantomjsで遊ぶ - 萌えキャラとは何だったのか</title>
+		<meta charset="utf-8" />
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<script src="/js/app.js"></script>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-48133863-1', 'mix3.github.io');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<header class="grid">
+			<div class="col-1-1">
+				<img src="/images/header.jpg" />
+				<h1><a href="/">萌えキャラとは何だったのか</a></h1>
+				<h2>ギークにも絵描きにもなれない者の末路</h2>
+				<div class="top-menu">
+					<ul>
+						<li><a href="/index.rdf">RSS Feed</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<nav class="grid">
+				<div class="col-1-1">
+					<ul>
+						<li class="current">Blog</li>
+						<li class=""><a href="/archives">Archive</a></li>
+					</ul>
+				</div>
+		</nav>
+		<main class="grid">
+			<article class="col-8-12">
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2013/04/13/20130413/">phantomjsで遊ぶ</a></h2>
+		</div>
+		<div class="social_button">
+				<!-- はてブ -->
+				<div class="hatena">
+					<a href="http://b.hatena.ne.jp/entry/http://mix3.github.io/blog/2013/04/13/20130413/" class="hatena-bookmark-button" data-hatena-bookmark-title="phantomjsで遊ぶ - 萌えキャラとは何だったのか" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+				</div>
+				<!-- Twitter -->
+				<div class="twitter">
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mix3.github.io/blog/2013/04/13/20130413/" data-text="phantomjsで遊ぶ - 萌えキャラとは何だったのか" data-via="mix3" data-lang="ja">ツイート</a>
+					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+				</div>
+				<!-- Google+ -->
+				<div class="googleplus">
+					<div class="g-plusone" data-size="medium" data-href="http://mix3.github.io/blog/2013/04/13/20130413/"></div>
+					<script type="text/javascript">
+						window.___gcfg = {lang: 'ja'};
+						(function() {
+							var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+							po.src = 'https://apis.google.com/js/platform.js';
+							var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+						})();
+					</script>
+				</div>
+				<!-- facebook -->
+				<div class="facebook">
+					<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmix3.github.io%2Fblog%2F2013%2F04%2F13%2F20130413%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=false&amp;height=21&amp;appId=662642987135668" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+				</div>
+		</div>
+		<div class="clearer"></div>
+		<div class="content">
+			<p>うわっ…私のチーム、レベル低すぎ…？ mix3です。リードエンジニアとしてどうにかしろって話ですが、コミュ
+障の自分には荷が重いです…</p>
+
+<h3><a href="http://d.hatena.ne.jp/karasuyamatengu/20110126/1296066287">PhantomJS: 最小限なheadlessのWebKitベースのJavaScriptツール</a></h3>
+
+<p>だそうです。正直良くわかりませんが、nodeのようにサーバーサイドで書けるイメージ。</p>
+
+<p>$ cat hello.js</p>
+
+<pre><code>console.log('Hello, world!');
+phantom.exit();
+</code></pre>
+
+<p>$ phantomjs hello.js</p>
+
+<pre><code>Hello, world!
+</code></pre>
+
+<p>とか</p>
+
+<p>$ cat google_capture.js</p>
+
+<pre><code>var page = require('webpage').create();
+page.open('http://www.google.com', function (status) {
+    page.render('google_capture.png');
+    phantom.exit();
+});
+</code></pre>
+
+<p><a href="/images/20130413/google_capture.png"><img src="/images/20130413/google_capture.png" width="200" /></a><br /></p>
+
+<p>とか</p>
+
+<p>$ cat hello_server.js</p>
+
+<pre><code>var system = require('system');
+
+if (system.args.length !== 2) {
+    console.log('Usage: hello_server.js &lt;portnumber&gt;');
+    phantom.exit(1);
+} else {
+    port = system.args[1];
+    server = require('webserver').create();
+
+    service = server.listen(port, function (request, response) {
+        response.statusCode = 200;
+        response.write('&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;');
+        response.close();
+    });
+
+    if (!service) {
+        console.log('Error: Could not create web server listening on port ' + port);
+        phantom.exit();
+    }
+}
+</code></pre>
+
+<p>$ phantomjs hello_server.js</p>
+
+<p>$ curl http://localhost:2525</p>
+
+<pre><code>&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+
+<p>などなど。単純なCLIプログラムや、Webページにアクセスしてキャプチャ取ったり、サーバプログラムも書けたりします。</p>
+
+<p>ローカルファイルも扱えるので、例えばあるディレクトリ以下の画像を並べて表示するサーバを立てつつ、それを</p>
+
+<pre><code>page.open('http://localhost:[port]', function () {
+    page.render(...);
+});
+</code></pre>
+
+<p>とかするとあら不思議。コマンド一発で複数画像を１枚画像に出来たりします。</p>
+
+<h3>なんでこんなもん触ってるかというと</h3>
+
+<p>ソーシャルゲームに携わっていて思う事なのですが、イベント中だと特にそうですが時間で文言が変わるということは良くあることです。そしてこういうものは当然リリース前にスケジュールはきっちり決まっていて（もちろん差し込みで仕込み直すこともありますが）がっつりテストすることになります。が、開発段階でも当然自分で目視チェックすることになるのですがこれが非常に面倒くさい。なぜ面倒くさいかというとモジュールの単体テストとは違いローカルプロキシ越しにブラウザで確認したり実機で確認したりすることになり、自動テストになかなか上手く落とし込めないからです。（見た目の部分は特に変更が出易いのでそういう意味でもテストに落としづらいというのはあると思います）他のプロジェクトだと一部定型的な部分はモデルに落とし込んでテスト出来るようにしていたりするようですが、当然限界もあり。</p>
+
+<p>ということで、今のところ画像、文言など見た目の部分をテストに落とし込むのは無理だろうなぁと思っておりますが、そうは言ってもチェックが面倒なことは面倒なのでチェックすること自体はいくらか楽にはしたい。特に時間で文言が切り替わるのを見比べられる状態にしたい。</p>
+
+<p>ということでphantomjsでしこしこ以下のようなスクリプト書いてました</p>
+
+<ul>
+<li>指定ページを時間別にキャプチャしてpngで吐き出すスクリプト</li>
+<li>フォルダ以下の*.png画像を横に並べて表示するサーバを立ててそれをキャプチャするスクリプト</li>
+</ul>
+
+<p>参考: <a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">PhantomJS でログインが必要なページでも自由自在にスクレイピング - 凹みTips</a></p>
+
+<p>ほぼほぼキャプチャの部分は<a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">参考</a>をそのまま使わせてもらっているのですが、参考のままだと画像などがキャプチャされないことがあったので、setTimeoutを使ってキャプチャのタイミングを遅らせるなどの簡単な工夫をしています。</p>
+
+<p>後、サーバがバイナリを出力するときは、ローカルからファイルを読み込む時に 'b' を指定するのとresponse.writeするまえにresponse.setEncoding('binary')しないといけないようなので注意が必要です。</p>
+
+<pre><code>var image = fs.read(file_path, 'b');
+response.headers = {
+    'Accept-Ranges': 'bytes',
+    'Content-Type': 'image/png',
+    'Content-Length': image.length
+};
+response.setEncoding('binary');
+response.write(image);
+</code></pre>
+
+<p>こうすることで横並び画像にして文言チェック出来るようになり捗りそうな気配がしています。（まだ作ったばかりで実際に活用するのはこれから）</p>
+
+<p>ちなみに一枚画像にしてしまうのは社内gyazoにあげてディレクターなど他の方にも見てもらえるようにしたかったからですが、今にして思えば別に一枚画像にする必要はなく、画像一括アップロード出来るフォームと横並びにして表示出来る簡単なサーバアプリを書くだけで良いことに気づいたので、ここは今後やりやすい方にシフトする感じで行きたい。</p>
+
+<p>ということでphantomjs便利なんじゃないかなというお話でした。</p>
+
+		</div>
+		<div class="footer">
+			<time>2013-04-13</time>
+			<ul class="tag">
+				<li><a href="/tag/phantomjs">phantomjs(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1 pager">
+	<a href="/blog/2013/03/16/20130316/" class="float-left">≪おれおれWebフレームワーク - Chaco</a>
+	<a href="/blog/2013/07/28/20130728/" class="float-right">テスト書くのって難しい≫</a>
+	</div>
+	<div class="clearer"></div>
+			</article>
+			<aside class="col-4-12">
+				<div class="col-1-1">
+					<h3>Profile</h3>
+					<div class="content">
+						<img src="/images/avatar.png" class="float-left" style="width:100px;" />
+						<a href="https://twitter.com/mix3" target="_blank">twitter @mix3</a><br />
+						<a href="https://github.com/mix3/" target="_blank">github @mix3</a><br />
+						<a href="http://pixiv.me/mix3" target="_blank">pixiv @mix3</a><br />
+						<div class="clearer"></div>
+						Webエンジニアのような何か。絶賛人生の迷子中。スキルセット的には以下のような感じ<br />
+						Perl/MySQL/Linux/ソーシャルアプリ開発・運用
+					</div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>coderwall</h3>
+					<div id="coderwall"></div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Recent Posts</h3>
+					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
+						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
+						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
+						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
+						<li><a href="/blog/2013/12/28/20131228/">Vagrant with Virtualbox tips - internal network setting</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2014">2014年(4)</a>
+								<ul>
+										<li><a href="/archives/2014/06">2014年06月(1)</a></li>
+										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
+										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
+										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2013">2013年(18)</a>
+								<ul>
+										<li><a href="/archives/2013/12">2013年12月(3)</a></li>
+										<li><a href="/archives/2013/11">2013年11月(2)</a></li>
+										<li><a href="/archives/2013/10">2013年10月(5)</a></li>
+										<li><a href="/archives/2013/08">2013年08月(1)</a></li>
+										<li><a href="/archives/2013/07">2013年07月(1)</a></li>
+										<li><a href="/archives/2013/04">2013年04月(1)</a></li>
+										<li><a href="/archives/2013/03">2013年03月(3)</a></li>
+										<li><a href="/archives/2013/02">2013年02月(1)</a></li>
+										<li><a href="/archives/2013/01">2013年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2012">2012年(7)</a>
+								<ul>
+										<li><a href="/archives/2012/12">2012年12月(1)</a></li>
+										<li><a href="/archives/2012/11">2012年11月(2)</a></li>
+										<li><a href="/archives/2012/08">2012年08月(1)</a></li>
+										<li><a href="/archives/2012/04">2012年04月(3)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2011">2011年(13)</a>
+								<ul>
+										<li><a href="/archives/2011/11">2011年11月(1)</a></li>
+										<li><a href="/archives/2011/07">2011年07月(6)</a></li>
+										<li><a href="/archives/2011/06">2011年06月(3)</a></li>
+										<li><a href="/archives/2011/05">2011年05月(2)</a></li>
+										<li><a href="/archives/2011/04">2011年04月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Tags</h3>
+					<ul class="sidemenu toggle_tree_2">
+						<li class=""><a href="/tag/perl">perl(9)</a></li>
+						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+						<li class=""><a href="/tag/php">php(3)</a></li>
+						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
+						<li class="hide"><a href="/tag/Linux">Linux(2)</a></li>
+						<li class="hide"><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
+						<li class="hide"><a href="/tag/golang">golang(2)</a></li>
+						<li class="hide"><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
+						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
+						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
+						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class="hide"><a href="/tag/Bot">Bot(1)</a></li>
+						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
+						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
+						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
+						<li class="hide"><a href="/tag/Chrome">Chrome(1)</a></li>
+						<li class="hide"><a href="/tag/Hadoop">Hadoop(1)</a></li>
+						<li class="hide"><a href="/tag/IRC">IRC(1)</a></li>
+						<li class="hide"><a href="/tag/Log">Log(1)</a></li>
+						<li class="hide"><a href="/tag/Markdown">Markdown(1)</a></li>
+						<li class="hide"><a href="/tag/Mojolicious">Mojolicious(1)</a></li>
+						<li class="hide"><a href="/tag/Mouse">Mouse(1)</a></li>
+						<li class="hide"><a href="/tag/PhotonCloud">PhotonCloud(1)</a></li>
+						<li class="hide"><a href="/tag/Play">Play(1)</a></li>
+						<li class="hide"><a href="/tag/Qudo">Qudo(1)</a></li>
+						<li class="hide"><a href="/tag/SNBinder">SNBinder(1)</a></li>
+						<li class="hide"><a href="/tag/SQLite">SQLite(1)</a></li>
+						<li class="hide"><a href="/tag/Scala">Scala(1)</a></li>
+						<li class="hide"><a href="/tag/Teng">Teng(1)</a></li>
+						<li class="hide"><a href="/tag/Vagrant">Vagrant(1)</a></li>
+						<li class="hide"><a href="/tag/Virtualbox">Virtualbox(1)</a></li>
+						<li class="hide"><a href="/tag/Xslate">Xslate(1)</a></li>
+						<li class="hide"><a href="/tag/bless">bless(1)</a></li>
+						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
+						<li class="hide"><a href="/tag/bot">bot(1)</a></li>
+						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
+						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
+						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
+						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
+						<li class="hide"><a href="/tag/java">java(1)</a></li>
+						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
+						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/vagrant">vagrant(1)</a></li>
+						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
+						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
+						<li class="hide"><a href="/tag/サーバ管理">サーバ管理(1)</a></li>
+						<li class="hide"><a href="/tag/テスト">テスト(1)</a></li>
+						<li class="hide"><a href="/tag/ネットワーク設定">ネットワーク設定(1)</a></li>
+						<li class="hide"><a href="/tag/パーティショニング">パーティショニング(1)</a></li>
+						<li class="hide"><a href="/tag/ブログ">ブログ(1)</a></li>
+						<li class="hide"><a href="/tag/修士論文">修士論文(1)</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+			</aside>
+		</main>
+		<footer class="grid">
+			<div class="col-1-1">
+				<small>&copy; copyright 2014 mix3.github.io</small>
+			</div>
+		</footer>
+	</body>
+</html>

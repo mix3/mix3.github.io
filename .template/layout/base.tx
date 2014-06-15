@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+	<head>
+		<title><: block subtitle -> {}:><: $blog.conf.title :></title>
+		<meta charset="utf-8" />
+		: block meta -> {}
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<script src="/js/app.js"></script>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-48133863-1', 'mix3.github.io');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<header class="grid">
+			<div class="col-1-1">
+				<img src="/images/header.jpg" />
+				<h1><a href="/"><: $blog.conf.title :></a></h1>
+				<h2><: $blog.conf.slogan :></h2>
+				<div class="top-menu">
+					<ul>
+						<li><a href="/index.rdf">RSS Feed</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<nav class="grid">
+			: block nav -> {
+				<div class="col-1-1">
+					<ul>
+						<li class="current">Blog</li>
+						<li class=""><a href="/archives">Archive</a></li>
+					</ul>
+				</div>
+			: }
+		</nav>
+		<main class="grid">
+			<article class="col-8-12">
+				: block content -> {}
+			</article>
+			<aside class="col-4-12">
+				<div class="col-1-1">
+					<h3>Profile</h3>
+					<div class="content">
+						<img src="/images/avatar.png" class="float-left" style="width:100px;" />
+						<a href="https://twitter.com/mix3" target="_blank">twitter @mix3</a><br />
+						<a href="https://github.com/mix3/" target="_blank">github @mix3</a><br />
+						<a href="http://pixiv.me/mix3" target="_blank">pixiv @mix3</a><br />
+						<div class="clearer"></div>
+						Webエンジニアのような何か。絶賛人生の迷子中。スキルセット的には以下のような感じ<br />
+						Perl/MySQL/Linux/ソーシャルアプリ開発・運用
+					</div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>coderwall</h3>
+					<div id="coderwall"></div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Recent Posts</h3>
+					<ul class="sidemenu">
+					: for $blog.latest_article -> $article {
+						<li><a href="<: $article.perma :>"><: $article.data.title :></a></li>
+					: }
+					</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Archives</h3>
+					: for $blog.year_month_to_article.keys().sort(-> $a, $b { $b cmp $a }) -> $year {
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/<: $year :>"><: $year :>年(<: $blog.year_month_to_article[$year].article.size() :>)</a>
+								<ul>
+									: for $blog.year_month_to_article[$year].month.keys().sort(-> $a, $b { $b cmp $a }) -> $month {
+										<li><a href="/archives/<: $year :>/<: $month :>"><: $year :>年<: $month :>月(<: $blog.year_month_to_article[$year].month[$month].size() :>)</a></li>
+									: }
+								</ul>
+							</li>
+						</ul>
+					: }
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Tags</h3>
+					<ul class="sidemenu toggle_tree_2">
+					: for $blog.tag_to_article.keys().sort(-> $a, $b { $blog.tag_to_article[$b].size() cmp $blog.tag_to_article[$a].size() }) -> $tag {
+						<li class="<: if ($blog.tag_to_article[$tag].size() <= $blog.conf.hide_num) { :>hide<: } :>"><a href="/tag/<: $tag :>"><: $tag :>(<: $blog.tag_to_article[$tag].size() :>)</a></li>
+					: }
+					</ul>
+				</div>
+				<div class="clearer"></div>
+			</aside>
+		</main>
+		<footer class="grid">
+			<div class="col-1-1">
+				<small>&copy; copyright 2014 mix3.github.io</small>
+			</div>
+		</footer>
+	</body>
+</html>

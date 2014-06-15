@@ -1,0 +1,16 @@
+: cascade layout::base with macro { blog => $blog }
+
+: around nav -> {
+	<div class="col-1-1">
+		<ul>
+			<li class=""><a href="/">Blog</a></li>
+			<li class="current">Archive</li>
+		</ul>
+	</div>
+: }
+
+: around content -> {
+	: for $blog.archive -> $article {
+		: archive($article)
+	: }
+: }

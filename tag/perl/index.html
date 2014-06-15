@@ -1,748 +1,319 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <link href="/css/style.css" rel="stylesheet" type="text/css" />
-  <link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
-  <link href="/css/prettify/prettify.css" rel="stylesheet" type="text/css" media="screen" />
-  <script src="/js/prettify/prettify.js" type="text/javascript"></script>
-  <script type="text/javascript">
-      $(function(){
-          $('pre').filter(function(){
-              console.log($(this).parent());
-              return !$(this).parent().hasClass('gist-highlight');
-          }).addClass('prettyprint linenums');
-          prettyPrint();
-          $('#content').fadeIn(2000);
-      });
-  </script>
-
-  <script type="text/javascript">
-  
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-10744212-4']);
-    _gaq.push(['_setDomainName', 'github.com']);
-    _gaq.push(['_setAllowHash', 'false']);
-    _gaq.push(['_trackPageview']);
-  
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  
-  </script>
-
-  <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
-  <link href="http://coderwall.com/stylesheets/jquery.coderwall.css" media="all" rel="stylesheet" type="text/css" />
-  <script src="http://coderwall.com/javascripts/jquery.coderwall.js"></script>
-
-  <title>萌えキャラとは何だったのか</title>
-</head>
-<body>
-<div id="wrap">
-  <div id="header">
-    <h1 id="logo-text"><a href="/" title="">萌えキャラとは何だったのか</a></h1>
-    <p id="slogan">ギークにも絵描きにもなれない者の末路</p>
-    <div id="top-menu">
-      <p>
-        <a href="/index.rdf">rss feed</a> | 
-        <a href="https://twitter.com/#!/mix3">twitter</a> | 
-        <a href="https://github.com/mix3">github</a> | 
-        <a href="http://www.pixiv.net/member.php?id=88339">pixiv</a>
-      </p>
-    </div>
-  </div>
-  <div  id="nav">
-    <ul>
-      <li id="current"><a href="/">Home</a></li>
-    </ul>
-  </div>
-  <div id="content">
-    <div id="main">
-      <div class="rslt_row autopagerize_page_element">
-<h2><a href="/2014/04/12/20140412/" title="">p5-IkuSanを煩悩のままに公開</a></h2>
-<p>人生の迷子の行き着く先は富士の樹海ではないかと最近良く考えています。mix3です。</p>
-
-<h3><a href="http://search.cpan.org/~himachoco/IkuSan-0.01/lib/IkuSan.pm">p5-IkuSan</a></h3>
-
-<p>IRCボットいい加減今のプロジェクトに欲しくなったので、自分がIRCボット作ったらこうするなというのを<a href="/2013/10/05/20131005/">以前書いた</a>のだが、今回は実際にそれを作ったという話です。</p>
-
-<p>ただ単に作るだけだと別に<a href="http://search.cpan.org/~songmu/UnazuSan-0.02/lib/UnazuSan.pm">UnazuSan</a>で良いじゃないってなっちゃうので、以下の機能を盛り込みました</p>
-
-<h4>Getopt::Longの引数が取れる</h4>
-
-<p><a href="/2013/10/05/20131005/">以前の記事</a>参照</p>
-
-<h4>並列にタスク処理が出来る</h4>
-
-<p>最初Gearman使って頑張ってたのだけれど <a href="https://twitter.com/#!/karupanerura">@karupanerura</a> さん作、<a href="http://search.cpan.org/~karupa/AnyEvent-ForkManager-0.01/lib/AnyEvent/ForkManager.pm">AnyEvent::ForkManager</a>というのがあるのを見つたのでそれを使うように。worker数を指定出来る様にして並列に処理出来る様にしました</p>
-
-<p>あんまり気にしなくても良いとは思うけれども処理中だからってボットが無反応になるのはなんとなく嫌だったので</p>
-
-<h4>タスク処理中、dieしたら共通処理出来る様に</h4>
-
-<p><a href="http://search.cpan.org/~doy/Try-Tiny-0.20/lib/Try/Tiny.pm">Try::Tiny</a>を使って囲ってるだけなので別にいらないと言えばいらない（自前でtry catchするのでも良い）が、どうせボットが返すエラー文言なんて一律で同じように返したって全然良いと思うので、共通処理を設定出来る様にしておきました</p>
-
-<h3>ということで</h3>
-
-<p><a href="http://search.cpan.org/~himachoco/IkuSan-0.01/lib/IkuSan.pm">p5-IkuSan</a>が出来ました</p>
-
-<p>一応<a href="http://search.cpan.org/">CPAN</a>に上げるつもりだったので、今まで使ったことなかった<a href="http://search.cpan.org/~tokuhirom/Minilla/lib/Minilla.pm">Minilla</a>を使ってみたり、<a href="https://github.com/tokuhirom/plenv">plenv</a>と<a href="http://search.cpan.org/~miyagawa/Carton-v1.0.12/lib/Carton.pm">Carton</a>を経由して<a href="http://cr.yp.to/daemontools.html">daemontools</a>で起動出来るようにするというplackアプリの起動で良くある感じのアレをちゃんとやってみたり、その際にCarton経由しつつsystem perl使おうとするとCartonの方で環境変数PERL5OPTが設定されてしまうのでunsetするなりしないと読むモジュールが違って悲しい思いをするということを知ったり、perl5.19.10とか使うとNet::SSLeayあたりでpanicとかなんとか言われて動かなかったり（原因不明）forkしてる関係で子プロセスからsend_messageやらなんやらしようとして死にまくったりして、<a href="http://search.cpan.org/~yappo/App-Ikachan-v0.2.1/lib/App/Ikachan.pm">ikachan</a>リスペクトで頑張ってみたり、<a href="https://github.com/mix3/p5-IkuSan#readme">衣玖さんはやっぱり可愛い</a>んだなと再認識したりしました。CPANの方にもちゃんと画像出る様にしたい。</p>
-
-<p>あと以下の発言が実現出来てワタクシ非常に満足しております。煩悩はチカラなり。</p>
-
-<blockquote class="twitter-tweet" lang="ja"><p>（Ikusanっていう名前の入ったcpanモジュール作りたいだけです）</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/440167221289955328">March 2, 2014</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p class="post-footer"><span class="date">2014-04-12</span></p>
-<h2><a href="/2014/03/08/20140308/" title="">revel入門</a></h2>
-<p>絶賛人生の迷子中、mix3です</p>
-
-<h3>golangでWebアプリ</h3>
-
-<p>を作ってレビューしてもらったらそれはもうフルボッコでそれこそ雄山のあれな感じでした</p>
-
-<p><img src="/images/20140308/oisinbo_yuzan_arai.gif" alt="このWebアプリを作ったのは誰だぁっ" title="このWebアプリを作ったのは誰だぁっ" /></p>
-
-<p><a href="/2013/11/13/20131113/">isucon3</a>を元に手探りでやったため突っ込みどころを残してしまったようです</p>
-
-<ul>
-<li>panic使ってerror潰すのやめろ</li>
-<li>パス解決にCallerいらねーだろ
-<ul>
-<li>一応カレントディレクトリを判断したいという意図だったけどいらないらしい</li>
-</ul></li>
-<li>動かし方 go run hoge.go じゃなくて go build hoge.go; ./hoge ってちゃんと書け</li>
-</ul>
-
-<p>などなど</p>
-
-<p>golangのWebアプリの良いサンプル、一応最初に自分で探してはみたものの良い感じのを見つけられず、後で「<a href="https://github.com/campoy/todo">campoy/todo</a>が参考になるんじゃない？」と教えてもらいました</p>
-
-<p>最初に知りたかった… ちなみにパス解決の突っ込み</p>
-
-<p><a href="https://gist.github.com/mix3/9430209">https://gist.github.com/mix3/9430209</a></p>
-
-<pre><code>mix3 ~/tmp/caller_sample $ go run main.go
-2014/03/08 21:56:14 loading config (with caller) file: /private/tmp/caller_sample/config/config.json
-2014/03/08 21:56:14 OK
-2014/03/08 21:56:14 loading config file: config/config.json
-2014/03/08 21:56:14 OK
-
-mix3 ~/tmp $ go run caller_sample/main.go
-2014/03/08 21:56:38 loading config (with caller) file: /private/tmp/caller_sample/config/config.json
-2014/03/08 21:56:38 OK
-2014/03/08 21:56:38 loading config file: config/config.json
-2014/03/08 21:56:38 open config/config.json: no such file or directory
-exit status 1
-</code></pre>
-
-<p>こんな感じで実行パスに左右されないパス解決が出来るので使い方間違ってなければ意味はある書き方だとは思うんですが、まあ今回は必要ないよってことですかね</p>
-
-<h3><a href="http://robfig.github.io/revel/index.html">revel</a>使いましょ</h3>
-
-<p>そんな感じで <strong>センスの無い</strong> やつが手探りでやると悲惨なことになるのでWAFに乗っかった方がきっと良いと判断されたっぽい（実はそこらへん曖昧だったり…）のでとりあえず<a href="http://robfig.github.io/revel/index.html">revel</a>にのっかることにしました</p>
-
-<p>使い方は公式<a href="http://robfig.github.io/revel/index.html">http://robfig.github.io/revel/index.html</a>のtutorialとmanualとsample眺めてればなんとなく分かる感じです</p>
-
-<p>以下<a href="http://robfig.github.io/revel/samples/booking.html">revel/samples/booking</a>にはgorpとsqliteを使ったサンプルコードがあるのだけど、「mysqlにするにはどうすれば？」と少し悩んだのでメモ</p>
-
-<h4>conf/app.conf のsqliteの設定をmysqlのものに変更</h4>
-
-<pre><code>db.import = github.com/go-sql-driver/mysql
-db.driver = mysql
-db.spec   = root@tcp(localhost:3306)/alphawing
-</code></pre>
-
-<h4>app/controllers/gorp.go のimportしているドライバをmysqlのものに変更</h4>
-
-<pre><code>_ "github.com/go-sql-driver/mysql"
-</code></pre>
-
-<h4>app/controllers/gorp.go の gorp.DbMap{} を mysqlのものに変更</h4>
-
-<pre><code>Dbm = &amp;gorp.DbMap{Db: db.Db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
-</code></pre>
-
-<p>だいたいこれくらい弄るとmysqlで動く様になるはず</p>
-
-<p>ちなみにsampleだからだと思うのだけど<a href="https://github.com/robfig/revel/blob/master/samples/booking/app/controllers/init.go">以下のような感じ</a>でコントローラ処理の前後にBegin,Commit,Rollback を入れ込んでて吹いた</p>
-
-<pre><code>func init() {
-    revel.OnAppStart(InitDB)
-    revel.InterceptMethod((*GorpController).Begin, revel.BEFORE)
-    revel.InterceptMethod((*GorpController).Commit, revel.AFTER)
-    revel.InterceptMethod((*GorpController).Rollback, revel.FINALLY)
-}
-</code></pre>
-
-<p>modelsでちゃんとやりたいときにはどうしたらいんだろうか…</p>
-
-<p class="post-footer"><span class="date">2014-03-08</span></p>
-<h2><a href="/2013/07/28/20130728/" title="">テスト書くのって難しい</a></h2>
-<p>布都ちゃんが可愛すぎて生きるのが辛い。mix3です。</p>
-
-<p><img src="/images/20130728/futo.png" /></p>
-
-<h3>テスト書くのって難しい</h3>
-
-<p>なんの意味も無い以下のような糞コードがあったとして、各subについてテストを書いたりなんかしてみるとこんな感じだろうか？</p>
-
-<script src="https://gist.github.com/mix3/6097116.js"></script>
-
-<p>なんでこんな糞コード書いたかというと</p>
-
-<ul>
-<li>type_a, type_b
-<ul>
-<li>まあ良い</li>
-</ul></li>
-<li>type_to_execute
-<ul>
-<li>type増えたらやだなぁと思うけどまあ良い</li>
-</ul></li>
-<li>calc_type
-<ul>
-<li>計算複雑になったらやだなぁと思うけどまあ良い</li>
-</ul></li>
-<li>execute
-<ul>
-<li>type_a,type_b,type_to_execute,calc_typeが総じて複雑になった時、全部と通るテスト書くの考えたくないんだけど…</li>
-</ul></li>
-</ul>
-
-<p>普通にアプリ書いてると、色々複雑になった上でexecuteみたいにいくつも関数経由して結果を返すやんちゃな関数が出てきてしまうのですが、そういうののテストは正直書いていて死にたくなります。そして後で機能拡張しようとしてやっぱり死んだりする。</p>
-
-<p>「そもそも設計が悪いよ」「それ◯◯で出来るよ」「糞コードに何を求めてるの」etc… ということなんでしょうか。テスト大事なのは分かるのですが、正しくて網羅的なテストというのはきちんとスキルを身につけてないと出来ないよなぁと思う事が多いです。「書かないよりはずっと良い」と心の中で言い訳しながら書いてますが。</p>
-
-<p>ただ、以下のような事もあるのでやっぱりただ書くだけでもダメなんだなと思いつつ、もやもやする今日この頃です。</p>
-
-<blockquote class="twitter-tweet"><p>リファクタリングに使えないテストのことをレガシーカバーと呼ぶ。結局リファクタリングできないんだからレガシーコードのまま。</p>&mdash; いろふ(成分無調整) (@irof) <a href="https://twitter.com/irof/statuses/346946470890573824">June 18, 2013</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p class="post-footer"><span class="date">2013-07-28</span></p>
-<h2><a href="/2013/03/16/20130316/" title="">おれおれWebフレームワーク - Chaco</a></h2>
-<p>これ書くタイミング間違えてる気がするけどまあいいや</p>
-
-<p>なんとなく作ってみるなど。別に他フレームワークと差別化して使うようなものでもなく習作的な感じ。</p>
-
-<p>*::LiteとかDancerとか使えばワンソースでお手軽にWebアプリ書けるわけですが、実際に簡単なアプリ書くとなると、Liteなんだけどなんとなく仰々しい気がしてきたり。（Liteと言っても結局各フレームワークが持つ色々な機能は提供されているのでそう感じるのかな？）</p>
-
-<p>でもだからといって</p>
-
-<pre><code>my $app = sub {
-    my $env = shift;
-    [200, ['Content-Type' =&gt; 'text/plain'] ['Hello World'] ];
-};
-
-$app;
-</code></pre>
-
-<p>とかをモリモリ書いちゃうのもどう考えたって違う。</p>
-
-<p>ということで、Plack::*,Router::Simple(Router::Simple::Sinatraish),Text::Xslate,Data::Section::Simpleでそれっぽく書けるようなものを作ってみた。あまりにも決め打ちすぎるので、設定を渡せるようにしたりして融通効くようにしたいかな。あんまり迷惑にならなそうなところで使ってみてます。</p>
-
-<p>「劣化<a href="https://github.com/tokuhirom/MojaMoja">MojaMoja</a>」とか「劣化<a href="https://github.com/yusukebe/Hitagi">Hitagi</a>」とか「劣化<a href="http://blog.nomadscafe.jp/2010/07/nopastesinatrawaf.html">Shirahata</a>」とか思いつつ、劣化ということすらおこがましい状態。そりゃ大半コピーアンドペーストだもの仕方ないね。</p>
-
-<p>強いて特徴を上げるならフォワードっぽいこと出来るようにしてみた（$ENV{PATH_INFO}をlocalで書き換える力技なので問題あるとは思う）けどSinatra的ルーティングでフォワードは用途を勘違いしてる感が否めないので正直いらないと思います。マル。</p>
-
-<p>ちなみに<a href="https://github.com/mix3/Chaco">Chaco</a>はチャコと読みます。以前実家にいた、今は亡き黒のラブラドールレトリーバーの名前です。</p>
-
-<pre><code>use Chaco;
-# ...
-run;
-</code></pre>
-
-<p>で、元気に走り回るチャコの姿を思い浮かべながら書いてました。<a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=4507497">以前書いた絵</a>の日付みてもう４年近くも経ってるんですね…</p>
-
-<p class="post-footer"><span class="date">2013-03-16</span></p>
-<h2><a href="/2013/03/09/20130309-2/" title="">Plack::App::Directoryで画像を展開する</a></h2>
-<p>Perlのネガティブキャンペーンが流行ってる今日この頃ですが私は元気です（震え声）</p>
-
-<p>p5-JQueryPresentationHelperなんてなかったんや</p>
-
-<h3>Plack::App::Directoryで画像とかは展開してほしい</h3>
-
-<p>Plack::App::Directoryでカレントディレクトリ以下を見えるようにするワンライナーをbashrcとかでエイリアスにしておくとか良くあると思います。凄く便利なのでそれはそれとして良いのですが、画像とかは出来れば展開してそのまま見えてほしいかなと思う事もあります。</p>
-
-<p>なので、どうすれば良いかなとPlack::App::Directoryの中見てたのですが、もりもりっとtrタグを羅列してるだけっぽかったので、HTML出力を正規表現でちょちょっと弄ればそれっぽくなりそうだと思ったのでやってみました。</p>
-
-<script src="https://gist.github.com/mix3/5109843.js"></script>
-
-<p>ファイルを出力するときはPlack::Util::IOWithPathのオブジェクトを返してるようなので、そうでないときだけ正規表現でちょちょっと弄る感じですると良い感じに画像表示してくれました。</p>
-
-<p>swfも見えてほしいなぁという声が聞こえてきたのでswfobject.jsで見えるようにしてみました。</p>
-
-<script src="https://gist.github.com/mix3/5116797.js"></script>
-
-<p>タイルで見えるともっと良いね！という声が聞こえてきましたが、Plack::App::Directoryを使う限り無理なので、それは新規で別モジュール作った方が良いなと思いました。</p>
-
-<p>ちなみにswfobject.jsは2.2でもまだ微妙にセキュリティリスクがあるらしい <a href="http://t-ashula.hateblo.jp/entry/2012/01/11/233156">ほむらちゃほむほむ - swfobject.js がアレな話</a> ので外から見えるところで使うのは止めた方が良いかなと思います。</p>
-
-<p class="post-footer"><span class="date">2013-03-09</span></p>
-<h2><a href="/2013/03/09/20130309-1/" title="">p5-JQueryPresentationHelper作ってみた</a></h2>
-<p>やりたかったこと。</p>
-
-<ul>
-<li>use Hoge でメソッドが生えるモジュールの習作が作りたかった</li>
-<li><a href="http://code.google.com/p/jquery-presentation/">jquery-presentation</a>:<a href="http://dl.dropbox.com/u/268240/googleCode/jquery-presentation/index.html">demo</a>をmarkdownで書けるようにしたかった</li>
-</ul>
-
-<p>結果、良くわからないものが中途半端に出来てしまって、でも放置してもあれなのでとりあえずgithubにアップ。</p>
-
-<p>git clone を前提としたもっとゆるい感じで作った方が良い感じにおさまった気がしてます。</p>
-
-<p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
-
-<p class="post-footer"><span class="date">2013-03-09</span></p>
-<h2><a href="/2012/04/14/20120414/" title="">Capture::Tiny</a></h2>
-<p>前回pixivブログは github pages のコピーだから大丈夫とか書いたけど、github pages で書き始める前のpixivブログはバックアップ取ってなかったのでほんとは大丈夫じゃなかった mix3 です。SSH+LDAP とか keepalived を試してみた記事が消えたのはちょっともったいなかったかな。まあ、Google検索でキャッシュ漁ればある程度は発掘出来そうではあるけれども。</p>
-
-<h3>p5-SWFEditor</h3>
-
-<p>アウトプットが無さ過ぎて良くないなぁということでひねり出してみる。</p>
-
-<p>前の記事に書いたp5-SWFEditorですが、swf_info と print_tag_data はCが標準出力をしていて、これをテストしようとすると標準出力をキャプチャしないといけなくてちょっと困ってしまいました。Capture::Tiny というものを使うとキャプチャ出来るというのは<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんから教わって試してみたけれどなぜか上手く行かず。言われて試してみたときは途中までしかキャプチャ出来ませんでした。</p>
-
-<p>ただ、途中までしかキャプチャできないという時点で出力がバッファされているというのはピンと来ていて、実際その通りだったのですが、Perlでこれをどうこうする方法が分からず結局今もどうすれば良いのかというのは分かっていません。今はXSのほうでfflushするようにしてテストが出来るようにしています。</p>
-
-<p>以下標準出力を捕まえる方法を探っていたときに書いたサンプルです。fflushしたときの標準出力とPerlIO_stdoutfを使った標準出力はキャプチャできていますが、素直にprintfしたときはキャプチャできず遅れてバッファに溜まっていたものが標準出力されてしまっています。</p>
-
-<script src="https://gist.github.com/2384966.js"> </script>
-
-<p class="post-footer"><span class="date">2012-04-14</span></p>
-<h2><a href="/2012/04/10/20120410/" title="">やったー cpan auhor になったよー＼(^o^)／</a></h2>
-<p>今年入ってからミスが多すぎてそろそろ本当に首になるか、潔く自分から辞めるかした方が良いんじゃないかと真剣に考えるmix3です。</p>
-
-<h3><a href="http://pixiv.cc/mix3">pixivブログ消滅</a></h3>
-
-<p>pixivブログで書いていた事は github の pages のコピーだったので、pixivブログのサービス終了には特にどうということは無かったのですが、本当にサービスが終了して見れなくなってしまったので、ようやっと github の方に完全に移行しました。</p>
-
-<p>移行にあたって、ブログ生成スクリプトを改修（リファクタリング的には今も相当酷いが）して、Octpressのような感じでURLがそれっぽくなるようにしてみました。後はカテゴリかタグに対応してページング出来れば良いかなと思っています。</p>
-
-<p>それにしても 元 pixiv ユーザ（本当は今もpixivユーザのつもりだけど今となってはまともに描いてないので…）として pixiv ブログ自体は気に入ってたのでちょっと残念です。</p>
-
-<h3><a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a></h3>
-
-<p>タイトルに書いた通り、<a href="http://search.cpan.org/~himachoco/">cpan author</a> になりました。p5-SWFEditorという swf の画像置換やMovieClipの置換など、swf を perl から色々弄れるライブラリを作成してアップしました。</p>
-
-<p>p5-SWFEditorの中身は <a href="https://twitter.com/#!/yoya">@yoya</a> さんの好意により <a href="https://twitter.com/#!/yoya">@yoya</a> さん作 <a href="http://sourceforge.jp/projects/swfed/">SWFEditor for PHP</a> をまるっとそのまま使わせてもらっています。自分がしたのは C で書かれている SWFEditor の機能を使うためのインタフェースを XS で書いた形になります。
-（そもそも SWFEdito for PHP が移植性などを考慮してSWF操作のコア部分とそれを使うインタフェースに分離して作られているので非常に移植しやすくなっています。素晴らしいですね！）</p>
-
-<p>SWFEditor の Perl バインディングの作成を快く許可して下さった <a href="https://twitter.com/#!/yoya">@yoya</a> さんに心から感謝致します。</p>
-
-<h3>ということで</h3>
-
-<p>ブログ移行にともないpixivブログからCSSを持ってきてそれっぽくしたのでそれのお知らせと、p5-SWFEditor を cpan にアップして cpan author になったよー というお知らせでした。</p>
-
-<p class="post-footer"><span class="date">2012-04-10</span></p>
-<h2><a href="/2011/07/22/20110722/" title="">blessとMouse</a></h2>
-<h3>健康診断</h3>
-
-<p>健康診断へ行って血を取ってきました。前回はチューブ通して採血の容器に取ってたのが今回は針から直結するようになって、それのおかげか何なのかは分りませんが採血スピードが向上して地味に嬉しかったです。痛いのは嫌いなのです…</p>
-
-<h3>blessとMouseの速度比較</h3>
-
-<p>すこし気になってblessとMouse、その他の速度比較。いろんなところでやられてるので今更自分でする事でもないでしょうが。なおblessで作るクラスは手を抜いて型制限などの実装はせずアクセサを用意して値を操作するだけにしました。適当適当。</p>
-
-<p><a href="http://blog.livedoor.jp/sasata299/archives/51281496.html">いまさら聞けない「Moose」超入門</a>を参考にblessとMouseのコードを書き足しました。以下の処理の速度を比較しています。</p>
-
-<ol>
-<li>hoge/fugaのアクセサを持ったクラスをnew
-<ul>
-<li>初期値はfugaに1</li>
-</ul></li>
-<li>hogeに'bbb'を代入</li>
-<li>fugaの値を取得</li>
-<li>hogeの値を取得</li>
-</ol>
-
-<h4>cost.pl</h4>
-
-<pre><code># おまじないしない場合
-package MooseTest;
-use Moose;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-no Moose;
-
-1;
-
-# おまじないする場合
-package MooseTest_mi;
-use Moose;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-__PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
-
-no Moose;
-
-1;
-
-# おまじないしない場合
-package MouseTest;
-use Mouse;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-no Mouse;
-
-1;
-
-# おまじないする場合
-package MouseTest_mi;
-use Mouse;
-
-has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
-has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
-
-__PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
-
-no Mouse;
-
-1;
-
-# Class::Accessor を使った場合
-package ClassAccessorTest;
-use strict;
-use warnings;
-use base 'Class::Accessor';
-
-__PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
-
-1;
-
-# Class::Accessor::Fast を使った場合
-package ClassAccessorFastTest;
-use strict;
-use warnings;
-use base 'Class::Accessor::Fast';
-
-__PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
-
-1;
-
-# perl5 OOP の場合
-package Bless;
-use strict;
-use warnings;
-
-sub new {
-    my $class = shift;
-    my $self  = shift || {};
-    return bless $self, $class;
-}
-
-sub hoge {
-    my $self = shift;
-    if (@_) {
-        $self-&gt;{hoge} = shift;
-    } else {
-        $self-&gt;{hoge};
-    }
-}
-
-sub fuga {
-    my $self = shift;
-    if (@_) {
-        $self-&gt;{fuga} = shift;
-    } else {
-        $self-&gt;{fuga};
-    }
-}
-
-1;
-
-package main;
-use strict;
-use warnings;
-use Benchmark qw(cmpthese timethese);
-
-cmpthese timethese(100000, {
-    moose =&gt; sub {
-        my $moose = MooseTest-&gt;new( fuga =&gt; 1 );
-        $moose-&gt;hoge('bbb');
-        $moose-&gt;fuga;
-        $moose-&gt;hoge;
-    },
-    moose_mi =&gt; sub {
-        my $moose = MooseTest_mi-&gt;new( fuga =&gt; 1 );
-        $moose-&gt;hoge('bbb');
-        $moose-&gt;fuga;
-        $moose-&gt;hoge;
-    },
-    mouse =&gt; sub {
-        my $mouse = MouseTest-&gt;new( fuga =&gt; 1 );
-        $mouse-&gt;hoge('bbb');
-        $mouse-&gt;fuga;
-        $mouse-&gt;hoge;
-    },
-    mouse_mi =&gt; sub {
-        my $mouse = MouseTest_mi-&gt;new( fuga =&gt; 1 );
-        $mouse-&gt;hoge('bbb');
-        $mouse-&gt;fuga;
-        $mouse-&gt;hoge;
-    },
-    accessor =&gt; sub {
-        my $class = ClassAccessorTest-&gt;new({ fuga =&gt; 1 });
-        $class-&gt;hoge('bbb');
-        $class-&gt;fuga;
-        $class-&gt;hoge;
-    },
-    accessor_fast =&gt; sub {
-        my $class = ClassAccessorFastTest-&gt;new({ fuga =&gt; 1 });
-        $class-&gt;hoge('bbb');
-        $class-&gt;fuga;
-        $class-&gt;hoge;
-    },
-    bless =&gt; sub {
-        my $class = Bless-&gt;new({ fuga =&gt; 1 });
-        $class-&gt;hoge('bbb');
-        $class-&gt;fuga;
-        $class-&gt;hoge;
-    },
-});
-</code></pre>
-
-<p>結果はこんな感じになりました。何回か実行するとばらつくので３つほど結果を書き出しています。</p>
-
-<pre><code>Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-  accessor:  2 wallclock secs ( 1.19 usr +  0.00 sys =  1.19 CPU) @ 84033.61/s (n=100000)
-accessor_fast:  0 wallclock secs ( 0.58 usr +  0.00 sys =  0.58 CPU) @ 172413.79/s (n=100000)
-     bless:  1 wallclock secs ( 0.41 usr +  0.00 sys =  0.41 CPU) @ 243902.44/s (n=100000)
-     moose: 21 wallclock secs (21.26 usr +  0.02 sys = 21.28 CPU) @ 4699.25/s (n=100000)
-  moose_mi:  2 wallclock secs ( 1.67 usr +  0.00 sys =  1.67 CPU) @ 59880.24/s (n=100000)
-     mouse:  0 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
-  mouse_mi: -1 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
-                  Rate moose moose_mi accessor accessor_fast mouse_mi mouse bless
-moose           4699/s    --     -92%     -94%          -97%     -98%  -98%  -98%
-moose_mi       59880/s 1174%       --     -29%          -65%     -69%  -69%  -75%
-accessor       84034/s 1688%      40%       --          -51%     -57%  -57%  -66%
-accessor_fast 172414/s 3569%     188%     105%            --     -12%  -12%  -29%
-mouse_mi      196078/s 4073%     227%     133%           14%       --    0%  -20%
-mouse         196078/s 4073%     227%     133%           14%       0%    --  -20%
-bless         243902/s 5090%     307%     190%           41%      24%   24%    --
-
-Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-  accessor:  1 wallclock secs ( 0.87 usr +  0.00 sys =  0.87 CPU) @ 114942.53/s (n=100000)
-accessor_fast:  0 wallclock secs ( 0.56 usr +  0.00 sys =  0.56 CPU) @ 178571.43/s (n=100000)
-     bless:  1 wallclock secs ( 0.43 usr +  0.00 sys =  0.43 CPU) @ 232558.14/s (n=100000)
-     moose: 18 wallclock secs (18.30 usr +  0.00 sys = 18.30 CPU) @ 5464.48/s (n=100000)
-  moose_mi:  2 wallclock secs ( 1.57 usr +  0.00 sys =  1.57 CPU) @ 63694.27/s (n=100000)
-     mouse:  0 wallclock secs ( 0.55 usr +  0.00 sys =  0.55 CPU) @ 181818.18/s (n=100000)
-  mouse_mi:  1 wallclock secs ( 0.65 usr +  0.00 sys =  0.65 CPU) @ 153846.15/s (n=100000)
-                  Rate moose moose_mi accessor mouse_mi accessor_fast mouse bless
-moose           5464/s    --     -91%     -95%     -96%          -97%  -97%  -98%
-moose_mi       63694/s 1066%       --     -45%     -59%          -64%  -65%  -73%
-accessor      114943/s 2003%      80%       --     -25%          -36%  -37%  -51%
-mouse_mi      153846/s 2715%     142%      34%       --          -14%  -15%  -34%
-accessor_fast 178571/s 3168%     180%      55%      16%            --   -2%  -23%
-mouse         181818/s 3227%     185%      58%      18%            2%    --  -22%
-bless         232558/s 4156%     265%     102%      51%           30%   28%    --
-
-Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
-  accessor:  1 wallclock secs ( 0.90 usr +  0.00 sys =  0.90 CPU) @ 111111.11/s (n=100000)
-accessor_fast:  0 wallclock secs ( 0.75 usr +  0.00 sys =  0.75 CPU) @ 133333.33/s (n=100000)
-     bless:  1 wallclock secs ( 0.47 usr +  0.00 sys =  0.47 CPU) @ 212765.96/s (n=100000)
-     moose: 22 wallclock secs (21.62 usr +  0.01 sys = 21.63 CPU) @ 4623.21/s (n=100000)
-  moose_mi:  1 wallclock secs ( 1.61 usr +  0.00 sys =  1.61 CPU) @ 62111.80/s (n=100000)
-     mouse:  1 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
-  mouse_mi:  0 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
-                  Rate moose moose_mi accessor accessor_fast bless mouse_mi mouse
-moose           4623/s    --     -93%     -96%          -97%  -98%     -98%  -98%
-moose_mi       62112/s 1243%       --     -44%          -53%  -71%     -72%  -72%
-accessor      111111/s 2303%      79%       --          -17%  -48%     -50%  -50%
-accessor_fast 133333/s 2784%     115%      20%            --  -37%     -40%  -40%
-bless         212766/s 4502%     243%      91%           60%    --      -4%   -4%
-mouse_mi      222222/s 4707%     258%     100%           67%    4%       --    0%
-mouse         222222/s 4707%     258%     100%           67%    4%       0%    --
-</code></pre>
-
-<p>Mouseが爆速でblessより速いこともあるようです。にわかに信じられないのですが。何か最適化されているものでもあるのでしょうか？ちゃんと中身を見ないといけませんね。</p>
-
-<h3>思う事</h3>
-
-<p>速度というのは最近気にしているテーマで、Webアプリの１リクエストのレスポンスタイムが10msと100msとあったとして、それの時間差が90msと何となく微々たる物のように思う物でも分間10リクエストとして合計100msと1000msになり差が900msとどんどん大きくなっていくのが恐ろしいなぁと思ったりしています。もしもこれが分間じゃなくて秒間だったら？10リクエストじゃなくて100リクエストだったら？1000リクエストだったら？…まだ実感の伴わない話なのでアレですが今後直面する問題だろうなと感じています。モダンだ流行だと色々なものに飛びつくのも勉強になって良いですが、ただ実際それが実用に堪えうるのかどうかちゃんと検証することも覚えないといけないなと。そんなことを考えています。</p>
-
-<p class="post-footer"><span class="date">2011-07-22</span></p>
-<!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
-      </div>
-      <div class="autopagerize_insert_before"></div>
-    </div>
-    <div id="sidebar">
-<h3>Profile</h3>
-<p>
-  <a href="/"><img class="float-left" width="80" height="80" alt="avatar" src="/images/avatar.png"></a>
-  <a href="https://twitter.com/#!/mix3">mix3</a><br />
-  日々惰性で生きているダメ人間。Webエンジニアのような何かだが、実は絵を描くマのエンジニア志望なのは今も変わらない。
-</p>
-<h3>Archives</h3>
-<ul class="sidemenu">
-  <li><a href="/archives/2014/06/">2014年06月</a></li>
-  <li><a href="/archives/2014/04/">2014年04月</a></li>
-  <li><a href="/archives/2014/03/">2014年03月</a></li>
-  <li><a href="/archives/2014/01/">2014年01月</a></li>
-  <li><a href="/archives/2013/12/">2013年12月</a></li>
-  <li><a href="/archives/2013/11/">2013年11月</a></li>
-  <li><a href="/archives/2013/10/">2013年10月</a></li>
-  <li><a href="/archives/2013/08/">2013年08月</a></li>
-  <li><a href="/archives/2013/07/">2013年07月</a></li>
-  <li><a href="/archives/2013/04/">2013年04月</a></li>
-  <li><a href="/archives/2013/03/">2013年03月</a></li>
-  <li><a href="/archives/2013/02/">2013年02月</a></li>
-  <li><a href="/archives/2013/01/">2013年01月</a></li>
-  <li><a href="/archives/2012/12/">2012年12月</a></li>
-  <li><a href="/archives/2012/11/">2012年11月</a></li>
-  <li><a href="/archives/2012/08/">2012年08月</a></li>
-  <li><a href="/archives/2012/04/">2012年04月</a></li>
-  <li><a href="/archives/2011/11/">2011年11月</a></li>
-  <li><a href="/archives/2011/07/">2011年07月</a></li>
-  <li><a href="/archives/2011/06/">2011年06月</a></li>
-  <li><a href="/archives/2011/05/">2011年05月</a></li>
-  <li><a href="/archives/2011/04/">2011年04月</a></li>
-</ul>
-<h3>coderwall</h3>
-<p>
-<section class="coderwall" data-coderwall-username="mix3" data-coderwall-orientation="horizontal"></section>
-</p>
-<h3>TagCloud</h3>
-<p><style type="text/css">
-
-#htmltagcloud {
-  text-align:  center;
-  line-height: 1;
-}
-span.tagcloud0 {font-size: 12px;}
-span.tagcloud0 a {text-decoration: none;}
-span.tagcloud1 {font-size: 13px;}
-span.tagcloud1 a {text-decoration: none;}
-span.tagcloud2 {font-size: 14px;}
-span.tagcloud2 a {text-decoration: none;}
-span.tagcloud3 {font-size: 15px;}
-span.tagcloud3 a {text-decoration: none;}
-span.tagcloud4 {font-size: 16px;}
-span.tagcloud4 a {text-decoration: none;}
-span.tagcloud5 {font-size: 17px;}
-span.tagcloud5 a {text-decoration: none;}
-span.tagcloud6 {font-size: 18px;}
-span.tagcloud6 a {text-decoration: none;}
-span.tagcloud7 {font-size: 19px;}
-span.tagcloud7 a {text-decoration: none;}
-span.tagcloud8 {font-size: 20px;}
-span.tagcloud8 a {text-decoration: none;}
-span.tagcloud9 {font-size: 21px;}
-span.tagcloud9 a {text-decoration: none;}
-span.tagcloud10 {font-size: 22px;}
-span.tagcloud10 a {text-decoration: none;}
-span.tagcloud11 {font-size: 23px;}
-span.tagcloud11 a {text-decoration: none;}
-span.tagcloud12 {font-size: 24px;}
-span.tagcloud12 a {text-decoration: none;}
-span.tagcloud13 {font-size: 25px;}
-span.tagcloud13 a {text-decoration: none;}
-span.tagcloud14 {font-size: 26px;}
-span.tagcloud14 a {text-decoration: none;}
-span.tagcloud15 {font-size: 27px;}
-span.tagcloud15 a {text-decoration: none;}
-span.tagcloud16 {font-size: 28px;}
-span.tagcloud16 a {text-decoration: none;}
-span.tagcloud17 {font-size: 29px;}
-span.tagcloud17 a {text-decoration: none;}
-span.tagcloud18 {font-size: 30px;}
-span.tagcloud18 a {text-decoration: none;}
-span.tagcloud19 {font-size: 31px;}
-span.tagcloud19 a {text-decoration: none;}
-span.tagcloud20 {font-size: 32px;}
-span.tagcloud20 a {text-decoration: none;}
-span.tagcloud21 {font-size: 33px;}
-span.tagcloud21 a {text-decoration: none;}
-span.tagcloud22 {font-size: 34px;}
-span.tagcloud22 a {text-decoration: none;}
-span.tagcloud23 {font-size: 35px;}
-span.tagcloud23 a {text-decoration: none;}
-span.tagcloud24 {font-size: 36px;}
-span.tagcloud24 a {text-decoration: none;}
-</style><div id="htmltagcloud">
-<span class="tagcloud0"><a href="/tag/Bot/">Bot</a></span>
-<span class="tagcloud0"><a href="/tag/CI/">CI</a></span>
-<span class="tagcloud0"><a href="/tag/CRUD/">CRUD</a></span>
-<span class="tagcloud0"><a href="/tag/Capture%3A%3ATiny/">Capture::Tiny</a></span>
-<span class="tagcloud0"><a href="/tag/Chrome/">Chrome</a></span>
-<span class="tagcloud0"><a href="/tag/Hadoop/">Hadoop</a></span>
-<span class="tagcloud0"><a href="/tag/IRC/">IRC</a></span>
-<span class="tagcloud7"><a href="/tag/Linux/">Linux</a></span>
-<span class="tagcloud0"><a href="/tag/Log/">Log</a></span>
-<span class="tagcloud0"><a href="/tag/Markdown/">Markdown</a></span>
-<span class="tagcloud7"><a href="/tag/MobaSiF/">MobaSiF</a></span>
-<span class="tagcloud0"><a href="/tag/Mojolicious/">Mojolicious</a></span>
-<span class="tagcloud0"><a href="/tag/Mouse/">Mouse</a></span>
-<span class="tagcloud12"><a href="/tag/MySQL/">MySQL</a></span>
-<span class="tagcloud0"><a href="/tag/PhotonCloud/">PhotonCloud</a></span>
-<span class="tagcloud0"><a href="/tag/Play/">Play</a></span>
-<span class="tagcloud0"><a href="/tag/Qudo/">Qudo</a></span>
-<span class="tagcloud0"><a href="/tag/SNBinder/">SNBinder</a></span>
-<span class="tagcloud0"><a href="/tag/SQLite/">SQLite</a></span>
-<span class="tagcloud0"><a href="/tag/Scala/">Scala</a></span>
-<span class="tagcloud0"><a href="/tag/Teng/">Teng</a></span>
-<span class="tagcloud0"><a href="/tag/Vagrant/">Vagrant</a></span>
-<span class="tagcloud0"><a href="/tag/Virtualbox/">Virtualbox</a></span>
-<span class="tagcloud0"><a href="/tag/Xslate/">Xslate</a></span>
-<span class="tagcloud0"><a href="/tag/bless/">bless</a></span>
-<span class="tagcloud0"><a href="/tag/bonding/">bonding</a></span>
-<span class="tagcloud0"><a href="/tag/bot/">bot</a></span>
-<span class="tagcloud0"><a href="/tag/cpan/">cpan</a></span>
-<span class="tagcloud0"><a href="/tag/cpan%20author/">cpan author</a></span>
-<span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
-<span class="tagcloud7"><a href="/tag/golang/">golang</a></span>
-<span class="tagcloud0"><a href="/tag/heroku/">heroku</a></span>
-<span class="tagcloud0"><a href="/tag/isucon/">isucon</a></span>
-<span class="tagcloud0"><a href="/tag/java/">java</a></span>
-<span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>
-<span class="tagcloud12"><a href="/tag/p5-SWFEditor/">p5-SWFEditor</a></span>
-<span class="tagcloud0"><a href="/tag/packer/">packer</a></span>
-<span class="tagcloud24"><a href="/tag/perl/">perl</a></span>
-<span class="tagcloud0"><a href="/tag/phantomjs/">phantomjs</a></span>
-<span class="tagcloud12"><a href="/tag/php/">php</a></span>
-<span class="tagcloud0"><a href="/tag/vagrant/">vagrant</a></span>
-<span class="tagcloud0"><a href="/tag/wicket/">wicket</a></span>
-<span class="tagcloud7"><a href="/tag/%E3%81%95%E3%81%8F%E3%82%89VPS/">さくらVPS</a></span>
-<span class="tagcloud7"><a href="/tag/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">インフラ</a></span>
-<span class="tagcloud0"><a href="/tag/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91/">オブジェクト指向</a></span>
-<span class="tagcloud0"><a href="/tag/%E3%82%B5%E3%83%BC%E3%83%90%E7%AE%A1%E7%90%86/">サーバ管理</a></span>
-<span class="tagcloud0"><a href="/tag/%E3%83%86%E3%82%B9%E3%83%88/">テスト</a></span>
-<span class="tagcloud0"><a href="/tag/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%A8%AD%E5%AE%9A/">ネットワーク設定</a></span>
-<span class="tagcloud0"><a href="/tag/%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%8B%E3%83%B3%E3%82%B0/">パーティショニング</a></span>
-<span class="tagcloud12"><a href="/tag/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AF%E3%83%BC%E3%82%AF/">フレームワーク</a></span>
-<span class="tagcloud0"><a href="/tag/%E3%83%96%E3%83%AD%E3%82%B0/">ブログ</a></span>
-<span class="tagcloud0"><a href="/tag/%E4%BF%AE%E5%A3%AB%E8%AB%96%E6%96%87/">修士論文</a></span>
-<span class="tagcloud7"><a href="/tag/%E8%90%BD%E6%9B%B8%E3%81%8D/">落書き</a></span>
-<span class="tagcloud7"><a href="/tag/%E9%9B%91%E8%A8%98/">雑記</a></span>
-</div></p>
-    </div>
-  </div>
-  <div id="footer">
-    <p>
-      &copy; All your copyright info here  
-  
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  
-      <a href="http://www.bluewebtemplates.com/" title="Website Templates">website templates</a> by <a href="http://www.styleshout.com/">styleshout</a> |
-      Valid <a href="http://validator.w3.org/check?uri=referer">XHTML</a> | 
-      <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a>
-  
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  
-      <a href="/">Home</a>&nbsp;|&nbsp;
-      <a href="/">RSS Feed</a>
-    </p>
-  </div>
-</body>
+<!doctype html>
+<html>
+	<head>
+		<title>萌えキャラとは何だったのか</title>
+		<meta charset="utf-8" />
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<script src="/js/app.js"></script>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-48133863-1', 'mix3.github.io');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<header class="grid">
+			<div class="col-1-1">
+				<img src="/images/header.jpg" />
+				<h1><a href="/">萌えキャラとは何だったのか</a></h1>
+				<h2>ギークにも絵描きにもなれない者の末路</h2>
+				<div class="top-menu">
+					<ul>
+						<li><a href="/index.rdf">RSS Feed</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<nav class="grid">
+				<div class="col-1-1">
+					<ul>
+						<li class="current">Blog</li>
+						<li class=""><a href="/archives">Archive</a></li>
+					</ul>
+				</div>
+		</nav>
+		<main class="grid">
+			<article class="col-8-12">
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2013/03/09/20130309-2/">Plack::App::Directoryで画像を展開する</a></h2>
+		</div>
+		<div class="footer">
+			<time>2013-03-09</time>
+			<ul class="tag">
+					<li><a href="/tag/perl">perl(9)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer"></div>
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2013/07/28/20130728/">テスト書くのって難しい</a></h2>
+		</div>
+		<div class="footer">
+			<time>2013-07-28</time>
+			<ul class="tag">
+					<li><a href="/tag/perl">perl(9)</a></li>
+					<li><a href="/tag/テスト">テスト(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer"></div>
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></h2>
+		</div>
+		<div class="footer">
+			<time>2014-04-12</time>
+			<ul class="tag">
+					<li><a href="/tag/perl">perl(9)</a></li>
+					<li><a href="/tag/cpan">cpan(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer"></div>
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2014/03/08/20140308/">revel入門</a></h2>
+		</div>
+		<div class="footer">
+			<time>2014-03-08</time>
+			<ul class="tag">
+					<li><a href="/tag/perl">perl(9)</a></li>
+					<li><a href="/tag/bot">bot(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer"></div>
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2013/03/09/20130309-1/">p5-JQueryPresentationHelper作ってみた</a></h2>
+		</div>
+		<div class="footer">
+			<time>2013-03-09</time>
+			<ul class="tag">
+					<li><a href="/tag/perl">perl(9)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer"></div>
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2013/03/16/20130316/">おれおれWebフレームワーク - Chaco</a></h2>
+		</div>
+		<div class="footer">
+			<time>2013-03-16</time>
+			<ul class="tag">
+					<li><a href="/tag/perl">perl(9)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer"></div>
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2011/07/22/20110722/">blessとMouse</a></h2>
+		</div>
+		<div class="footer">
+			<time>2011-07-22</time>
+			<ul class="tag">
+					<li><a href="/tag/perl">perl(9)</a></li>
+					<li><a href="/tag/bless">bless(1)</a></li>
+					<li><a href="/tag/Mouse">Mouse(1)</a></li>
+					<li><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer"></div>
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2012/04/14/20120414/">Capture::Tiny</a></h2>
+		</div>
+		<div class="footer">
+			<time>2012-04-14</time>
+			<ul class="tag">
+					<li><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
+					<li><a href="/tag/perl">perl(9)</a></li>
+					<li><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer"></div>
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2012/04/10/20120410/">やったー cpan auhor になったよー＼(^o^)／</a></h2>
+		</div>
+		<div class="footer">
+			<time>2012-04-10</time>
+			<ul class="tag">
+					<li><a href="/tag/cpan author">cpan author(1)</a></li>
+					<li><a href="/tag/perl">perl(9)</a></li>
+					<li><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer"></div>
+			</article>
+			<aside class="col-4-12">
+				<div class="col-1-1">
+					<h3>Profile</h3>
+					<div class="content">
+						<img src="/images/avatar.png" class="float-left" style="width:100px;" />
+						<a href="https://twitter.com/mix3" target="_blank">twitter @mix3</a><br />
+						<a href="https://github.com/mix3/" target="_blank">github @mix3</a><br />
+						<a href="http://pixiv.me/mix3" target="_blank">pixiv @mix3</a><br />
+						<div class="clearer"></div>
+						Webエンジニアのような何か。絶賛人生の迷子中。スキルセット的には以下のような感じ<br />
+						Perl/MySQL/Linux/ソーシャルアプリ開発・運用
+					</div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>coderwall</h3>
+					<div id="coderwall"></div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Recent Posts</h3>
+					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
+						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
+						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
+						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
+						<li><a href="/blog/2013/12/28/20131228/">Vagrant with Virtualbox tips - internal network setting</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2014">2014年(4)</a>
+								<ul>
+										<li><a href="/archives/2014/06">2014年06月(1)</a></li>
+										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
+										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
+										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2013">2013年(18)</a>
+								<ul>
+										<li><a href="/archives/2013/12">2013年12月(3)</a></li>
+										<li><a href="/archives/2013/11">2013年11月(2)</a></li>
+										<li><a href="/archives/2013/10">2013年10月(5)</a></li>
+										<li><a href="/archives/2013/08">2013年08月(1)</a></li>
+										<li><a href="/archives/2013/07">2013年07月(1)</a></li>
+										<li><a href="/archives/2013/04">2013年04月(1)</a></li>
+										<li><a href="/archives/2013/03">2013年03月(3)</a></li>
+										<li><a href="/archives/2013/02">2013年02月(1)</a></li>
+										<li><a href="/archives/2013/01">2013年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2012">2012年(7)</a>
+								<ul>
+										<li><a href="/archives/2012/12">2012年12月(1)</a></li>
+										<li><a href="/archives/2012/11">2012年11月(2)</a></li>
+										<li><a href="/archives/2012/08">2012年08月(1)</a></li>
+										<li><a href="/archives/2012/04">2012年04月(3)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2011">2011年(13)</a>
+								<ul>
+										<li><a href="/archives/2011/11">2011年11月(1)</a></li>
+										<li><a href="/archives/2011/07">2011年07月(6)</a></li>
+										<li><a href="/archives/2011/06">2011年06月(3)</a></li>
+										<li><a href="/archives/2011/05">2011年05月(2)</a></li>
+										<li><a href="/archives/2011/04">2011年04月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Tags</h3>
+					<ul class="sidemenu toggle_tree_2">
+						<li class=""><a href="/tag/perl">perl(9)</a></li>
+						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+						<li class=""><a href="/tag/php">php(3)</a></li>
+						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
+						<li class="hide"><a href="/tag/Linux">Linux(2)</a></li>
+						<li class="hide"><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
+						<li class="hide"><a href="/tag/golang">golang(2)</a></li>
+						<li class="hide"><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
+						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
+						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
+						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class="hide"><a href="/tag/Bot">Bot(1)</a></li>
+						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
+						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
+						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
+						<li class="hide"><a href="/tag/Chrome">Chrome(1)</a></li>
+						<li class="hide"><a href="/tag/Hadoop">Hadoop(1)</a></li>
+						<li class="hide"><a href="/tag/IRC">IRC(1)</a></li>
+						<li class="hide"><a href="/tag/Log">Log(1)</a></li>
+						<li class="hide"><a href="/tag/Markdown">Markdown(1)</a></li>
+						<li class="hide"><a href="/tag/Mojolicious">Mojolicious(1)</a></li>
+						<li class="hide"><a href="/tag/Mouse">Mouse(1)</a></li>
+						<li class="hide"><a href="/tag/PhotonCloud">PhotonCloud(1)</a></li>
+						<li class="hide"><a href="/tag/Play">Play(1)</a></li>
+						<li class="hide"><a href="/tag/Qudo">Qudo(1)</a></li>
+						<li class="hide"><a href="/tag/SNBinder">SNBinder(1)</a></li>
+						<li class="hide"><a href="/tag/SQLite">SQLite(1)</a></li>
+						<li class="hide"><a href="/tag/Scala">Scala(1)</a></li>
+						<li class="hide"><a href="/tag/Teng">Teng(1)</a></li>
+						<li class="hide"><a href="/tag/Vagrant">Vagrant(1)</a></li>
+						<li class="hide"><a href="/tag/Virtualbox">Virtualbox(1)</a></li>
+						<li class="hide"><a href="/tag/Xslate">Xslate(1)</a></li>
+						<li class="hide"><a href="/tag/bless">bless(1)</a></li>
+						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
+						<li class="hide"><a href="/tag/bot">bot(1)</a></li>
+						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
+						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
+						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
+						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
+						<li class="hide"><a href="/tag/java">java(1)</a></li>
+						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
+						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/vagrant">vagrant(1)</a></li>
+						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
+						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
+						<li class="hide"><a href="/tag/サーバ管理">サーバ管理(1)</a></li>
+						<li class="hide"><a href="/tag/テスト">テスト(1)</a></li>
+						<li class="hide"><a href="/tag/ネットワーク設定">ネットワーク設定(1)</a></li>
+						<li class="hide"><a href="/tag/パーティショニング">パーティショニング(1)</a></li>
+						<li class="hide"><a href="/tag/ブログ">ブログ(1)</a></li>
+						<li class="hide"><a href="/tag/修士論文">修士論文(1)</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+			</aside>
+		</main>
+		<footer class="grid">
+			<div class="col-1-1">
+				<small>&copy; copyright 2014 mix3.github.io</small>
+			</div>
+		</footer>
+	</body>
 </html>

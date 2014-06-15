@@ -5,12 +5,12 @@
 >
 
 <channel>
-<title>萌えキャラとは何だったのか</title>
+<title>&#x840C;&#x3048;&#x30AD;&#x30E3;&#x30E9;&#x3068;&#x306F;&#x4F55;&#x3060;&#x3063;&#x305F;&#x306E;&#x304B;</title>
 <link>http://mix3.github.io</link>
-<description>ギークにも絵描きにもなれない者の末路</description>
+<description>&#x30AE;&#x30FC;&#x30AF;&#x306B;&#x3082;&#x7D75;&#x63CF;&#x304D;&#x306B;&#x3082;&#x306A;&#x308C;&#x306A;&#x3044;&#x8005;&#x306E;&#x672B;&#x8DEF;</description>
 
 <item>
-<title>golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</title>
+<title>golangWAF&#x306E;traffic&#x3092;&#x89E6;&#x308B;&#x3064;&#x3044;&#x3067;&#x306B;&#x30B5;&#x30F3;&#x30D7;&#x30EB;&#x30B3;&#x30FC;&#x30C9;&#x3092;&#x4F5C;&#x3063;&#x3066;CI&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x3092;&#x8A66;&#x3057;&#x3066;heroku&#x306B;&#x4E0A;&#x3052;&#x3066;&#x307F;&#x305F;</title>
 <description>
 <![CDATA[
 <p>コートレビューされると毎回マサカリが飛んできて自分はやはり糞コード製造機だなぁと改めて実感しててまた死にたい感じになってます。mix3です。</p>
@@ -169,11 +169,11 @@ gvm pkgset use hoge
 <p>この記事は5/13に書いたのだが、いつのまにか6/15である 時間が経つのは早い</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/2014/06/15/20140615/</guid>
-<pubDate>Sun, 15 Jun 2014 00:00:00 +0900</pubDate>
+<guid isPermaLink="true">http://mix3.github.io/blog/2014/06/15/20140615/</guid>
+<pubDate>Sun, 15 Jun 2014 00:00:00 -0000</pubDate>
 </item>
 <item>
-<title>p5-IkuSanを煩悩のままに公開</title>
+<title>p5-IkuSan&#x3092;&#x7169;&#x60A9;&#x306E;&#x307E;&#x307E;&#x306B;&#x516C;&#x958B;</title>
 <description>
 <![CDATA[
 <p>人生の迷子の行き着く先は富士の樹海ではないかと最近良く考えています。mix3です。</p>
@@ -211,11 +211,11 @@ gvm pkgset use hoge
 <p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/2014/04/12/20140412/</guid>
-<pubDate>Sat, 12 Apr 2014 00:00:00 +0900</pubDate>
+<guid isPermaLink="true">http://mix3.github.io/blog/2014/04/12/20140412/</guid>
+<pubDate>Sat, 12 Apr 2014 00:00:00 -0000</pubDate>
 </item>
 <item>
-<title>revel入門</title>
+<title>revel&#x5165;&#x9580;</title>
 <description>
 <![CDATA[
 <p>絶賛人生の迷子中、mix3です</p>
@@ -301,11 +301,11 @@ db.spec   = root@tcp(localhost:3306)/alphawing
 <p>modelsでちゃんとやりたいときにはどうしたらいんだろうか…</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/2014/03/08/20140308/</guid>
-<pubDate>Sat, 08 Mar 2014 00:00:00 +0900</pubDate>
+<guid isPermaLink="true">http://mix3.github.io/blog/2014/03/08/20140308/</guid>
+<pubDate>Sat, 08 Mar 2014 00:00:00 -0000</pubDate>
 </item>
 <item>
-<title>あけまして</title>
+<title>&#x3042;&#x3051;&#x307E;&#x3057;&#x3066;</title>
 <description>
 <![CDATA[
 <p>おめでとうございます</p>
@@ -317,8 +317,8 @@ db.spec   = root@tcp(localhost:3306)/alphawing
 <p>今年もよろしくお願いします</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/2014/01/05/20140105/</guid>
-<pubDate>Sun, 05 Jan 2014 00:00:00 +0900</pubDate>
+<guid isPermaLink="true">http://mix3.github.io/blog/2014/01/05/20140105/</guid>
+<pubDate>Sun, 05 Jan 2014 00:00:00 -0000</pubDate>
 </item>
 <item>
 <title>Vagrant with Virtualbox tips - internal network setting</title>
@@ -377,11 +377,11 @@ end
 <p><a href="http://docs.vagrantup.com/v2/provisioning/shell.html">Shell Provisioner</a>でnetworkの再起動をしてます。もっとスマートなやりかたあればいいんだけど。</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/2013/12/28/20131228/</guid>
-<pubDate>Sat, 28 Dec 2013 00:00:00 +0900</pubDate>
+<guid isPermaLink="true">http://mix3.github.io/blog/2013/12/28/20131228/</guid>
+<pubDate>Sat, 28 Dec 2013 00:00:00 -0000</pubDate>
 </item>
 <item>
-<title>ndenv を homebrew で入れる話 または如何にして心配するのを止めてRequireJSを愛するようになったか</title>
+<title>ndenv &#x3092; homebrew &#x3067;&#x5165;&#x308C;&#x308B;&#x8A71; &#x307E;&#x305F;&#x306F;&#x5982;&#x4F55;&#x306B;&#x3057;&#x3066;&#x5FC3;&#x914D;&#x3059;&#x308B;&#x306E;&#x3092;&#x6B62;&#x3081;&#x3066;RequireJS&#x3092;&#x611B;&#x3059;&#x308B;&#x3088;&#x3046;&#x306B;&#x306A;&#x3063;&#x305F;&#x304B;</title>
 <description>
 <![CDATA[
 <p>というようなことを元々は <a href="http://tech.kayac.com/archive/techkayaccom_advent_calendar_2013.html">teck.kayac.com Advent Calender 2013</a> の17日目 の記事として考えてたんだけど、結局なんか無性にWicketの事を書きたくなっちゃったので、お蔵入りになった記事をこっちに書く事にする。</p>
@@ -447,11 +447,11 @@ brew install ndenv node-build --HEAD
 </ul>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/2013/12/22/20131222_02/</guid>
-<pubDate>Sun, 22 Dec 2013 00:00:01 +0900</pubDate>
+<guid isPermaLink="true">http://mix3.github.io/blog/2013/12/22/20131222_02/</guid>
+<pubDate>Sun, 22 Dec 2013 00:00:01 -0000</pubDate>
 </item>
 <item>
-<title>退勤時間の自動検出ソリューション</title>
+<title>&#x9000;&#x52E4;&#x6642;&#x9593;&#x306E;&#x81EA;&#x52D5;&#x691C;&#x51FA;&#x30BD;&#x30EA;&#x30E5;&#x30FC;&#x30B7;&#x30E7;&#x30F3;</title>
 <description>
 <![CDATA[
 <p>というようなことを元々は <a href="http://tech.kayac.com/archive/techkayaccom_advent_calendar_2013.html">teck.kayac.com Advent Calender 2013</a> の17日目 の記事として考えてたんだけど、結局なんか無性にWicketの事を書きたくなっちゃったので、お蔵入りになった記事をこっちに書く事にする。</p>
@@ -544,11 +544,11 @@ fi
 <p>なお、日々ちゃんと勤怠管理出来てる人には関係ない話の模様。</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/2013/12/22/20131222_01/</guid>
-<pubDate>Sun, 22 Dec 2013 00:00:00 +0900</pubDate>
+<guid isPermaLink="true">http://mix3.github.io/blog/2013/12/22/20131222_01/</guid>
+<pubDate>Sun, 22 Dec 2013 00:00:00 -0000</pubDate>
 </item>
 <item>
-<title>packerを使ってboxを作ってvagrant upしてansibleでprovisioningしてみるなど</title>
+<title>packer&#x3092;&#x4F7F;&#x3063;&#x3066;box&#x3092;&#x4F5C;&#x3063;&#x3066;vagrant up&#x3057;&#x3066;ansible&#x3067;provisioning&#x3057;&#x3066;&#x307F;&#x308B;&#x306A;&#x3069;</title>
 <description>
 <![CDATA[
 <p><a href="/2013/11/13/20131113/">前の記事</a>が <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんにブクマされた後もりもりっとブクマがのびてビビるなど。mix3です。</p>
@@ -749,11 +749,11 @@ Options:
 <p>次はserverspecとか触りたいですね。確か今年の新卒たちはchefやらserverspecやらを研修で学んだと聞くのでそろそろ後輩に追いつかないといかんとですよ。</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/2013/11/23/20131123/</guid>
-<pubDate>Sat, 23 Nov 2013 00:00:00 +0900</pubDate>
+<guid isPermaLink="true">http://mix3.github.io/blog/2013/11/23/20131123/</guid>
+<pubDate>Sat, 23 Nov 2013 00:00:00 -0000</pubDate>
 </item>
 <item>
-<title>isucon3のリファレンス実装をGoに移植した話</title>
+<title>isucon3&#x306E;&#x30EA;&#x30D5;&#x30A1;&#x30EC;&#x30F3;&#x30B9;&#x5B9F;&#x88C5;&#x3092;Go&#x306B;&#x79FB;&#x690D;&#x3057;&#x305F;&#x8A71;</title>
 <description>
 <![CDATA[
 <p>isucon3スタッフとして本選運営のお手伝いをしてきましたが、参加者ではないのでisuconについて特に書くことが見つからないmix3です。一つ言えるのはみんな凄すぎでそれに比べて自分は本当になにも出来ない無能なんだなぁと再認識させられました。死にたい。</p>
@@ -1089,11 +1089,11 @@ func handler(w http.ResponseWriter, r *http.Request, s Stash) {
 <p>isucon関係者、参加者のみなさま、本当にお疲れさまでした。</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/2013/11/13/20131113/</guid>
-<pubDate>Wed, 13 Nov 2013 00:00:00 +0900</pubDate>
+<guid isPermaLink="true">http://mix3.github.io/blog/2013/11/13/20131113/</guid>
+<pubDate>Wed, 13 Nov 2013 00:00:00 -0000</pubDate>
 </item>
 <item>
-<title>Photon Cloud の MacOSX SDK の Demo を動かす</title>
+<title>Photon Cloud &#x306E; MacOSX SDK &#x306E; Demo &#x3092;&#x52D5;&#x304B;&#x3059;</title>
 <description>
 <![CDATA[
 <p><a href="http://www.nintendo.co.jp/ds/azwj/02-4.html">アシュリー</a>たんが可愛すぎて生きるのが辛い 任天堂こんな可愛いキャラクタいつの間に生み出してたんや mix3です</p>
@@ -1208,8 +1208,8 @@ disconnected
 <p>これで何かする予定もないので、これぐらいで今は満足満足</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/2013/10/23/20131023/</guid>
-<pubDate>Wed, 23 Oct 2013 00:00:00 +0900</pubDate>
+<guid isPermaLink="true">http://mix3.github.io/blog/2013/10/23/20131023/</guid>
+<pubDate>Wed, 23 Oct 2013 00:00:00 -0000</pubDate>
 </item>
 </channel>
 </rss>

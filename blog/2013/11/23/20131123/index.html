@@ -1,0 +1,438 @@
+<!doctype html>
+<html>
+	<head>
+		<title>packerを使ってboxを作ってvagrant upしてansibleでprovisioningしてみるなど - 萌えキャラとは何だったのか</title>
+		<meta charset="utf-8" />
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<script src="/js/app.js"></script>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-48133863-1', 'mix3.github.io');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<header class="grid">
+			<div class="col-1-1">
+				<img src="/images/header.jpg" />
+				<h1><a href="/">萌えキャラとは何だったのか</a></h1>
+				<h2>ギークにも絵描きにもなれない者の末路</h2>
+				<div class="top-menu">
+					<ul>
+						<li><a href="/index.rdf">RSS Feed</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<nav class="grid">
+				<div class="col-1-1">
+					<ul>
+						<li class="current">Blog</li>
+						<li class=""><a href="/archives">Archive</a></li>
+					</ul>
+				</div>
+		</nav>
+		<main class="grid">
+			<article class="col-8-12">
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2013/11/23/20131123/">packerを使ってboxを作ってvagrant upしてansibleでprovisioningしてみるなど</a></h2>
+		</div>
+		<div class="social_button">
+				<!-- はてブ -->
+				<div class="hatena">
+					<a href="http://b.hatena.ne.jp/entry/http://mix3.github.io/blog/2013/11/23/20131123/" class="hatena-bookmark-button" data-hatena-bookmark-title="packerを使ってboxを作ってvagrant upしてansibleでprovisioningしてみるなど - 萌えキャラとは何だったのか" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+				</div>
+				<!-- Twitter -->
+				<div class="twitter">
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mix3.github.io/blog/2013/11/23/20131123/" data-text="packerを使ってboxを作ってvagrant upしてansibleでprovisioningしてみるなど - 萌えキャラとは何だったのか" data-via="mix3" data-lang="ja">ツイート</a>
+					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+				</div>
+				<!-- Google+ -->
+				<div class="googleplus">
+					<div class="g-plusone" data-size="medium" data-href="http://mix3.github.io/blog/2013/11/23/20131123/"></div>
+					<script type="text/javascript">
+						window.___gcfg = {lang: 'ja'};
+						(function() {
+							var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+							po.src = 'https://apis.google.com/js/platform.js';
+							var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+						})();
+					</script>
+				</div>
+				<!-- facebook -->
+				<div class="facebook">
+					<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmix3.github.io%2Fblog%2F2013%2F11%2F23%2F20131123%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=false&amp;height=21&amp;appId=662642987135668" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+				</div>
+		</div>
+		<div class="clearer"></div>
+		<div class="content">
+			<p><a href="/2013/11/13/20131113/">前の記事</a>が <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんにブクマされた後もりもりっとブクマがのびてビビるなど。mix3です。</p>
+
+<p>vagrantやansibleが流行っぽいので、MBP13インチをRetinaモデルに新調してウキウキハイテンションの今のうちに触っておくことにしました。</p>
+
+<p>ちなみにpacker,vagrant,ansibleに対する自分の理解は以下のような感じ</p>
+
+<ul>
+<li>packer
+<ul>
+<li>vagrantのboxを作るためのツール</li>
+</ul></li>
+<li>vagrant
+<ul>
+<li>昔virtualboxのフロントエンドツールだったぽいけど今はvirtualboxに縛られなくなってるんだっけ？</li>
+</ul></li>
+<li>ansible
+<ul>
+<li>provisioningツール chefとかより軽量</li>
+</ul></li>
+</ul>
+
+<p>正しくないかもしれないけど、大きく外してないと思いたい。</p>
+
+<h4>インストール</h4>
+
+<p>packerはbrew install packerか、バージョンを気にする場合はgit clone > make</p>
+
+<p>vagrantは<a href="http://downloads.vagrantup.com/">Vagrant Downloads</a>からdmgを持ってきてインストールでサクっと完了。</p>
+
+<p>ansibleはbrew install ansibleで。なおpyenvを使ってsystemのpythonを使われないようにしました。</p>
+
+<h3>packerを試す</h3>
+
+<p>やったのはcentos5.6のboxを作ること <a href="https://github.com/hnakamur/my-packer-template-files/tree/895f40358ff38328d30a69727bceba5f4962c3e2/centos6.4">my-packer-template-files/centos6.4</a>を元に弄りました</p>
+
+<ul>
+<li>vmwareの項目を削った</li>
+<li>netinstallだと時間がかかるのでDVD1of2をローカルに持ってきておいてそれを使うようにした</li>
+<li>Virutalboxで実際にインストールした後に出来るanaconda.cfgををもとにks.cfgを弄った</li>
+<li>GuestAdditionsのせいで削ったyumが元に戻った</li>
+<li>etc...</li>
+</ul>
+
+<p>色々削れないかなぁと思って色々削った末に色々削れずに元に戻るということをpacker buildを打ちまくって繰り返してました。</p>
+
+<p>なお、最小構成でのOSインストールにしているとはいえboxがexportされるまでそれなりに時間が掛かるのでtry&amp;errorで試すのは結構面倒くさいです。</p>
+
+<ul>
+<li>box作成までの流れ
+<ul>
+<li>vmが立ち上がってkickstartでOSインストール</li>
+<li>vm再起動後、provisionersの設定が走ってyumやら色々インストール</li>
+<li>vm落とした後box作成</li>
+</ul></li>
+</ul>
+
+<p>ちなみにboxは <a href="http://www.vagrantbox.es/">Vagrantbox.es</a>に色々あるのでそれで問題ないのであればpacker使って自作する前にそっちを使うべきかと思います。</p>
+
+<p>centos5.6のboxもあります。</p>
+
+<ul>
+<li><a href="http://yum.mnxsolutions.com/vagrant/centos_56_32.box">CentOS 5.6 32</a></li>
+<li><a href="https://dl.dropbox.com/u/7196/vagrant/CentOS-56-x64-packages-puppet-2.6.10-chef-0.10.6.box">CentOS 5.6 64 Packages (puppet 2.6.10 &amp; chef 0.10.6 from RPM, VirtualBox 4.2.0)</a></li>
+</ul>
+
+<p>ということで自作したpacker templateはこちらになります <a href="https://github.com/mix3/my-packer-template-files/tree/master/centos5.6">my-packer-template-files/centos5.6</a></p>
+
+<p>json手書きとかケツカンマの関係でやりたくなかったのでperlで書いてjsonに直す感じになってます</p>
+
+<h3>vagrant upする</h3>
+
+<p>boxが出来たので起動するのですが、いまいちvagrantの使い方がわかっていないのでとりあえず以下の手順で起動してみた</p>
+
+<ul>
+<li>vagrant box add [box name] [box file]</li>
+<li>cd 適当な場所</li>
+<li>vagrant init [box name]</li>
+<li>vagrant up</li>
+</ul>
+
+<p>vagrant init でVagrantfileが作られるので設定が必要な場合はupするまえに弄る感じになるっぽい 例えばvirtualboxの設定を変えたいときは以下を弄ったりするんだと思われる</p>
+
+<p>packerの時点でGuestAdditionsインストールを削って使わない設定にするとかもここかな？</p>
+
+<pre><code># config.vm.provider :virtualbox do |vb|
+#   # Don't boot with headless mode
+#   vb.gui = true
+#
+#   # Use VBoxManage to customize the VM. For example to change memory:
+#   vb.customize ["modifyvm", :id, "--memory", "1024"]
+# end
+</code></pre>
+
+<p>sshで入るときは vagrant ssh すると入れる vagrant ssh-config で .ssh/config の設定が見えるので手動で何かしたいときはそっちを見ると良いかな</p>
+
+<h3>ansibleを試す</h3>
+
+<p>ansibleを動かすにはINVENTRY（サーバリスト）とplaybook（chefでいうレシピ）が必要になります。今回は配信先が一つなのでINVENTRYはシンプルに一行で良いのですが、意味も無くグルーピングしてみました</p>
+
+<pre><code>$ cat hosts 
+[vagrant]
+127.0.0.1 ansible_ssh_port=2222
+
+# きちんとグルーピング指定するならこんな感じかな？
+# [vagrant-app]
+# 127.0.0.1 ansible_ssh_port=2223
+# 127.0.0.1 ansible_ssh_port=2224
+# 127.0.0.1 ansible_ssh_port=2225
+# 127.0.0.1 ansible_ssh_port=2226
+
+# [vagrant-db]
+# 127.0.0.1 ansible_ssh_port=2227
+
+# [vagrant-app:vars]
+# ...
+# [vagrant-db:vars]
+# ...
+
+[vagrant:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+</code></pre>
+
+<p>ansible_*のオプションは<a href="http://yteraoka.github.io/ansible-tutorial/ansible-in-detail.html">Ansible in detail</a> で確認しました</p>
+
+<p>ひとまずはこれで配信が出来るか試したところ</p>
+
+<pre><code>$ ansible all -i hosts -m ping -s
+127.0.0.1 | FAILED &gt;&gt; {
+    "failed": true, 
+    "msg": "SUDO-SUCCESS-moxmhsptrmdnainrjekmubryetybkhrq\r\nError: ansible requires a json module, none found!", 
+    "parsed": false
+}
+</code></pre>
+
+<p>という感じで怒られてしまいました。配信先のpythonにjson moduleが別途必要なようです（python2.6からは不要）文言が違うけど以下参考</p>
+
+<ul>
+<li><a href="http://qiita.com/yamasaki-masahide/items/4485a438125e6b1748ce">Ansible CentOS5で出るImportError: No module named simplejson の対処</a></li>
+</ul>
+
+<p>これはに対して -m raw でjsonを使わず -a "..." で実行内容を直接指定して配信先に対してjson moduleを入れるのが定石のようなようです</p>
+
+<pre><code>$ ansible all -i hosts -m raw -a "yum -y install python-simplejson" -s
+$ ansible all -i hosts -m ping -s
+127.0.0.1 | success &gt;&gt; {
+    "changed": false, 
+    "ping": "pong"
+}
+</code></pre>
+
+<p>これでplaybookを作ってやれば配信できる状態になったと思われます。</p>
+
+<p>ちなみに ansible all -i hosts all -m ping -s のオプションの意味ですが以下のようになっています</p>
+
+<pre><code>$ ansible
+Usage: ansible &lt;host-pattern&gt; [options] # host-pattern は all指定で全グループへ、グループ名指定で特定のグループへ配信
+
+Options:
+  -i INVENTORY, --inventory-file=INVENTORY
+                        specify inventory host file            # ホストリストファイルの指定
+                        (default=/usr/local/etc/ansible/hosts)
+  -s, --sudo            run operations with sudo (nopasswd)    # 配信先での操作でnopassのsudoを使う
+</code></pre>
+
+<h4>playbook</h4>
+
+<p>playbookは以下をつまみ食いしたあと、後公式ドキュメン <a href="http://www.ansibleworks.com/docs/modules.html">Ansible Modules</a> をつまみ食いして作りました</p>
+
+<ul>
+<li><a href="http://d2.haro.jp/2013/08/ansible_start.html">[Ansible] 使いやすい Ansible 、みんな使おう Ansible (1)</a></li>
+<li><a href="http://d.hatena.ne.jp/akishin999/20130815/1376520672">Ansible の Playbook を使ってみる</a></li>
+<li><a href="http://open-groove.net/ansible/nginx-install/">Ansibleでnginxをソースインストール</a></li>
+</ul>
+
+<p>作ったplaybookの内容は以下の通り なにやら怪しい感じですが気にしてはいけません。</p>
+
+<ul>
+<li>apacheのyumインストール</li>
+<li>fcgiのyumインストール</li>
+<li>mod_fastcgi2.4.6のソースインストール</li>
+<li>mysqld5.1のrpmインストール</li>
+<li>memcachedのyumインストール</li>
+</ul>
+
+<p>ということで、具体的には<a href="https://gist.github.com/mix3/7611961">https://gist.github.com/mix3/7611961</a>のようになりました 意味も無くymlを分割したりしています。</p>
+
+<p>rpmモジュールは<a href="http://qiita.com/dayflower/items/21c64a6f5da155a5ade3">Ansible で RPM を扱う</a>から拝借させてもらいました</p>
+
+<p>本来必要の無いものなのですが、CentOS5だとyumモジュールでのrpmインストールがうまく行かないようなので使わせてもらいました</p>
+
+<h3>ということで</h3>
+
+<p>仮想化やらクラウドやらのおかげで複数台のサーバを気軽に扱えるような時代になってるので、気軽に扱えるなら扱えるなりに扱い方を覚えていかないとなぁとそんなこと思いながらpacker, vagrant, ansible とかを触ってみました。</p>
+
+<p>次はserverspecとか触りたいですね。確か今年の新卒たちはchefやらserverspecやらを研修で学んだと聞くのでそろそろ後輩に追いつかないといかんとですよ。</p>
+
+		</div>
+		<div class="footer">
+			<time>2013-11-23</time>
+			<ul class="tag">
+				<li><a href="/tag/packer">packer(1)</a></li>
+				<li><a href="/tag/vagrant">vagrant(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1 pager">
+	<a href="/blog/2013/11/13/20131113/" class="float-left">≪isucon3のリファレンス実装をGoに移植した話</a>
+	<a href="/blog/2013/12/22/20131222_01/" class="float-right">退勤時間の自動検出ソリューション≫</a>
+	</div>
+	<div class="clearer"></div>
+			</article>
+			<aside class="col-4-12">
+				<div class="col-1-1">
+					<h3>Profile</h3>
+					<div class="content">
+						<img src="/images/avatar.png" class="float-left" style="width:100px;" />
+						<a href="https://twitter.com/mix3" target="_blank">twitter @mix3</a><br />
+						<a href="https://github.com/mix3/" target="_blank">github @mix3</a><br />
+						<a href="http://pixiv.me/mix3" target="_blank">pixiv @mix3</a><br />
+						<div class="clearer"></div>
+						Webエンジニアのような何か。絶賛人生の迷子中。スキルセット的には以下のような感じ<br />
+						Perl/MySQL/Linux/ソーシャルアプリ開発・運用
+					</div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>coderwall</h3>
+					<div id="coderwall"></div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Recent Posts</h3>
+					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
+						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
+						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
+						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
+						<li><a href="/blog/2013/12/28/20131228/">Vagrant with Virtualbox tips - internal network setting</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2014">2014年(4)</a>
+								<ul>
+										<li><a href="/archives/2014/06">2014年06月(1)</a></li>
+										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
+										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
+										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2013">2013年(18)</a>
+								<ul>
+										<li><a href="/archives/2013/12">2013年12月(3)</a></li>
+										<li><a href="/archives/2013/11">2013年11月(2)</a></li>
+										<li><a href="/archives/2013/10">2013年10月(5)</a></li>
+										<li><a href="/archives/2013/08">2013年08月(1)</a></li>
+										<li><a href="/archives/2013/07">2013年07月(1)</a></li>
+										<li><a href="/archives/2013/04">2013年04月(1)</a></li>
+										<li><a href="/archives/2013/03">2013年03月(3)</a></li>
+										<li><a href="/archives/2013/02">2013年02月(1)</a></li>
+										<li><a href="/archives/2013/01">2013年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2012">2012年(7)</a>
+								<ul>
+										<li><a href="/archives/2012/12">2012年12月(1)</a></li>
+										<li><a href="/archives/2012/11">2012年11月(2)</a></li>
+										<li><a href="/archives/2012/08">2012年08月(1)</a></li>
+										<li><a href="/archives/2012/04">2012年04月(3)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2011">2011年(13)</a>
+								<ul>
+										<li><a href="/archives/2011/11">2011年11月(1)</a></li>
+										<li><a href="/archives/2011/07">2011年07月(6)</a></li>
+										<li><a href="/archives/2011/06">2011年06月(3)</a></li>
+										<li><a href="/archives/2011/05">2011年05月(2)</a></li>
+										<li><a href="/archives/2011/04">2011年04月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Tags</h3>
+					<ul class="sidemenu toggle_tree_2">
+						<li class=""><a href="/tag/perl">perl(9)</a></li>
+						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+						<li class=""><a href="/tag/php">php(3)</a></li>
+						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
+						<li class="hide"><a href="/tag/Linux">Linux(2)</a></li>
+						<li class="hide"><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
+						<li class="hide"><a href="/tag/golang">golang(2)</a></li>
+						<li class="hide"><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
+						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
+						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
+						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class="hide"><a href="/tag/Bot">Bot(1)</a></li>
+						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
+						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
+						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
+						<li class="hide"><a href="/tag/Chrome">Chrome(1)</a></li>
+						<li class="hide"><a href="/tag/Hadoop">Hadoop(1)</a></li>
+						<li class="hide"><a href="/tag/IRC">IRC(1)</a></li>
+						<li class="hide"><a href="/tag/Log">Log(1)</a></li>
+						<li class="hide"><a href="/tag/Markdown">Markdown(1)</a></li>
+						<li class="hide"><a href="/tag/Mojolicious">Mojolicious(1)</a></li>
+						<li class="hide"><a href="/tag/Mouse">Mouse(1)</a></li>
+						<li class="hide"><a href="/tag/PhotonCloud">PhotonCloud(1)</a></li>
+						<li class="hide"><a href="/tag/Play">Play(1)</a></li>
+						<li class="hide"><a href="/tag/Qudo">Qudo(1)</a></li>
+						<li class="hide"><a href="/tag/SNBinder">SNBinder(1)</a></li>
+						<li class="hide"><a href="/tag/SQLite">SQLite(1)</a></li>
+						<li class="hide"><a href="/tag/Scala">Scala(1)</a></li>
+						<li class="hide"><a href="/tag/Teng">Teng(1)</a></li>
+						<li class="hide"><a href="/tag/Vagrant">Vagrant(1)</a></li>
+						<li class="hide"><a href="/tag/Virtualbox">Virtualbox(1)</a></li>
+						<li class="hide"><a href="/tag/Xslate">Xslate(1)</a></li>
+						<li class="hide"><a href="/tag/bless">bless(1)</a></li>
+						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
+						<li class="hide"><a href="/tag/bot">bot(1)</a></li>
+						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
+						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
+						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
+						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
+						<li class="hide"><a href="/tag/java">java(1)</a></li>
+						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
+						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/vagrant">vagrant(1)</a></li>
+						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
+						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
+						<li class="hide"><a href="/tag/サーバ管理">サーバ管理(1)</a></li>
+						<li class="hide"><a href="/tag/テスト">テスト(1)</a></li>
+						<li class="hide"><a href="/tag/ネットワーク設定">ネットワーク設定(1)</a></li>
+						<li class="hide"><a href="/tag/パーティショニング">パーティショニング(1)</a></li>
+						<li class="hide"><a href="/tag/ブログ">ブログ(1)</a></li>
+						<li class="hide"><a href="/tag/修士論文">修士論文(1)</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+			</aside>
+		</main>
+		<footer class="grid">
+			<div class="col-1-1">
+				<small>&copy; copyright 2014 mix3.github.io</small>
+			</div>
+		</footer>
+	</body>
+</html>

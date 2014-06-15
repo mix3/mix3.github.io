@@ -1,0 +1,396 @@
+<!doctype html>
+<html>
+	<head>
+		<title>golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた - 萌えキャラとは何だったのか</title>
+		<meta charset="utf-8" />
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<script src="/js/app.js"></script>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-48133863-1', 'mix3.github.io');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<header class="grid">
+			<div class="col-1-1">
+				<img src="/images/header.jpg" />
+				<h1><a href="/">萌えキャラとは何だったのか</a></h1>
+				<h2>ギークにも絵描きにもなれない者の末路</h2>
+				<div class="top-menu">
+					<ul>
+						<li><a href="/index.rdf">RSS Feed</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<nav class="grid">
+				<div class="col-1-1">
+					<ul>
+						<li class="current">Blog</li>
+						<li class=""><a href="/archives">Archive</a></li>
+					</ul>
+				</div>
+		</nav>
+		<main class="grid">
+			<article class="col-8-12">
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></h2>
+		</div>
+		<div class="social_button">
+				<!-- はてブ -->
+				<div class="hatena">
+					<a href="http://b.hatena.ne.jp/entry/http://mix3.github.io/blog/2014/06/15/20140615/" class="hatena-bookmark-button" data-hatena-bookmark-title="golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた - 萌えキャラとは何だったのか" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+				</div>
+				<!-- Twitter -->
+				<div class="twitter">
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mix3.github.io/blog/2014/06/15/20140615/" data-text="golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた - 萌えキャラとは何だったのか" data-via="mix3" data-lang="ja">ツイート</a>
+					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+				</div>
+				<!-- Google+ -->
+				<div class="googleplus">
+					<div class="g-plusone" data-size="medium" data-href="http://mix3.github.io/blog/2014/06/15/20140615/"></div>
+					<script type="text/javascript">
+						window.___gcfg = {lang: 'ja'};
+						(function() {
+							var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+							po.src = 'https://apis.google.com/js/platform.js';
+							var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+						})();
+					</script>
+				</div>
+				<!-- facebook -->
+				<div class="facebook">
+					<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmix3.github.io%2Fblog%2F2014%2F06%2F15%2F20140615%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=false&amp;height=21&amp;appId=662642987135668" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+				</div>
+		</div>
+		<div class="clearer"></div>
+		<div class="content">
+			<p>コートレビューされると毎回マサカリが飛んできて自分はやはり糞コード製造機だなぁと改めて実感しててまた死にたい感じになってます。mix3です。</p>
+
+<h3>golangのWAF調査の一環として</h3>
+
+<p>goによる社内アプリ(?)を後輩らと共同でマサカリを一身に受けて血反吐吐きながら書いていたのですが</p>
+
+<p><a href="http://revel.github.io/">Revel</a>使っていたけど使いこなせてない感じが半端無くて(Revelのセンスが悪いのか自分たちのセンスが悪いのか考えると多分自分たちのセンスが悪いんだろうなと思う)</p>
+
+<p>あらかた動く様になった段階で、最終的にリライトするのも辞さない覚悟でWAF調査から再出発することに。</p>
+
+<ul>
+<li><a href="http://beego.me/">Beego</a></li>
+<li><a href="http://naoina.github.io/kocha/">Kocha</a></li>
+<li><a href="https://github.com/pilu/traffic">traffic</a></li>
+<li><a href="http://martini.codegangsta.io/">Martini</a></li>
+</ul>
+
+<p>とググって見つかったWAFを担当振ってサンプルアプリ作ってどんなもんか調べましょうとなりました。</p>
+
+<p>自分は<a href="https://github.com/pilu/traffic">traffic</a>を担当。</p>
+
+<p>ただ調べるだけだとつまらないので、Travisやheroku使った事無かったというのもあり、タイトルにあるCI連携とherokuへのデプロイまでやることにしました。</p>
+
+<h3>作ったもの</h3>
+
+<p>最初は<a href="http://todomvc.com/">TodoMVC</a>の<a href="http://todomvc.com/architecture-examples/angularjs/">AngularJS</a>を使うかと考えたが<a href="http://bower.io/">Bower</a>が絡んできて余計な事で悩みそうだったのでやめて、<a href="http://dotinstall.com/lessons/todo_angularjs">AngularJSで作るToDoアプリ</a>を見てシコシコとhtml/js/cssを書いてから<a href="https://github.com/pilu/traffic">traffic</a>を書いてみた</p>
+
+<p>最終的に出来たのが以下</p>
+
+<ul>
+<li>github <a href="https://github.com/mix3/go-traffic-sample">https://github.com/mix3/go-traffic-sample</a></li>
+<li>heroku <a href="http://lit-plains-4846.herokuapp.com/">http://lit-plains-4846.herokuapp.com/</a></li>
+</ul>
+
+<h3>CI連携</h3>
+
+<p>最初に<a href="https://travis-ci.org/">Travis</a>を試して、<a href="http://wercker.com/">wercker</a>なるものを後で見つけて追加して、<a href="https://drone.io/">drone.io</a>なるものもあってそれも追加して、と手当たり次第試してみた</p>
+
+<p>基本的にCIは専用のyml(drone.ioはいらないみたい)をコミットして go test ./... を走らせるだけだけど、<a href="https://github.com/naoina/genmai">genmai</a>のTravisのテストが賢くてナルホドなってなった</p>
+
+<p><a href="https://github.com/naoina/genmai/blob/master/genmai_test.go#L110">https://github.com/naoina/genmai/blob/master/genmai_test.go#L110</a></p>
+
+<pre><code>func testDB(dsn ...string) (*DB, error) {
+    switch os.Getenv("DB") {
+    case "mysql":
+        return New(&amp;MySQLDialect{}, "travis@/genmai_test")
+    case "postgres":
+        return New(&amp;PostgresDialect{}, "user=postgres dbname=genmai_test sslmode=disable")
+    default:
+        var DSN string
+        switch len(dsn) {
+        case 0:
+            DSN = ":memory:"
+        case 1:
+            DSN = dsn[0]
+        default:
+            panic(fmt.Errorf("too many arguments"))
+        }
+        return New(&amp;SQLite3Dialect{}, DSN)
+    }
+}
+</code></pre>
+
+<p><a href="https://github.com/naoina/genmai/blob/master/.travis.yml">https://github.com/naoina/genmai/blob/master/.travis.yml</a></p>
+
+<pre><code>language: go
+go:
+ - 1.2
+ - 1.2.1
+ - tip
+install:
+ - go get -v github.com/mattn/go-sqlite3
+ - go get -v github.com/go-sql-driver/mysql
+ - go get -v github.com/lib/pq
+ - go get -v github.com/naoina/genmai
+env:
+ - DB=sqlite3
+ - DB=mysql
+ - DB=postgres
+before_script:
+ - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'DROP DATABASE IF EXISTS genmai_test;' -U postgres; fi"
+ - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'CREATE DATABASE genmai_test;' -U postgres; fi"
+ - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE IF NOT EXISTS genmai_test;'; fi"
+script:
+ - go test ./...
+</code></pre>
+
+<p>.travis.ymlでenvを複数指定するとそれぞれの環境変数でテストが走るので、テストの方で環境変数で使うDBを変える様にしておくことでいい感じにDB別のテストが走っていてとても賢い</p>
+
+<p>order byしてないせいでsqlite,mysqlでは通るがpostgresでは通らないみたいなことがあったので、DB限定しない作りのアプリのテストはこのやり方を真似しておくと良いなと思った</p>
+
+<p>設定に環境変数を使うというのは<a href="http://twelve-factor-ja.herokuapp.com/config">The Twelve-Factor App</a>で推奨されてて環境に合わせて柔軟に設定出来るのは確かに良いなぁと思った</p>
+
+<h3>heroku</h3>
+
+<p>元々herokuまでやるつもりはなかったけど、作ったものを見える状態にするのも大事だなと思ってCIまでは割とサクサク行ったのでheroku使った事無かったし試してみた</p>
+
+<p>最初 git push heroku master しても全然うまくいかず泣きそうになっていたのだが、最終的には</p>
+
+<ul>
+<li>godepを使わない</li>
+<li>.godirはgithub.com/mix3/go-traffic-sampleじゃなくてgo-traffic-sampleで</li>
+<li>src以下にきちんと配置(最初はシンボリックリンク使って別の場所で開発してた)
+<ul>
+<li>pushが通らなかった一番の理由が多分これ</li>
+</ul></li>
+</ul>
+
+<p>という感じでやるとなんとかpush出来た</p>
+
+<p>ググったりgithubで「golang heroku」とかで検索掛けたりするとgodep使ってたり、srcをリポジトリに含めたり含めなかったりしてどうするのが良いのかいまいち分からなくて非常に困った（し、今も良くわかっていない）</p>
+
+<p>結局traffic作者のブログ記事<a href="http://gravityblast.com/2013/12/05/how-to-deploy-go-with-traffic-on-heroku/">How to deploy Go with Traffic on Heroku</a>をそのままやってうまく行ったので今はそれに合わせている。godepとbuildpack-goは大分トラウマになった気がする。</p>
+
+<p>デプロイしてから静的ファイルが配信出来ていないことに気づいて<a href="http://gravityblast.com/2013/12/05/how-to-deploy-go-with-traffic-on-heroku/">How to deploy Go with Traffic on Heroku</a>をよく見るとproductionでも静的ファイルをアプリ側で返す様に弄るよう指示されていたので修正した。</p>
+
+<p>が、herokuにも静的ファイルの配信は出来るハズなので、workerをアプリにしてwebを<a href="https://github.com/mattn/gorem">gorem</a>にしてやればいけるんじゃないかと思ったが、portが不定なのでjsonにport記述できないし、goremはコマンドだからherokuの場合にどうしたらいいのかサッパリ分からなかったのでそこまでは出来なかった。</p>
+
+<h3>テスト</h3>
+
+<p>revelのときはテスト書いてなかったのでテスト書く場合はどうなるのかなということでCRUDを確認する簡単なモデルテストを書いてみたが、時間が絡むテストが非常に書きにくくて困る（し、今も困っている）</p>
+
+<p>DBから取ってきたデータの比較でreflect.DeepEqualを使ってデータをまるまる比較したのだがdatetime型があるとそれが出来なくて困る。time.Now()をモックできないかとググるも良い情報が無くて詰んでいる。</p>
+
+<p>多分標準パッケージのtimeをどうこうすることは出来ないので、別の時間管理用モジュールを作るか見繕ってきてそれをモックするようにするのが良いのかなと思っている。例えばこれとか？<a href="https://github.com/101loops/clock">https://github.com/101loops/clock</a></p>
+
+<h3><a href="https://github.com/moovweb/gvm">gvm</a></h3>
+
+<p>goの開発環境を綺麗に保つときにgvmを使うと良さそうなことに気づいた</p>
+
+<pre><code>gvm install go1.*.*
+gvm use go1.*.*
+</code></pre>
+
+<p>とかして、簡単に好きなバージョンのgoが使えるし、</p>
+
+<pre><code>gvm pkgset use global
+</code></pre>
+
+<p>とかするとインストールしたgo専用のGOPATHが設定されるし、</p>
+
+<pre><code>gvm pkgset create hoge
+gvm pkgset use hoge
+</code></pre>
+
+<p>とかすると、さらにGOPATHが設定される(GOPATH=/path/to/hoge:/pagh/to/global になるのでhoge優先)</p>
+
+<p>ので、適当にgvm installして適当にgvm pkgset create hogeしてglobal以下で開発、依存パッケージをhogeに入れるようにすると環境を何も汚さない感じで開発出来てよいと思う</p>
+
+<p>ひとつ残念なのはgvmは[GVM](the Groovy enVironment Manager)とコマンド名がバッティングしていてそれだけは勘弁してほしいなってなってる</p>
+
+<h3>なお</h3>
+
+<p>この記事は5/13に書いたのだが、いつのまにか6/15である 時間が経つのは早い</p>
+
+		</div>
+		<div class="footer">
+			<time>2014-06-15</time>
+			<ul class="tag">
+				<li><a href="/tag/golang">golang(2)</a></li>
+				<li><a href="/tag/CI">CI(1)</a></li>
+				<li><a href="/tag/heroku">heroku(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1 pager">
+	<a href="/blog/2014/04/12/20140412/" class="float-left">≪p5-IkuSanを煩悩のままに公開</a>
+	</div>
+	<div class="clearer"></div>
+			</article>
+			<aside class="col-4-12">
+				<div class="col-1-1">
+					<h3>Profile</h3>
+					<div class="content">
+						<img src="/images/avatar.png" class="float-left" style="width:100px;" />
+						<a href="https://twitter.com/mix3" target="_blank">twitter @mix3</a><br />
+						<a href="https://github.com/mix3/" target="_blank">github @mix3</a><br />
+						<a href="http://pixiv.me/mix3" target="_blank">pixiv @mix3</a><br />
+						<div class="clearer"></div>
+						Webエンジニアのような何か。絶賛人生の迷子中。スキルセット的には以下のような感じ<br />
+						Perl/MySQL/Linux/ソーシャルアプリ開発・運用
+					</div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>coderwall</h3>
+					<div id="coderwall"></div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Recent Posts</h3>
+					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
+						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
+						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
+						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
+						<li><a href="/blog/2013/12/28/20131228/">Vagrant with Virtualbox tips - internal network setting</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2014">2014年(4)</a>
+								<ul>
+										<li><a href="/archives/2014/06">2014年06月(1)</a></li>
+										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
+										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
+										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2013">2013年(18)</a>
+								<ul>
+										<li><a href="/archives/2013/12">2013年12月(3)</a></li>
+										<li><a href="/archives/2013/11">2013年11月(2)</a></li>
+										<li><a href="/archives/2013/10">2013年10月(5)</a></li>
+										<li><a href="/archives/2013/08">2013年08月(1)</a></li>
+										<li><a href="/archives/2013/07">2013年07月(1)</a></li>
+										<li><a href="/archives/2013/04">2013年04月(1)</a></li>
+										<li><a href="/archives/2013/03">2013年03月(3)</a></li>
+										<li><a href="/archives/2013/02">2013年02月(1)</a></li>
+										<li><a href="/archives/2013/01">2013年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2012">2012年(7)</a>
+								<ul>
+										<li><a href="/archives/2012/12">2012年12月(1)</a></li>
+										<li><a href="/archives/2012/11">2012年11月(2)</a></li>
+										<li><a href="/archives/2012/08">2012年08月(1)</a></li>
+										<li><a href="/archives/2012/04">2012年04月(3)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2011">2011年(13)</a>
+								<ul>
+										<li><a href="/archives/2011/11">2011年11月(1)</a></li>
+										<li><a href="/archives/2011/07">2011年07月(6)</a></li>
+										<li><a href="/archives/2011/06">2011年06月(3)</a></li>
+										<li><a href="/archives/2011/05">2011年05月(2)</a></li>
+										<li><a href="/archives/2011/04">2011年04月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Tags</h3>
+					<ul class="sidemenu toggle_tree_2">
+						<li class=""><a href="/tag/perl">perl(9)</a></li>
+						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+						<li class=""><a href="/tag/php">php(3)</a></li>
+						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
+						<li class="hide"><a href="/tag/Linux">Linux(2)</a></li>
+						<li class="hide"><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
+						<li class="hide"><a href="/tag/golang">golang(2)</a></li>
+						<li class="hide"><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
+						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
+						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
+						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class="hide"><a href="/tag/Bot">Bot(1)</a></li>
+						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
+						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
+						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
+						<li class="hide"><a href="/tag/Chrome">Chrome(1)</a></li>
+						<li class="hide"><a href="/tag/Hadoop">Hadoop(1)</a></li>
+						<li class="hide"><a href="/tag/IRC">IRC(1)</a></li>
+						<li class="hide"><a href="/tag/Log">Log(1)</a></li>
+						<li class="hide"><a href="/tag/Markdown">Markdown(1)</a></li>
+						<li class="hide"><a href="/tag/Mojolicious">Mojolicious(1)</a></li>
+						<li class="hide"><a href="/tag/Mouse">Mouse(1)</a></li>
+						<li class="hide"><a href="/tag/PhotonCloud">PhotonCloud(1)</a></li>
+						<li class="hide"><a href="/tag/Play">Play(1)</a></li>
+						<li class="hide"><a href="/tag/Qudo">Qudo(1)</a></li>
+						<li class="hide"><a href="/tag/SNBinder">SNBinder(1)</a></li>
+						<li class="hide"><a href="/tag/SQLite">SQLite(1)</a></li>
+						<li class="hide"><a href="/tag/Scala">Scala(1)</a></li>
+						<li class="hide"><a href="/tag/Teng">Teng(1)</a></li>
+						<li class="hide"><a href="/tag/Vagrant">Vagrant(1)</a></li>
+						<li class="hide"><a href="/tag/Virtualbox">Virtualbox(1)</a></li>
+						<li class="hide"><a href="/tag/Xslate">Xslate(1)</a></li>
+						<li class="hide"><a href="/tag/bless">bless(1)</a></li>
+						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
+						<li class="hide"><a href="/tag/bot">bot(1)</a></li>
+						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
+						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
+						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
+						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
+						<li class="hide"><a href="/tag/java">java(1)</a></li>
+						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
+						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/vagrant">vagrant(1)</a></li>
+						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
+						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
+						<li class="hide"><a href="/tag/サーバ管理">サーバ管理(1)</a></li>
+						<li class="hide"><a href="/tag/テスト">テスト(1)</a></li>
+						<li class="hide"><a href="/tag/ネットワーク設定">ネットワーク設定(1)</a></li>
+						<li class="hide"><a href="/tag/パーティショニング">パーティショニング(1)</a></li>
+						<li class="hide"><a href="/tag/ブログ">ブログ(1)</a></li>
+						<li class="hide"><a href="/tag/修士論文">修士論文(1)</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+			</aside>
+		</main>
+		<footer class="grid">
+			<div class="col-1-1">
+				<small>&copy; copyright 2014 mix3.github.io</small>
+			</div>
+		</footer>
+	</body>
+</html>
