@@ -42,6 +42,43 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2013/03/09/20130309-2/">Plack::App::Directoryで画像を展開する</a></h2>
+		</div>
+		<div class="content">
+			<p>Perlのネガティブキャンペーンが流行ってる今日この頃ですが私は元気です（震え声）</p>
+
+<p>p5-JQueryPresentationHelperなんてなかったんや</p>
+
+<h3>Plack::App::Directoryで画像とかは展開してほしい</h3>
+
+<p>Plack::App::Directoryでカレントディレクトリ以下を見えるようにするワンライナーをbashrcとかでエイリアスにしておくとか良くあると思います。凄く便利なのでそれはそれとして良いのですが、画像とかは出来れば展開してそのまま見えてほしいかなと思う事もあります。</p>
+
+<p>なので、どうすれば良いかなとPlack::App::Directoryの中見てたのですが、もりもりっとtrタグを羅列してるだけっぽかったので、HTML出力を正規表現でちょちょっと弄ればそれっぽくなりそうだと思ったのでやってみました。</p>
+
+<script src="https://gist.github.com/mix3/5109843.js"></script>
+
+<p>ファイルを出力するときはPlack::Util::IOWithPathのオブジェクトを返してるようなので、そうでないときだけ正規表現でちょちょっと弄る感じですると良い感じに画像表示してくれました。</p>
+
+<p>swfも見えてほしいなぁという声が聞こえてきたのでswfobject.jsで見えるようにしてみました。</p>
+
+<script src="https://gist.github.com/mix3/5116797.js"></script>
+
+<p>タイルで見えるともっと良いね！という声が聞こえてきましたが、Plack::App::Directoryを使う限り無理なので、それは新規で別モジュール作った方が良いなと思いました。</p>
+
+<p>ちなみにswfobject.jsは2.2でもまだ微妙にセキュリティリスクがあるらしい <a href="http://t-ashula.hateblo.jp/entry/2012/01/11/233156">ほむらちゃほむほむ - swfobject.js がアレな話</a> ので外から見えるところで使うのは止めた方が良いかなと思います。</p>
+
+		</div>
+		<div class="footer">
+			<time>2013-03-09</time>
+			<ul class="tag">
+				<li><a href="/tag/perl">perl(9)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2013/03/09/20130309-1/">p5-JQueryPresentationHelper作ってみた</a></h2>
 		</div>
 		<div class="content">
@@ -221,49 +258,6 @@
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2012/11/07/20121107/">巨大ファイルの削除</a></h2>
-		</div>
-		<div class="content">
-			<p>DBサーバのslow_queryログがローテートされておらず単一ファイルで100G超えしていて辛いmix3です。</p>
-
-<h3>巨大なファイルを rm するのは危険</h3>
-
-<p>実際に試していないのでどうなるのか分からないですが、おそらく消し終わるまで間IOが占有されてDBのパフォーマンスに影響が出ちゃうのでしょう。</p>
-
-<p>rm はやらないほうが良いねとなりました。</p>
-
-<h3>: > /path/to/file</h3>
-
-<p>じゃあどうすればという事で調べていたら</p>
-
-<pre><code>
-: > /path/to/file
-</code></pre>
-
-<p>を使ってはどうか？というようなものを見かけました</p>
-
-<p><a href="http://serverfault.com/questions/336917/is-there-a-way-to-delete-100gb-file-on-linux-without-thrashing-io-load">Is there a way to delete 100GB file on Linux without thrashing IO / load?</a></p>
-
-<p>容量に余裕のある別サーバで $ dd if=/dev/zero of=tempfile bs=1024000 count=100000 とかしてファイルを作って試したところ、readが発生するもののパフォーマンスにはあまり影響は無い感じで使えそうということに。</p>
-
-<h3>ちなみに</h3>
-
-<p>: > /path/to/file は空ファイルを作るときの方法のようで、<a href="http://d.hatena.ne.jp/japanrock_pg/20100212/1265972572">Linuxでファイルを空にする5つの方法</a> とかで見かけました</p>
-
-<p>他のやり方だとまた違ってくるのでしょうか？</p>
-
-		</div>
-		<div class="footer">
-			<time>2012-11-07</time>
-			<ul class="tag">
-				<li><a href="/tag/Linux">Linux(2)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/4" class="float-left">≪前のページ</a>
 		<a href="/page/6" class="float-right">次のページ≫</a>
@@ -292,20 +286,20 @@
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
 						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
 						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
-						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(5)</a>
+							<li><a href="/archives/2014">2014年(6)</a>
 								<ul>
-										<li><a href="/archives/2014/06">2014年06月(2)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(3)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
 										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
 										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
@@ -355,12 +349,12 @@
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/perl">perl(9)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/golang">golang(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
 						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
 						<li class="hide"><a href="/tag/Linux">Linux(2)</a></li>
 						<li class="hide"><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
-						<li class="hide"><a href="/tag/golang">golang(2)</a></li>
 						<li class="hide"><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
 						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
 						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>

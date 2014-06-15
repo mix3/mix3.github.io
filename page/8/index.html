@@ -42,6 +42,139 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2011/07/17/20110717/">さくらVPSをちょこちょこ触ってみる</a></h2>
+		</div>
+		<div class="content">
+			<p>と言っても特に何かしたとかは無かったり。</p>
+
+<ul>
+<li>sshのポートを変えた</li>
+<li>iptablesを設定した</li>
+<li>logwatchを導入した</li>
+<li>pacoを導入した</li>
+</ul>
+
+<h3>sshのポート変更</h3>
+
+<p>セキュリティ的にはsshを公開鍵認証にしておくだけで基本大丈夫だとは思うのですが、アタックされることには変わりなく気持ち悪い物は気持ち悪いので一応変えておきました。</p>
+
+<h3>iptablesの設定</h3>
+
+<p>何処でも見かける設定ですが以下のような基準でiptablesを設定するスクリプトを組みました。</p>
+
+<ul>
+<li>内から外への通信以外は拒否
+<ul>
+<li>ただし内から外への通信の応答は通す</li>
+</ul></li>
+<li>SSH用の穴は用意する</li>
+</ul>
+
+<h4>iptables-init.sh</h4>
+
+<pre><code>#!/bin/sh
+
+# ルールクリア
+iptables -F
+iptables -X
+
+# 内から外への通信以外は破棄
+iptables -P INPUT   DROP
+iptables -P OUTPUT  ACCEPT
+iptables -P FORWARD DROP
+
+# ループバックは全て許可
+iptables -A INPUT  -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+# プライベートネットワークなんて無かったんや…
+iptables -A INPUT -s 10.0.0.0/8     -j DROP
+iptables -A INPUT -s 127.16.0.0/12  -j DROP
+iptables -A INPUT -s 192.168.0.0/16 -j DROP
+
+# SSH用の穴
+iptables -A INPUT -p tcp --dport {SSHのポート} -j ACCEPT
+
+# 内から外への通信の応答は通す
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+</code></pre>
+
+<h3>logwatchの導入</h3>
+
+<p>ログも監視しないと意味ないのでlogwatchなるログを定期的に（デフォルトはcron.dailyを利用した毎日）メールで知らせるプログラムを導入してみました。yumで入れるとバージョンが結構古かったりするので<a href="http://sourceforge.net/projects/logwatch/files/">sourceforge</a>から落としてインストールしました。rpmで入れるとデフォルトの設定ファイルが/usr/share/logwatch/default.conf以下となるようです。/etc/logwatch/conf以下に設定ファイルを置くと設定を上書きするようです。</p>
+
+<p>とりあえずSSHのログとDiskスペースのログを監視するようにしました。デフォルトではService = Allで全部を監視するようにしてその後除外を設定しているのでその設定をコメントアウトしてSSHのログとDiskスペースのログに決め打ちしました。</p>
+
+<h4>/usr/share/logwatch/default.conf/logwatch.conf</h4>
+
+<pre><code>#Service = All
+#Service = "-zz-network" 
+#Service = "-zz-sys" 
+#Service = "-eximstats"
+</code></pre>
+
+<h4>/etc/logwatch/conf/logwatch.conf</h4>
+
+<pre><code>MailTo = 送信先メールアドレス
+MailFrom = 送信元メールアドレス
+Service = sshd
+Service = zz-disk_space
+</code></pre>
+
+<p>rpmで入れているならばおそらく/etc/cron.daily/0logwatchにlogwatchスクリプトへのシンボリックリンクが貼られているので毎日定期的に実行されメールが届くようになるハズです。ただしデフォルトでは前日のログを送信する設定（Range = yesterday）になっていてログが記録されていなければ送信されません。</p>
+
+<h3>pacoの導入</h3>
+
+<p>pacoはmake installしたソフトを管理するものです。yumなどのパッケージ管理ソフトで管理されている以外のものについてもきちっと管理したい場合は導入するととても幸せになれそうです。</p>
+
+<ul>
+<li>参考
+<ul>
+<li><a href="http://paco.sourceforge.net/">paco</a></li>
+<li><a href="http://d.hatena.ne.jp/rx7/20081011/p2">make install"したソフトウェアを管理できる超便利ツール「Paco」</a></li>
+</ul></li>
+</ul>
+
+<p>pacoのインストール自体はconfigure make make installで出来ます。またpaco自身をpacoで管理するためにmake installの後make logmeを実行します。これ以降make installするときはpaco -D make insatllというふうにすることでそのソフトをpacoの管理下に置いてくれます。</p>
+
+<h4>注意</h4>
+
+<p>pacoはデフォルトで/usr/local/bin以下にインストールされるのですがsudoで実行するとPATHが引き継がれずpacoが見つからないためmake logmeに失敗してしまいました。./configure prefix=/binなどインストール場所を設定してsudoでも実行出来るようにするか、sudo時の環境変数の引き継ぎをするなどして回避しましょう。</p>
+
+<p>なおsudo時の環境変数の引き継ぎ方法は色々あるようです。</p>
+
+<h4>bashrcで設定</h4>
+
+<pre><code>alias sudo="sudo env PATH=$PATH"
+</code></pre>
+
+<h4>visudoで設定</h4>
+
+<pre><code>Defaults:{run_user} !env_reset
+    or
+Defaults env_keep+="PATH"
+</code></pre>
+
+<h4>sudo -s で実行</h4>
+
+<h3>次回は</h3>
+
+<p>Nginx+plackでなんか適当に外から見れる環境を作りたいかな。</p>
+
+		</div>
+		<div class="footer">
+			<time>2011-07-17</time>
+			<ul class="tag">
+				<li><a href="/tag/インフラ">インフラ(2)</a></li>
+				<li><a href="/tag/サーバ管理">サーバ管理(1)</a></li>
+				<li><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2011/07/05/20110705/">さくらVPS借りてみた</a></h2>
 		</div>
 		<div class="content">
@@ -413,52 +546,6 @@ sub pageMain {
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2011/06/12/20110612/">jquery-presentationを弄ってみた</a></h2>
-		</div>
-		<div class="content">
-			<p>最近自分の進むべき道の事について考えたり考えなかったりしているmix3です。</p>
-
-<h3>GoogleDocsも良いけれど</h3>
-
-<p>社内の勉強会でとある『未完』に終わったお話したのですが、そのときパワポに何を使おうか考えて普段はGoogleDocsを使ってるのですが、こんなパワポを見てHTML形式も良いなと思い、HTMLベースのパワポツールを探してみたところ以下のものが自分の琴線に触れました。
-琴線に触れたもの</p>
-
-<ul>
-<li>jquery-presentation - jQuery based presentation framework. [DEMO]</li>
-<li>HTML をプレゼン形式に表示する jQuery プラグインを作ってみた [DEMO]</li>
-<li>「イカワイパー」なHTMLベースのプレゼンツール「SliDegeso」を作ってみたでゲソ [DEMO]</li>
-<li>slippy [DEMO]</li>
-</ul>
-
-<p>イカに凄く惹かれたのですが上手くワイパーの動作をしてくれず見送り。一番シンプルそうなjquery-presentationを今回は使ってみました。slippyも結構良い感じっぽいので次回はそれを使ってみたいと思います。</p>
-
-<h3>jquery-presentationはちょっとシンプル過ぎる</h3>
-
-<p>jquery-presentationは実はページ送り（戻り）しか出来ない超絶シンプルなツールです。デフォルトのページ送りのエフェクトや、センター表示、ページ番号管理表示などはありますがそれだけです。「一部表示を隠して順に表示する」といったパワポの基本的な事が出来なかったりします。なのでその程度のことぐらいは出来てほしいなと思い少し手を入れました。こんな感じです。</p>
-
-<p><a href="http://dl.dropbox.com/u/5299588/jquery-presentation/index.html">デモはこちら</a></p>
-
-<script src="https://gist.github.com/1019885.js"> </script>
-
-<p>表示する順序や、visibility:hidden/display:noneの使い分けまでやりたいなと思いつつ片手間に弄ったので隠して表示が出来る程度にしています。やりすぎると「他のツール使え」ということになりますしね。</p>
-
-<p>ということで発表自体は非常に残念なことになったので精進して行きたいです。
-ちなみに</p>
-
-<p>HTMLベースのパワポの弱点としてスライドシェアに上げにくい（PDFにしにくい）というものがあります。スライドシェアに上げる前提の場合はHTMLベースは避けた方が良いでしょう。</p>
-
-		</div>
-		<div class="footer">
-			<time>2011-06-12</time>
-			<ul class="tag">
-				<li><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/7" class="float-left">≪前のページ</a>
 		<a href="/page/9" class="float-right">次のページ≫</a>
@@ -487,20 +574,20 @@ sub pageMain {
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
 						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
 						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
-						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(5)</a>
+							<li><a href="/archives/2014">2014年(6)</a>
 								<ul>
-										<li><a href="/archives/2014/06">2014年06月(2)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(3)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
 										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
 										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
@@ -550,12 +637,12 @@ sub pageMain {
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/perl">perl(9)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/golang">golang(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
 						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
 						<li class="hide"><a href="/tag/Linux">Linux(2)</a></li>
 						<li class="hide"><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
-						<li class="hide"><a href="/tag/golang">golang(2)</a></li>
 						<li class="hide"><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
 						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
 						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>

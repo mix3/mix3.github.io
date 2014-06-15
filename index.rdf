@@ -10,6 +10,85 @@
 <description>&#x30AE;&#x30FC;&#x30AF;&#x306B;&#x3082;&#x7D75;&#x63CF;&#x304D;&#x306B;&#x3082;&#x306A;&#x308C;&#x306A;&#x3044;&#x8005;&#x306E;&#x672B;&#x8DEF;</description>
 
 <item>
+<title>go&#x7248;ikachan&#x306E;github.com/mix3/go-ikusan&#x3092;&#x4F5C;&#x3063;&#x305F;&#x8A71;</title>
+<description>
+<![CDATA[
+<blockquote class="twitter-tweet" lang="ja"><p>衣玖さん芸人に!!!俺はなるっ!!!（海賊王的なノリで</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/475532375305109504">2014, 6月 8</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>最近p5-Ikusanを作ったり、それで衣玖さんのIRCボット作ったりして衣玖さんへのロマンティックが止まらないmix3です</p>
+
+<h3><a href="https://github.com/mix3/go-ikusan">github.com/mix3/go-ikusan</a>と<a href="https://github.com/mix3/go-irc">github.com/mix3/go-irc</a></h3>
+
+<p>最近golangを触ってる事が多いのですが（絶賛開発中の社内アプリがgolangだけどそっちにはあんまり関わってなかったりする）</p>
+
+<p>適当になんか作りたいなぁと思っていたところに最近衣玖さんへの愛が溢れ出してきてたので、そりゃ「go版ikachan作ろう」となるのは自然な事ですよね</p>
+
+<p>でgoでircってどう触るんだろうとgithubを漁ったところ</p>
+
+<ul>
+<li><a href="https://github.com/thoj/go-ircevent">github.com/thoj/go-ircevent</a></li>
+<li><a href="https://github.com/fluffle/goirc/tree/master">github.com/fluffle/goirc</a></li>
+</ul>
+
+<p>辺りがirc触るためのライブラリとして有名どころなのかなぁということが分かって、その辺り使って作ろうとしたのですが、</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>go-ikusanのためにgo-irceventの中追いかけてるがエラー検知からのリコネクト処理がダメだこりゃ close(end)して各イベントチャンネルをwaitgroupで待ってるけど、socketのreadで待ってるからtimeoutするまで待ち続けてる</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476224165708451840">2014, 6月 10</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>preadってチャンネル用意してるのにどこにも使ってなくて多分これはsocketから1行読んで解釈するのと、それをcallbackに投げるのを分離するためものだと思うけど、まだ未実装ってことなのかな</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476225950380597248">2014, 6月 10</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>go-ircevent、groupwaitしてるのsocketを安全に閉じるのを保証するためだと思うけど、socketのreadで待ち続けるのもなんとも言えないなぁ</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476226654398709761">2014, 6月 10</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>Errorチャンネルをselectで待ってて、検知したらdisconnectするけどそのdisconnectの中でさらにErrorを投げてるの結構ワンダーな感じする</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476227286870392832">2014, 6月 10</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>とか</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p><a href="http://t.co/jXGwN4arHz">http://t.co/jXGwN4arHz</a> がエラーハンドリングちゃんとしてそうだけど、flag要求されて非常に使いづらい</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476228862263570434">2014, 6月 10</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>とかでなんか微妙に使いづらいなぁとなってしまい、じゃあいっそそっから作るかということで両方の間の子みたなの作ったりしました。<a href="https://github.com/mix3/go-irc">github.com/mix3/go-irc</a></p>
+
+<p>出来るだけ薄くしておきたかったのと、IRCについて知識はまるでないので難しいことはしないようにしたかったので</p>
+
+<ul>
+<li>ircサーバへのリクエストが出来る</li>
+<li>ircサーバからのレスポンスを受け取れる</li>
+<li>ircサーバからのレスポンスを元にコールバックを呼ぶがディスパッチャみたいなことはしない</li>
+<li>ircサーバからのレスポンスのtimeoutを待たずに落ちる事が出来る</li>
+<li>落ちたタイミングで何かしたいこともあるだろうから、別途落ちたタイミングでコールバックを呼ぶようにする</li>
+<li>flagは使わない</li>
+<li>loggerはデフォルトで<a href="https://github.com/umisama/golog">github.com/umisama/golog</a>を使うけどinterfaceが定義されてるので差し替え出来るハズ</li>
+</ul>
+
+<p>ぐらいを満たすような感じで<a href="https://github.com/thoj/go-ircevent">github.com/thoj/go-ircevent</a>と<a href="https://github.com/fluffle/goirc/tree/master">github.com/fluffle/goirc</a>からコピペしたりしなかったりしました</p>
+
+<p>たまに落ちるときにWaitしたまま帰ってこないみたいなことがある感じなので、明らかにここマズいとかあったらプルリクあると嬉しいです</p>
+
+<p>で、これを元にgo版<a href="https://github.com/yappo/p5-App-Ikachan">ikachan</a>こと<a href="https://github.com/mix3/go-ikusan">go-ikusann</a>を作りましたとさ</p>
+
+<p>とってもキュートな衣玖さんがお出迎えしてくれるwebインタフェースも作ってやはり衣玖さんは最高だなって思いました</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>go-ikusanのwebインタフェース作った　衣玖さんマジかわ <a href="http://t.co/sAcXgUZJP1">pic.twitter.com/sAcXgUZJP1</a></p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/477786314641657857">2014, 6月 14</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>なおAAの画像は「衣玖 AA」で検索して見繕ったAAなので著作権的に問題あったら非常に心苦しいですが消します</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/blog/2014/06/15/20140615_03/</guid>
+<pubDate>Sun, 15 Jun 2014 18:00:00 -0000</pubDate>
+</item>
+<item>
 <title>&#x30D6;&#x30ED;&#x30B0;&#x30C7;&#x30B6;&#x30A4;&#x30F3;&#x3092;&#x5909;&#x3048;&#x3066;&#x307F;&#x308B;</title>
 <description>
 <![CDATA[
@@ -21,7 +100,7 @@
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.io/blog/2014/06/15/20140615_02/</guid>
-<pubDate>Sun, 15 Jun 2014 00:00:00 -0000</pubDate>
+<pubDate>Sun, 15 Jun 2014 17:15:00 -0000</pubDate>
 </item>
 <item>
 <title>golangWAF&#x306E;traffic&#x3092;&#x89E6;&#x308B;&#x3064;&#x3044;&#x3067;&#x306B;&#x30B5;&#x30F3;&#x30D7;&#x30EB;&#x30B3;&#x30FC;&#x30C9;&#x3092;&#x4F5C;&#x3063;&#x3066;CI&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x3092;&#x8A66;&#x3057;&#x3066;heroku&#x306B;&#x4E0A;&#x3052;&#x3066;&#x307F;&#x305F;</title>
@@ -765,346 +844,6 @@ Options:
 </description>
 <guid isPermaLink="true">http://mix3.github.io/blog/2013/11/23/20131123/</guid>
 <pubDate>Sat, 23 Nov 2013 00:00:00 -0000</pubDate>
-</item>
-<item>
-<title>isucon3&#x306E;&#x30EA;&#x30D5;&#x30A1;&#x30EC;&#x30F3;&#x30B9;&#x5B9F;&#x88C5;&#x3092;Go&#x306B;&#x79FB;&#x690D;&#x3057;&#x305F;&#x8A71;</title>
-<description>
-<![CDATA[
-<p>isucon3スタッフとして本選運営のお手伝いをしてきましたが、参加者ではないのでisuconについて特に書くことが見つからないmix3です。一つ言えるのはみんな凄すぎでそれに比べて自分は本当になにも出来ない無能なんだなぁと再認識させられました。死にたい。</p>
-
-<p><a href="/images/20131113/201311102153000.jpg"><img src="/images/20131113/201311102153000.jpg" width="300" alt="スタッフの証" /></a><br /></p>
-
-<h3>移植を引き受けた話</h3>
-
-<p>isuconでは最初に動く状態のアプリが用意されるのですが、そのアプリは問題が確定した後にまずリファレンス実装（今回はPerl）がされ、その後予選を抜けた人たちが使用していた言語（Perl含むRuby,Python,PHP,NodeJS,Go）に移植する、という流れで作られました。自分はその中でGo言語移植を担当しました。</p>
-
-<p>ちなみにPerl以外の移植言語の中ではPHPぐらいしか触ったことがなく、PHPもかれこれ２,３年は触っておらずすっかり忘れてしまってるので、何の言語を担当しようと何も分からない状態から始まるという「なんで移植担当引き受けちゃったの？」と言われても仕方ないような状態でした。</p>
-
-<p>なんでだろう？きっと<s>暇だった</s>仕事に余裕があったんだね</p>
-
-<h3>移植コトハジメ</h3>
-
-<p>そんな状態だったので、移植する前に「Goの勉強しないとなぁ」となり、以下のサイトを参考にGoの書き方、Goでwebappを作る場合にどうするのか調べたりしてました。なお、予選コードがあったおかげでベタ移植には困ることが無かったのでとてもとても助かりました。動くコードがあるというのは大事です。</p>
-
-<ul>
-<li><a href="http://qiita.com/tenntenn/items/0e33a4959250d1a55045">Go言語の初心者が見ると幸せになれる場所</a></li>
-<li><a href="http://qiita.com/tenntenn/items/b8b27e32c28f7569f41a">Go言語でWebAppの開発に必要なN個のこと</a></li>
-<li>予選のコード
-<ul>
-<li>jsonのconfigファイルのロードや、<a href="http://www.gorillatoolkit.org/pkg/mux">gorilla/mux</a>などは予選コードを<s>コピペ</s>参考にしました</li>
-</ul></li>
-</ul>
-
-<h3>移植戦略</h3>
-
-<p>今回の移植で予選コードに追加して必要だったのは以下3点</p>
-
-<ul>
-<li>外部コマンド
-<ul>
-<li>画像リサイズにリファレンス実装ではImageMagickのconvertコマンドを使用するため</li>
-</ul></li>
-<li>JSONのレスポンス生成
-<ul>
-<li>予選とは違いAPIベースだったのでJSONを返す必要があった</li>
-</ul></li>
-<li>ロングポーリングの実現</li>
-</ul>
-
-<p>これらが出来れば後は予選コードを<s>コピペ</s>参考にすれば移植は出来そうでした</p>
-
-<h3>外部コマンド, JSONレスポンス</h3>
-
-<p>外部コマンドについてはパッケージドキュメント <a href="http://golang.org/pkg/os/exec/">os/exec</a> 見たまんまです。捻りようもありませんね。</p>
-
-<p>JSONレスポンスは<a href="http://nesv.blogspot.jp/2012/09/super-easy-json-http-responses-in-go.html">Super-easy JSON HTTP responses, in Go</a>を<s>パクりました</s>参考にしました。</p>
-
-<p>へーと思ったのがtype Response map[string]interface{} の書き方。mapの値の型をinterface{}にするとinterface{}は何でも受け取れるので自身（この場合Response型）を入れ子にすることが出来るので、いわゆる連想配列やらMapやらと同じ感じで扱える型が出来るわけですね。まあJavaでMap&lt;String, Object&gt;とかする感じでしょうか。</p>
-
-<h3>goroutin サイコー</h3>
-
-<p>ロングポーリングは<a href="https://sites.google.com/site/gopatterns/web/long-poll-server">Go Language Patterns web/Long-Poll Server</a>にてgoroutinを使った例があり、これを<s>パクりました</s>参考にしました。</p>
-
-<p>ここで始めてgoroutinを知りました。Goの話を聞くときは大抵並列の話が出るな、と思っていたのですが「なるほど」となりました。たしかにgoroutinすごいです。</p>
-
-<ul>
-<li>message/channel で排他制御とか考えずにデータをやり取り出来る</li>
-<li>selectでmessage/channelを通してイベントドリブン制御</li>
-<li>go func () { ... } () でさくっと並列処理を走らせる</li>
-</ul>
-
-<p>確かにこれはそういった処理実装するの「簡単だわー」ってなります。</p>
-
-<p>ただまあロングポーリング程度の実装で何が分かる？という向きもあると思うし、これでヒャッホーってなってプロダクション環境で使ったりした日には何か罠踏むんだろうな、とは思いますが…。</p>
-
-<h3>Kossyのfilterと例外処理</h3>
-
-<p>ここまでで移植は可能だったので割合サクっと移植してしまい本選でもそれをgoの初期アプリとして出しました。が、正直なところ本戦に出した移植アプリは移植としては不完全だったかなぁという思いがありました。</p>
-
-<p>なぜならPerlのリファレンス実装で使われているKossyというフレームワークにはfilterという機能があり、Sinatraルーティングに追加してコントローラ処理の前後に処理を挟めるようになっており、リファレンス実装ではそれを使って、ユーザ情報の取得、ユーザ情報取得失敗時の400エラーを実装していました。抜粋すると以下のような感じ。</p>
-
-<pre><code>filter get_user =&gt; sub {
-    # userの取得してstashに保存 別にundefでも構わない
-};
-filter require_user =&gt; sub {
-    # stashにuserが無かったら400エラー
-};
-post '/signup' =&gt; sub {
-};
-get '/image/:image' =&gt; [qw/ get_user /] =&gt; sub {
-    # 先に get_user が実行される
-};
-get '/me' =&gt; [qw/ get_user require_user /] =&gt; sub {
-    # 先に get_user, require_user が並びの順で実行される
-};
-</code></pre>
-
-<p>これに対してGoのベタ移植ではgetUser関数を呼んで nilチェックするコードを各コントローラにコピペしていました。「こんなの業務で書いたら殺されるかもしれない」という思いが渦巻くぐらいには良くない書き方だと思います。</p>
-
-<p>それともう一つよく無かったなと思ったのがエラー時のレスポンス処理。Kossyでは$c->halt(500)などとしてExceptionを投げれば後はKossyがそれを捕まえてエラーレスポンスを返してくれます。これがGoのベタ移植では必要なときに毎度レスポンスを設定してreturnして関数を抜けるという素朴なことをしていました。</p>
-
-<p>この「Kossyのfilter」「エラー時のレスポンス処理」２点が移植していてすごくもやもやしていたので、本選のアプリとしては使わないかもしれないけど「こうしたほうが良いんじゃないか？」というのを盛りこんだ実装も別で書いたりしていました</p>
-
-<h3>Goにおける例外処理</h3>
-
-<p>Goにはtry-catch-finallyがない代わりにpanic/recoverというものがあり、deferと組み合わせて例外処理っぽいことが出来ます <a href="http://blog.golang.org/defer-panic-and-recover">Defer, Panic, and Recover</a></p>
-
-<ul>
-<li>defer
-<ul>
-<li>関数を抜けた後に実行する遅延処理を定義出来る</li>
-</ul></li>
-<li>panic
-<ul>
-<li>関数を即抜ける perlで言うとdieみたいな感じ またそのときに遅延処理を実行する</li>
-</ul></li>
-<li>recover
-<ul>
-<li>panicから復帰する perlで言うとevalみたいな感じ deferの中で使うのが基本？</li>
-</ul></li>
-</ul>
-
-<p>組み合わせて書くと例えば以下のような感じになります</p>
-
-<pre><code>func main() {
-    // (1) mainを抜けると実行される処理の定義
-    defer func() {
-        // (3) panicから復帰する
-        if err := recover(); err != nil {
-            fmt.Printf("recover: %v\n", err)
-        }
-    }()
-
-    // (2) mainから即抜ける
-    panic("panic")
-}
-// (4) output
-// recover: panic
-</code></pre>
-
-<h3>defer panic/recoverを使ったエラーレスポンス処理</h3>
-
-<p>これを使ってwebappのエラー処理をするならこうなるかな？というのを書いてみたのが以下になります（ちなみに以下のサンプルを書いていてswitch文にbreak使わなくてもよいことを初めて知りました）</p>
-
-<pre><code>package main
-
-import (
-    "net/http"
-    "github.com/gorilla/mux"
-    "fmt"
-)
-
-func main() {
-    r := mux.NewRouter()
-    r.HandleFunc("/",       handler).Methods("GET")
-    r.HandleFunc("/{code}", handler).Methods("GET")
-    http.Handle("/", r)
-    http.ListenAndServe(":5000", nil)
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-    defer func () {
-        if err := recover(); err != nil {
-            var code int
-            switch err {
-                case "400": code = http.StatusBadRequest
-                case "404": code = http.StatusNotFound
-                case "500": fallthrough
-                default   : code = http.StatusInternalServerError
-            }
-            http.Error(w, http.StatusText(code), code)
-        }
-    } ()
-    vars := mux.Vars(r)
-    if code := vars["code"]; code != "" {
-        panic(code)
-    }
-    fmt.Fprint(w, "OK")
-}
-
-// [output]
-// http://loclahost:5000/    =&gt; OK
-// http://loclahost:5000/400 =&gt; Bad Request
-// http://loclahost:5000/404 =&gt; Not Found
-// http://loclahost:5000/500 =&gt; Internal Server Error
-// http://loclahost:5000/999 =&gt; Internal Server Error
-</code></pre>
-
-<p>panicの引数はinterface{}型なのでつまり何でも渡せるので、自前の型を定義して便利機能を付けておくとrecover()で受け取った後が捗りそうですね。</p>
-
-<p>例外処理自体はこれで良いのですが、ただこのままだとdeferをコントローラ毎に書いて行かないと行けなくなるので、当然それは嬉しくありません。</p>
-
-<pre><code>func main() {
-    r := mux.NewRouter()
-    r.HandleFunc("/hoge", hoge).Methods("GET")
-    r.HandleFunc("/fuga", fuga).Methods("GET")
-    r.HandleFunc("/bar",  bar ).Methods("GET")
-    http.Handle("/", r)
-    http.ListenAndServe(":5000", nil)
-}
-func hoge(w http.ResponseWriter, r *http.Request) {
-    defer func () {
-        if err := recover(); err != nil {
-            // ...
-        }
-    } ()
-    fmt.Fprint(w, "hoge")
-}
-func fuga(w http.ResponseWriter, r *http.Request) {
-    defer func () {
-        if err := recover(); err != nil {
-            // ...
-        }
-    } ()
-    fmt.Fprint(w, "hoge")
-}
-func bar(w http.ResponseWriter, r *http.Request) {
-.
-.
-.
-// deferコピペしないといけないのでは嬉しく無い
-</code></pre>
-
-<p>で、どうしようか考えた結果、defer,recoverするラッパー関数にコントローラを渡してあげれば良いんじゃないかと考えてみました、具体的には以下のような感じ。</p>
-
-<pre><code>func main() {
-    r := mux.NewRouter()
-    r.HandleFunc("/hoge", wrapper(hoge).Methods("GET")
-    r.HandleFunc("/fuga", wrapper(fuga).Methods("GET")
-    r.HandleFunc("/bar",  wrapper(bar ).Methods("GET")
-    http.Handle("/", r)
-    http.ListenAndServe(":5000", nil)
-}
-func wrapper(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
-    return func (w http.ResponseWriter, r *http.Request) {
-        defer func () {
-            if err := recover(); err != nil {
-                // ....
-            }
-        } ()
-        handler(w, r)
-    }
-}
-func hoge(w http.ResponseWriter, r *http.Request) {
-    panic("hoge")
-}
-func fuga(w http.ResponseWriter, r *http.Request) {
-    panic("fuga")
-}
-func bar(w http.ResponseWriter, r *http.Request) {
-.
-.
-.
-</code></pre>
-
-<p>こうすることで例外処理の復帰部分をラッパー関数に押し込むことができました。例外処理のためにHandleFuncに渡すコントローラはラッパー関数を必ず噛ませないといけないルールが出来てしまうので、そこはちょっとアレな感じですが。</p>
-
-<p>そしてさらにこのラッパー関数を多段にするとKossyのfilterっぽいことが出来そうです。（Kossyでは配列で順序を自由に設定出来るので、実際にはそれっぽく出来るってだけですけども）</p>
-
-<pre><code>package main
-
-import (
-    "net/http"
-    "github.com/gorilla/mux"
-    "fmt"
-)
-
-type Stash map[string]interface{}
-
-func main() {
-    r := mux.NewRouter()
-    r.HandleFunc("/pass",   base(pass(handler))).Methods("GET")
-    r.HandleFunc("/{code}", base(     handler )).Methods("GET")
-    r.HandleFunc("/",       base(     handler )).Methods("GET")
-    http.Handle("/", r)
-    http.ListenAndServe(":5000", nil)
-}
-
-func base(handler func(w http.ResponseWriter, r *http.Request, s Stash)) func(w http.ResponseWriter, r *http.Request) {
-    return func (w http.ResponseWriter, r *http.Request) {
-        defer func () {
-            if err := recover(); err != nil {
-                var code int
-                switch err {
-                    case "400": code = http.StatusBadRequest
-                    case "404": code = http.StatusNotFound
-                    case "500": fallthrough
-                    default   : code = http.StatusInternalServerError
-                }
-                http.Error(w, http.StatusText(code), code)
-            }
-        } ()
-        handler(w, r, Stash{})
-    }
-}
-
-func pass(handler func(w http.ResponseWriter, r *http.Request, s Stash)) func(w http.ResponseWriter, r *http.Request, s Stash) {
-    return func (w http.ResponseWriter, r *http.Request, s Stash) {
-        s["msg"] = "PASS"
-        handler(w, r, s)
-    }
-}
-
-func handler(w http.ResponseWriter, r *http.Request, s Stash) {
-    vars := mux.Vars(r)
-    if code := vars["code"]; code != "" {
-        panic(code)
-    }
-    if msg, ok := s["msg"]; !ok || msg == "" {
-        fmt.Fprint(w, "OK")
-    } else {
-        fmt.Fprint(w, msg)
-    }
-}
-
-// [output]
-// http://loclahost:5000/     =&gt; OK
-// http://loclahost:5000/pass =&gt; PASS
-// http://loclahost:5000/400  =&gt; Bad Request
-// http://loclahost:5000/404  =&gt; Not Found
-// http://loclahost:5000/500  =&gt; Internal Server Error
-// http://loclahost:5000/999  =&gt; Internal Server Error
-</code></pre>
-
-<p>どうでしょうか。ラッパー関数を多段にすることでfilterっぽい感じが表現出来たり、panic/recoverでエラーレスポンスをサクッと作れたり、なんとなくフレームワーク支援を受けて書いてるような気分に浸れそうな感じがしてきませんかね。</p>
-
-<p>予選コードから考えるとちょっと手を入れ過ぎ感が否めなかったり、移植と言っても機能を満たせば良いわけでフレームワークがやってる処理までそれっぽく移植する必要はないので、結局は本戦の移植アプリにはしませんでしたが、実際にGoでこういうの書く場合はこれぐらいの工夫はしても良いんじゃないかなと思ったりします。ただでさえGoだとまじめにエラーハンドリングする必要があって縦にコードが伸び易いので、少しでもコードを減らす工夫はしたほうが良いように思います。</p>
-
-<p>なお、これを適用することによって900行あった本戦の移植アプリが800行になりました。やったねたえちゃん！100行も減ったよ！でもperlはそもそも400行ありませんでしたね。切ない。</p>
-
-<h3>ということで</h3>
-
-<p>自己満足も満たしつつ移植作業が出来たので楽しかったです。なによりgoroutinを知れたのが良かったです。「Goが良いというのはこういうことか」みたいなのが少しだけ実感を持って感じられました。</p>
-
-<h3>おわりに</h3>
-
-<p>今回はisuconにスタッフとして関わったけれどもisucon自体には一度も参加してないので、来年isuconあったら予選ぐらいは参加してボコボコにされてこようかな、とかそんなこと考えるくらいにはisucon3の盛り上がりが凄かったです。</p>
-
-<p>isucon関係者、参加者のみなさま、本当にお疲れさまでした。</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/blog/2013/11/13/20131113/</guid>
-<pubDate>Wed, 13 Nov 2013 00:00:00 -0000</pubDate>
 </item>
 </channel>
 </rss>

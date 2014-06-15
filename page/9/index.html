@@ -42,6 +42,52 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2011/06/12/20110612/">jquery-presentationを弄ってみた</a></h2>
+		</div>
+		<div class="content">
+			<p>最近自分の進むべき道の事について考えたり考えなかったりしているmix3です。</p>
+
+<h3>GoogleDocsも良いけれど</h3>
+
+<p>社内の勉強会でとある『未完』に終わったお話したのですが、そのときパワポに何を使おうか考えて普段はGoogleDocsを使ってるのですが、こんなパワポを見てHTML形式も良いなと思い、HTMLベースのパワポツールを探してみたところ以下のものが自分の琴線に触れました。
+琴線に触れたもの</p>
+
+<ul>
+<li>jquery-presentation - jQuery based presentation framework. [DEMO]</li>
+<li>HTML をプレゼン形式に表示する jQuery プラグインを作ってみた [DEMO]</li>
+<li>「イカワイパー」なHTMLベースのプレゼンツール「SliDegeso」を作ってみたでゲソ [DEMO]</li>
+<li>slippy [DEMO]</li>
+</ul>
+
+<p>イカに凄く惹かれたのですが上手くワイパーの動作をしてくれず見送り。一番シンプルそうなjquery-presentationを今回は使ってみました。slippyも結構良い感じっぽいので次回はそれを使ってみたいと思います。</p>
+
+<h3>jquery-presentationはちょっとシンプル過ぎる</h3>
+
+<p>jquery-presentationは実はページ送り（戻り）しか出来ない超絶シンプルなツールです。デフォルトのページ送りのエフェクトや、センター表示、ページ番号管理表示などはありますがそれだけです。「一部表示を隠して順に表示する」といったパワポの基本的な事が出来なかったりします。なのでその程度のことぐらいは出来てほしいなと思い少し手を入れました。こんな感じです。</p>
+
+<p><a href="http://dl.dropbox.com/u/5299588/jquery-presentation/index.html">デモはこちら</a></p>
+
+<script src="https://gist.github.com/1019885.js"> </script>
+
+<p>表示する順序や、visibility:hidden/display:noneの使い分けまでやりたいなと思いつつ片手間に弄ったので隠して表示が出来る程度にしています。やりすぎると「他のツール使え」ということになりますしね。</p>
+
+<p>ということで発表自体は非常に残念なことになったので精進して行きたいです。
+ちなみに</p>
+
+<p>HTMLベースのパワポの弱点としてスライドシェアに上げにくい（PDFにしにくい）というものがあります。スライドシェアに上げる前提の場合はHTMLベースは避けた方が良いでしょう。</p>
+
+		</div>
+		<div class="footer">
+			<time>2011-06-12</time>
+			<ul class="tag">
+				<li><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2011/05/04/20110504_01/">Mojolicious::Lite + Teng + SNBinder + Xslate (+ SQLite/OnMemory) でCRUDアプリを作ってみた</a></h2>
 		</div>
 		<div class="content">
@@ -367,20 +413,20 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
 						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
 						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
-						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(5)</a>
+							<li><a href="/archives/2014">2014年(6)</a>
 								<ul>
-										<li><a href="/archives/2014/06">2014年06月(2)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(3)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
 										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
 										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
@@ -430,12 +476,12 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/perl">perl(9)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/golang">golang(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
 						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
 						<li class="hide"><a href="/tag/Linux">Linux(2)</a></li>
 						<li class="hide"><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
-						<li class="hide"><a href="/tag/golang">golang(2)</a></li>
 						<li class="hide"><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
 						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
 						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
