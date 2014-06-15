@@ -10,6 +10,20 @@
 <description>&#x30AE;&#x30FC;&#x30AF;&#x306B;&#x3082;&#x7D75;&#x63CF;&#x304D;&#x306B;&#x3082;&#x306A;&#x308C;&#x306A;&#x3044;&#x8005;&#x306E;&#x672B;&#x8DEF;</description>
 
 <item>
+<title>&#x30D6;&#x30ED;&#x30B0;&#x30C7;&#x30B6;&#x30A4;&#x30F3;&#x3092;&#x5909;&#x3048;&#x3066;&#x307F;&#x308B;</title>
+<description>
+<![CDATA[
+<p>テンプレートは気に入っていて変えたくないのでその辺りは出来るだけそのままを保ちつつ、レスポンシブデザインってどうやるんだろうなと思いながらいじいじしてて数ヶ月経ってしまいこのままだともう日の目を見る事が無さそうな感じしたのでえいやで更新してしまいました</p>
+
+<p>それにともない記事のhtmlを一カ所にまとめる様に変更（記事生成後再生成でゴミが残るので面倒になった）それにともないパーマリンクが変更になるという鬼畜ぶりに我ながら身震いしたけどどうせブクマしてる人も全然いないし自分のブログだし好きにすることにした　404のカスタムhtmlでjs使って多少の誘導ぐらいは出来る様にしたいとは思ってるけどやらないかも</p>
+
+<p>ということで気分も新たにブログたまには書いて行きたい</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/blog/2014/06/15/20140615_02/</guid>
+<pubDate>Sun, 15 Jun 2014 00:00:00 -0000</pubDate>
+</item>
+<item>
 <title>golangWAF&#x306E;traffic&#x3092;&#x89E6;&#x308B;&#x3064;&#x3044;&#x3067;&#x306B;&#x30B5;&#x30F3;&#x30D7;&#x30EB;&#x30B3;&#x30FC;&#x30C9;&#x3092;&#x4F5C;&#x3063;&#x3066;CI&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x3092;&#x8A66;&#x3057;&#x3066;heroku&#x306B;&#x4E0A;&#x3052;&#x3066;&#x307F;&#x305F;</title>
 <description>
 <![CDATA[
@@ -169,7 +183,7 @@ gvm pkgset use hoge
 <p>この記事は5/13に書いたのだが、いつのまにか6/15である 時間が経つのは早い</p>
 ]]>
 </description>
-<guid isPermaLink="true">http://mix3.github.io/blog/2014/06/15/20140615/</guid>
+<guid isPermaLink="true">http://mix3.github.io/blog/2014/06/15/20140615_01/</guid>
 <pubDate>Sun, 15 Jun 2014 00:00:00 -0000</pubDate>
 </item>
 <item>
@@ -1091,125 +1105,6 @@ func handler(w http.ResponseWriter, r *http.Request, s Stash) {
 </description>
 <guid isPermaLink="true">http://mix3.github.io/blog/2013/11/13/20131113/</guid>
 <pubDate>Wed, 13 Nov 2013 00:00:00 -0000</pubDate>
-</item>
-<item>
-<title>Photon Cloud &#x306E; MacOSX SDK &#x306E; Demo &#x3092;&#x52D5;&#x304B;&#x3059;</title>
-<description>
-<![CDATA[
-<p><a href="http://www.nintendo.co.jp/ds/azwj/02-4.html">アシュリー</a>たんが可愛すぎて生きるのが辛い 任天堂こんな可愛いキャラクタいつの間に生み出してたんや mix3です</p>
-
-<p>Photon Cloud が何とか良くわかってないんだけど、とりあえず試したかった</p>
-
-<p>ちなみに Linux SDK は さくらVPS で 試したところ make すら出来ませんでした</p>
-
-<p>Linux SDK には勝てなかったよ…</p>
-
-<h3>MacOSX SDK の Demo を動かす</h3>
-
-<ul>
-<li>MacOSX SDK をサイトからダウンロードして unzip</li>
-<li>Demos/demo_loadBalancing/iMac/demo_iMac_loadBalancing_cpp.xcodeproj を XCode で開きビルドする</li>
-<li>$ Demos/demo_loadBalancing/iMac/build/debug/demo_iMac_loadBalancing_cpp</li>
-</ul>
-
-<pre><code>
-always:
-0 - exit
---------------------
-outside a game room:
-1 - create game
-2 - join random game
---------------------
-inside a game room:
-1 - leave game
---------------------
-connecting
-2013-10-23 02:06:56,558781 ERROR   NetworkLogic.cpp               connectionErrorReturn()                                      line:   217 - code: 1039
-connection failed with error 1039
-2013-10-23 02:06:56,559703 INFO    NetworkLogic.cpp               disconnectReturn()                                           line:   281 -
-disconnected
-</code></pre>
-
-<ul>
-<li>connection failed するので NetworkLogic.cppを弄る
-<ul>
-<li>80行目 : mLoadBalancingClient(*this, L"if connecting to the exitgamescloud, replace this string with the application id, that can be found after logging in at http://exitgamescloud.com/Dashboard", appVersion, PLAYER_NAME)</li>
-<li>100行目 mLoadBalancingClient.connect(L"localhost:5055"); // specify the ip and port of your local masterserver here; call the parameterless overload instead, if you want to connect to the  exitgamescloud</li>
-<li>80行目はL"<strong>YOUR_APP_ID</strong>"に変更, 100行目は Cloud を使うので空に変更</li>
-</ul></li>
-<li>再度ビルド</li>
-<li>$ Demos/demo_loadBalancing/iMac/build/debug/demo_iMac_loadBalancing_cpp</li>
-</ul>
-
-<pre><code>
-always:
-0 - exit
---------------------
-outside a game room:
-1 - create game
-2 - join random game
---------------------
-inside a game room:
-1 - leave game
---------------------
-connecting
-2013-10-23 02:18:49,198122 INFO    LoadBalancingClient.cpp        onStatusChanged()                                            line:   510 - connected to masterserver
-2013-10-23 02:18:49,507223 INFO    LoadBalancingPeer.cpp          opAuthenticate()                                             line:   100 - OperationRequest - operationCode: 230 {224="YOUR_APP_ID", 220="1.0", 225="OS X"}
-2013-10-23 02:18:49,809279 INFO    EnetPeer.cpp                   dispatchIncomingCommands()                                   line:   290 - command to dispatch not yet needed
-2013-10-23 02:18:49,810149 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 230, returnCode: 0 {}
-2013-10-23 02:18:49,810900 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
-2013-10-23 02:18:50,112417 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 229, returnCode: 0 {}
-2013-10-23 02:18:50,113866 INFO    NetworkLogic.cpp               connectReturn()                                              line:   268 -
-connected
-2013-10-23 02:18:50,114394 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 230
-2013-10-23 02:18:54,824511 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
-1creating game "-517133284"
-2013-10-23 02:18:56,329376 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 227, returnCode: 0 {230="95.211.58.243:5056", 255="-517133284"}
-2013-10-23 02:18:57,333041 INFO    LoadBalancingClient.cpp        onStatusChanged()                                            line:   505 - connected to gameserver
-2013-10-23 02:18:57,640726 INFO    LoadBalancingPeer.cpp          opAuthenticate()                                             line:   100 - OperationRequest - operationCode: 230 {224="YOUR_APP_ID", 220="1.0", 225="OS X"}
-2013-10-23 02:18:58,042258 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 230, returnCode: 0 {}
-2013-10-23 02:18:58,444147 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 227, returnCode: 0 {254=1, 248={250=[]}}
-2013-10-23 02:18:58,445078 INFO    NetworkLogic.cpp               createRoomReturn()                                           line:   288 -
-2013-10-23 02:18:58,445820 INFO    NetworkLogic.cpp               createRoomReturn()                                           line:   296 - localPlayerNr: 1
-game room "-517133284" has been created
-regularly sending dummy events now
-2013-10-23 02:18:58,446940 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 255
-2013-10-23 02:18:58,447675 INFO    NetworkLogic.cpp               joinRoomEventAction()                                        line:   242 - OS X joined the game
-
-player 1 OS X has joined the game
-sssssssssssssssssssssssssssssssssssssssssssssssssssssss1ss
-leaving game room
-2013-10-23 02:19:04,472288 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 254, returnCode: 0 {}
-2013-10-23 02:19:05,478600 INFO    LoadBalancingClient.cpp        onStatusChanged()                                            line:   510 - connected to masterserver
-2013-10-23 02:19:05,786180 INFO    LoadBalancingPeer.cpp          opAuthenticate()                                             line:   100 - OperationRequest - operationCode: 230 {224="YOUR_APP_ID", 220="1.0", 225="OS X"}
-2013-10-23 02:19:06,088374 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
-2013-10-23 02:19:06,089500 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 230, returnCode: 0 {}
-2013-10-23 02:19:06,390775 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 229, returnCode: 0 {}
-2013-10-23 02:19:06,391676 INFO    NetworkLogic.cpp               leaveRoomReturn()                                            line:   336 -
-game room has been successfully left
-2013-10-23 02:19:06,392076 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 230
-0terminating application
-2013-10-23 02:19:11,103029 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
-2013-10-23 02:19:11,404197 INFO    NetworkLogic.cpp               disconnectReturn()                                           line:   281 -
-disconnected
-</code></pre>
-
-<p>という感じで動くことを確認 ターミナルを二つ開いて</p>
-
-<ul>
-<li>Aが create game</li>
-<li>Bが random join game（gameが一つしかないので多分確定でAのいるところへ行く）</li>
-<li>Bが leave game</li>
-<li>Aが leave game</li>
-</ul>
-
-<p>みたいなことが出来ることも確認できた</p>
-
-<p>これで何かする予定もないので、これぐらいで今は満足満足</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/blog/2013/10/23/20131023/</guid>
-<pubDate>Wed, 23 Oct 2013 00:00:00 -0000</pubDate>
 </item>
 </channel>
 </rss>

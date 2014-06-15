@@ -42,6 +42,59 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2013/08/30/20130830/">信じて送り出したfcgiプロセスがulimitの設定によって次々と殺されて行く話</a></h2>
+		</div>
+		<div class="content">
+			<p>ではありません。</p>
+
+<p><a href="http://lestrrat.ldblog.jp/archives/25360109.html">livedoorブログ</a>がpsgiに移行したりなんかするこのご時世になぜかmod_rewriteとfcgiを使って頑張っているmix3です。</p>
+
+<h3>ulimitの話</h3>
+
+<p>とある事情でapacheのinit.dにulimitを設定していて、メモリを使いすぎる、とかCPU使いすぎるとfcgiプロセスを殺してもらうようにしていたのですが、</p>
+
+<p>「それ子(fcgi process)だけじゃなくて親(httpd)まで殺しちゃわない？」</p>
+
+<p>と <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんの有り難いお言葉が飛び出して大慌てでulimitを外すということが発生しました。</p>
+
+<p>しかもgracefulだと設定変更効かないからロードバランサから外して一台ずつリスタート掛けて行かなければならず…</p>
+
+<h3>再度設定する場合にどうするのか</h3>
+
+<p>とある事情は変わらないのでulimitの設定を戻さないと行けないが、どうすれば良いのか思いつかないので <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんに考えて頂いたところ、</p>
+
+<ul>
+<li>index.fcgiをindex.fcgi.plとか適当に変える</li>
+<li>index.fcgiは中身shスクリプトにしてそこにulimitを書く</li>
+</ul>
+
+<p>というのはどうか？と提案を頂きまして、いけそうな感じなのでそれで行こうかなぁとなっています。 <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんありがとうございました。</p>
+
+<h3>ulimitの設定どうやって確認するの？</h3>
+
+<p>と、ロードバランサから1台外してinit.d からulimitを消してリスタートしたところでふと思い聞いたところ</p>
+
+<pre><code>cat /proc/$(cat /var/run/httpd.pid)/limits
+</code></pre>
+
+<p>「こういう感じかな」と教えていただきました。備忘録。</p>
+
+<hr />
+
+<p>という記事を8月中ぐらいに書いていて放置プレイしてたので改めて残しておく</p>
+
+		</div>
+		<div class="footer">
+			<time>2013-08-30</time>
+			<ul class="tag">
+				<li><a href="/tag/Linux">Linux(2)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2013/07/28/20130728/">テスト書くのって難しい</a></h2>
 		</div>
 		<div class="content">
@@ -307,34 +360,6 @@ run;
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/03/09/20130309-1/">p5-JQueryPresentationHelper作ってみた</a></h2>
-		</div>
-		<div class="content">
-			<p>やりたかったこと。</p>
-
-<ul>
-<li>use Hoge でメソッドが生えるモジュールの習作が作りたかった</li>
-<li><a href="http://code.google.com/p/jquery-presentation/">jquery-presentation</a>:<a href="http://dl.dropbox.com/u/268240/googleCode/jquery-presentation/index.html">demo</a>をmarkdownで書けるようにしたかった</li>
-</ul>
-
-<p>結果、良くわからないものが中途半端に出来てしまって、でも放置してもあれなのでとりあえずgithubにアップ。</p>
-
-<p>git clone を前提としたもっとゆるい感じで作った方が良い感じにおさまった気がしてます。</p>
-
-<p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
-
-		</div>
-		<div class="footer">
-			<time>2013-03-09</time>
-			<ul class="tag">
-				<li><a href="/tag/perl">perl(9)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/3" class="float-left">≪前のページ</a>
 		<a href="/page/5" class="float-right">次のページ≫</a>
@@ -363,20 +388,20 @@ run;
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
-						<li><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
+						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
+						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
 						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
 						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
-						<li><a href="/blog/2013/12/28/20131228/">Vagrant with Virtualbox tips - internal network setting</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(4)</a>
+							<li><a href="/archives/2014">2014年(5)</a>
 								<ul>
-										<li><a href="/archives/2014/06">2014年06月(1)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(2)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
 										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
 										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
@@ -469,6 +494,7 @@ run;
 						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
 						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/responsive design">responsive design(1)</a></li>
 						<li class="hide"><a href="/tag/vagrant">vagrant(1)</a></li>
 						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
 						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>

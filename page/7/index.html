@@ -42,6 +42,46 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2011/11/23/2011123/">bonding設定で死んだ</a></h2>
+		</div>
+		<div class="content">
+			<h3>bondingとは</h3>
+
+<p>bondingというのはNICを冗長化するもののことのようです。ラウンドロビンで負荷分散したりマスタースレーブ構成にして片方が死んでも大丈夫なように出来るようです。</p>
+
+<p>参考<a href="http://d.hatena.ne.jp/sen-u/20061002/p1">意外と知らない？NICを冗長化するボンディング（bonding）Add Star</a></p>
+
+<h3>ネットワークが遅延？</h3>
+
+<p>ネットワークの知識なんてほぼ０なのでbondingなんて当然知らなかったのですが、でも設定しないといけないということなのでWebを漁ってとりあえずラウンドロビンで設定したのですが、これがいけなかった。</p>
+
+<p>並列(最大100プロセス)でアクセス掛ける負荷試験を行ってると、MySQLの接続でtimeoutが結構出る。</p>
+
+<p>根本的な問題として負荷試験のシナリオにミスがあったりはするのですが、それとは別にネットワークに遅延が発生する模様。</p>
+
+<p>インフラのプロフェッショナル<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんや<a href="https://twitter.com/#!/shin1rosei">@shin1rosei</a>さんに調べてもらって自分の設定したbondingの設定がラウンドロビンなのがマズいという事が判明。並列度が上がると、NICの切り替わりで問題が顕在化するみたいです。</p>
+
+<p>正直分った瞬間回線切って首吊って死にたい気分になりました...</p>
+
+<script src="http://togetter.com/js/parts.js"></script>
+
+<script>tgtr.ListWidget({id:'222670',url:'http://togetter.com/',width:'320px',height:'240px'});</script>
+
+<p>自分のした設定にどんな意味があるのか、ちゃんと考える様にします...</p>
+
+		</div>
+		<div class="footer">
+			<time>2011-11-23</time>
+			<ul class="tag">
+				<li><a href="/tag/bonding">bonding(1)</a></li>
+				<li><a href="/tag/ネットワーク設定">ネットワーク設定(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2011/07/24/20110724/">Play framework + Scala に入門してみる</a></h2>
 		</div>
 		<div class="content">
@@ -949,63 +989,6 @@ Defaults env_keep+="PATH"
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2011/07/05/20110705/">さくらVPS借りてみた</a></h2>
-		</div>
-		<div class="content">
-			<h3>さくらVPS借りてみた</h3>
-
-<p>インフラエンジニアを目指す宣言したは良いものの、自分で管理する外部に晒されている環境すら持ってないのはどうかという話があるのでまずはさくらVPSを借りてみることに請求が来る前に試用出来るようですぐに使えるのは凄いですねぇ。さくら様様です。（ちなみに一応自宅サーバ用のマシンは手元にあるのですが外部ディスプレイ手に入れてからとか考えてたら結局こっち来てから起動することはありませんでした…）</p>
-
-<p>インフラやりたいと言いつつミドルウェアの知識はまったく０に近い状態なので、ミドルウェアの勉強用に使って行きたいかなと思います。</p>
-
-<h3>とりあえず入れて最初にやったこと</h3>
-
-<ul>
-<li>ユーザの設定
-<ul>
-<li>rootのパスを変更する</li>
-<li>一般ユーザを追加する(sudoで管理者の権限を得るためにグループはwheelに入れる)</li>
-<li>一般ユーザのパスを変更する</li>
-<li>visudoでwheelグループがsudoで管理者権限で実行できるように変更</li>
-</ul></li>
-<li>SSHのログインを公開鍵に変更
-<ul>
-<li>/etc/ssh/sshd_config を修正</li>
-<li>キーペアを作成してログイン</li>
-</ul></li>
-<li>system-config-securitylevel-tui でssh以外を閉じる</li>
-<li>git,perlbrew,cpanmを入れる</li>
-</ul>
-
-<p>大体こんな感じ。SSHは以下のような感じで設定。コメントアウト外したりyes,no変えたり。</p>
-
-<pre><code>PermitRootLogin no
-AuthorizedKeysFile      .ssh/authorized_keys
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-</code></pre>
-
-<p>「ChallengeResponseAuthentication no」はデフォルトでnoだけれどこれがyesになってると公開鍵の認証に失敗したらパスワード認証も試すといった挙動をするので、公開鍵に限定する場合はちゃんとnoになってることをチェック。</p>
-
-<p>ファイアーウォールの設定は一旦 system-config-securitylevel-tui 使ってやりましたが、細かく設定する場合は当然 iptables を使って設定しないといけないので、おいおいここは最適化していきたいです。</p>
-
-<p>他にもデーモンを止める話とかもあるので以下とか参考にしつつ最適化していきたいです。</p>
-
-<p><a href="http://sakura.off-soft.net/blog/sakura_vps_centos_first_setup.html">さくらVPSを使うときに最初にやっておきたいこと(CentOS編)</a></p>
-
-		</div>
-		<div class="footer">
-			<time>2011-07-05</time>
-			<ul class="tag">
-				<li><a href="/tag/インフラ">インフラ(2)</a></li>
-				<li><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/6" class="float-left">≪前のページ</a>
 		<a href="/page/8" class="float-right">次のページ≫</a>
@@ -1034,20 +1017,20 @@ ChallengeResponseAuthentication no
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
-						<li><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
+						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
+						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
 						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
 						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
-						<li><a href="/blog/2013/12/28/20131228/">Vagrant with Virtualbox tips - internal network setting</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(4)</a>
+							<li><a href="/archives/2014">2014年(5)</a>
 								<ul>
-										<li><a href="/archives/2014/06">2014年06月(1)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(2)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
 										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
 										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
@@ -1140,6 +1123,7 @@ ChallengeResponseAuthentication no
 						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
 						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/responsive design">responsive design(1)</a></li>
 						<li class="hide"><a href="/tag/vagrant">vagrant(1)</a></li>
 						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
 						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>

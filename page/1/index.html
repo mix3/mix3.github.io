@@ -42,7 +42,28 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
-			<h2><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></h2>
+			<h2><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></h2>
+		</div>
+		<div class="content">
+			<p>テンプレートは気に入っていて変えたくないのでその辺りは出来るだけそのままを保ちつつ、レスポンシブデザインってどうやるんだろうなと思いながらいじいじしてて数ヶ月経ってしまいこのままだともう日の目を見る事が無さそうな感じしたのでえいやで更新してしまいました</p>
+
+<p>それにともない記事のhtmlを一カ所にまとめる様に変更（記事生成後再生成でゴミが残るので面倒になった）それにともないパーマリンクが変更になるという鬼畜ぶりに我ながら身震いしたけどどうせブクマしてる人も全然いないし自分のブログだし好きにすることにした　404のカスタムhtmlでjs使って多少の誘導ぐらいは出来る様にしたいとは思ってるけどやらないかも</p>
+
+<p>ということで気分も新たにブログたまには書いて行きたい</p>
+
+		</div>
+		<div class="footer">
+			<time>2014-06-15</time>
+			<ul class="tag">
+				<li><a href="/tag/responsive design">responsive design(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></h2>
 		</div>
 		<div class="content">
 			<p>コートレビューされると毎回マサカリが飛んできて自分はやはり糞コード製造機だなぁと改めて実感しててまた死にたい感じになってます。mix3です。</p>
@@ -383,74 +404,6 @@ db.spec   = root@tcp(localhost:3306)/alphawing
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/12/28/20131228/">Vagrant with Virtualbox tips - internal network setting</a></h2>
-		</div>
-		<div class="content">
-			<p>ちょっと詰まったことがあったのでメモ書き これ書いてる時点でVagrantのバージョンは <em>1.4.1</em> となります</p>
-
-<p>Virtualboxのネットワークアダプタにはいくつか種類があり</p>
-
-<ul>
-<li>NAT
-<ul>
-<li>ゲストOS -> 外</li>
-</ul></li>
-<li>内部ネットワーク
-<ul>
-<li>ゲストOS &lt;-> ゲストOS</li>
-</ul></li>
-<li>ホストオンリーアダプタ
-<ul>
-<li>ホスト -> ゲストOS</li>
-</ul></li>
-</ul>
-
-<p>あたりを組み合わせて遊んだりするのですが、Vagrant で内部ネットワークを設定する方法が分かりづらかったのでメモ</p>
-
-<pre><code>VAGRANTFILE_API_VERSION = "2"
-
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "box_name"
-    config.vm.define :host1 do |host1|
-    host1.vm.hostname = "host1"
-    host1.vm.network :private_network, ip: "192.168.1.111", virtualbox__intnet: "intnet"
-  end
-    config.vm.define :host2 do |host2|
-    host2.vm.hostname = "host2"
-    host2.vm.network :private_network, ip: "192.168.1.112", virtualbox__intnet: "intnet"
-  end
-  config.vm.provision "shell", inline: "/etc/init.d/network restart"
-end
-</code></pre>
-
-<p>抜粋するとこんな感じ</p>
-
-<p><a href="http://docs.vagrantup.com/v2/networking/private_network.html">Private Networks - Networking - Vagrant Documentation</a> とか見てると</p>
-
-<pre><code>virtualbox__intnet: true
-</code></pre>
-
-<p>とか書いてるけどそのまま設定すると「（trueが）文字列じゃねーよゴルァ！」と怒られるので、何かしら文字列を指定してあげる。</p>
-
-<p>Virtualboxで設定した場合、内部ネットワークを指定した時のデフォルトが <em>intnet</em> なのでintnetで良いでしょう。</p>
-
-<p>で、これで内部ネットワークの設定が出来るのですが初回の <em>vagrant up</em> 直後はNATによる設定で外に行けるはずなのに繋がらなかったりするので、</p>
-
-<p><a href="http://docs.vagrantup.com/v2/provisioning/shell.html">Shell Provisioner</a>でnetworkの再起動をしてます。もっとスマートなやりかたあればいいんだけど。</p>
-
-		</div>
-		<div class="footer">
-			<time>2013-12-28</time>
-			<ul class="tag">
-				<li><a href="/tag/Vagrant">Vagrant(1)</a></li>
-				<li><a href="/tag/Virtualbox">Virtualbox(1)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/2" class="float-right">次のページ≫</a>
 	</div>
@@ -478,20 +431,20 @@ end
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
-						<li><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
+						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
+						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
 						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
 						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
-						<li><a href="/blog/2013/12/28/20131228/">Vagrant with Virtualbox tips - internal network setting</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(4)</a>
+							<li><a href="/archives/2014">2014年(5)</a>
 								<ul>
-										<li><a href="/archives/2014/06">2014年06月(1)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(2)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
 										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
 										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
@@ -584,6 +537,7 @@ end
 						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
 						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/responsive design">responsive design(1)</a></li>
 						<li class="hide"><a href="/tag/vagrant">vagrant(1)</a></li>
 						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
 						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>

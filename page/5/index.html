@@ -42,6 +42,34 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2013/03/09/20130309-1/">p5-JQueryPresentationHelper作ってみた</a></h2>
+		</div>
+		<div class="content">
+			<p>やりたかったこと。</p>
+
+<ul>
+<li>use Hoge でメソッドが生えるモジュールの習作が作りたかった</li>
+<li><a href="http://code.google.com/p/jquery-presentation/">jquery-presentation</a>:<a href="http://dl.dropbox.com/u/268240/googleCode/jquery-presentation/index.html">demo</a>をmarkdownで書けるようにしたかった</li>
+</ul>
+
+<p>結果、良くわからないものが中途半端に出来てしまって、でも放置してもあれなのでとりあえずgithubにアップ。</p>
+
+<p>git clone を前提としたもっとゆるい感じで作った方が良い感じにおさまった気がしてます。</p>
+
+<p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
+
+		</div>
+		<div class="footer">
+			<time>2013-03-09</time>
+			<ul class="tag">
+				<li><a href="/tag/perl">perl(9)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2013/02/14/20130214/">すぐにpixivのランキングイラストを見れるGoogleChromeの拡張を作った。</a></h2>
 		</div>
 		<div class="content">
@@ -236,148 +264,6 @@
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2012/11/03/20121103/">スレーブ遅延</a></h2>
-		</div>
-		<div class="content">
-			<p>今の案件に触れてからの自分の低能ぶりの凄まじさに自ら恐怖を禁じ得ず、椅子から転げ落ちて失禁しそうなmix3です。</p>
-
-<h3>レプリケーション</h3>
-
-<p>今の案件ではDBにMySQLを使いレプリケーションを使って負荷分散しております。（レプリケーション必要無いぐらいの負荷だよね、とかインフラの方に言われてまた失禁しそうです）</p>
-
-<p>レプリケーションというのはリアルタイムに複製する技術のこと？上手く説明出来ませんが、まあWebサービスなんかだと書き込みより読み込みの方が圧倒的に割合が大きいらしく、マスターとその複製のスレーブにDBを分けて、書き込みはマスターへ、読み込みは複製のスレーブへ処理を振り分ける事で負荷を分散したりします。</p>
-
-<h3>スレーブ遅延</h3>
-
-<p>レプリケーションというのはリアルタイムな複製技術なので、基本的にはマスターとスレーブは同期が取れているハズですが、サーバの負荷状況によっては同期がとれていない状態になったりします。スレーブ遅延というものです。</p>
-
-<h3>レプリケーション下での更新処理</h3>
-
-<p>たとえばインクリメント的なアトミックな更新であればスレーブは関わらないので問題ないと思います。</p>
-
-<pre><code>
-UPDATE table SET column + 1 WHERE id = ?
-</code></pre>
-
-<p>そうではなくスレーブから読み込みをし、マスターに書き込みをするような処理をしてしまうと、スレーブが遅延していた場合に古い情報をもとに更新をしてしまい不整合が発生するなどあまりよろしくない状態になります</p>
-
-<pre><code>
-SELECT hoge FROM table_1 WHERE id = ?
-スレーブから取ってきたhogeが古いものだと、その後のUPDATEでそのhogeを使うのは当然よろしくない
-
-×UPDATE table_2 SET column = <hoge> WHERE id = ?
-</code></pre>
-
-<p>なので、そういったSELECT>UPDATEのような更新処理の場合は、SELECTもスレーブからではなくマスターからするようにしないといけせん。</p>
-
-<h3>ようするにスレーブ遅延による不整合が発生したということ</h3>
-
-<p>です。気をつけましょう。</p>
-
-<h3>MySQL::Sandbox と Percona Toolkit(旧Maatkit)のpt-slave-delay</h3>
-
-<p>こういうスレーブ遅延によるバグは開発環境では気づきにくかったりします。負荷の掛かっていない開発環境ではスレーブ遅延は発生しづらいでしょうし、そもそもDB構成が本番と違っていてレプリケーションされてなかったりすることも多いでしょう。</p>
-
-<p>が、最近は便利になった物で、cpanに上がっているMySQL::SandboxとPercona Toolkit(旧Maatkit)なるツールを使うと割と簡単にレプリケーション環境とスレーブ遅延を再現出来ます。というかMySQL::SandboxもPercona Toolkit(旧Maatkit)結構前からあるので最初から使っておけという感じですね。（正月にデータが吹っ飛ぶ前は実は使ってたりしてたんですけどね...）</p>
-
-<h3>MySQL::Sandbox</h3>
-
-<ul>
-<li><p>Install</p>
-
-<ul>
-<li>cpanm MySQL::Sandbox</li>
-</ul></li>
-<li><p>How to use</p>
-
-<ul>
-<li>SANDBOX_AS_ROOT=1 make_replication_sandbox -r master_data --how_many_slaves 1 --sandbox_base_port 11111 download/mysql-5.1.66-linux-x86_64-glibc23.tar.gz</li>
-<li>rootで作業するとSANDBOX_AS_ROOT=1を使わないと怒られるけどそもそもrootで作業するなという話</li>
-<li>sandboxes/master_data/以下にマスター(port: 11111, socket: /tmp/mysql_sandbox11111.sock)スレーブ(port: 11112, socket: /tmp/mysql_sandbox11112.sock)が出来る</li>
-<li>perl -MDBI -e 'DBI->connect("dbi:mysql:test:mysql_socket=/tmp/mysql_sandbox11111.sock", "msandbox", "msandbox")'</li>
-<li>port指定での接続方法は分からなかった。できなくは無いと思うけど</li>
-</ul></li>
-<li><p>init script</p>
-
-<ul>
-<li>以下のような感じで書いてみたがうまくいかん</li>
-<li>落とし忘れるとsocketファイルが残って次回起動時に残念な事になるので出来ればなんとかしたい</li>
-</ul></li>
-</ul>
-
-<pre><code>
-#!/bin/sh
-
-# chkconfig: 2345 65 35
-# description: sandbox_action
-
-# Source function library.
-. /etc/rc.d/init.d/functions
-
-# Get config.
-. /etc/sysconfig/network
-
-# Check that networking is up.
-if [ ${NETWORKING} = "no" ]
-then
-  exit 0
-fi
-
-prog="sandbox_action"
-
-case "$1" in
-  start)
-    echo -n "Starting $prog: "
-    sandbox_action start
-    success
-    echo
-  ;;
-  stop)
-    echo -n "Stopping $prog: "
-    sandbox_action stop
-    success
-    echo
-  ;;
-  status)
-    sandbox_action status
-  ;;
-  *)
-    echo $"Usage: $prog {start|stop|status}"
-    exit 1
-esac
-
-exit 0
-</code></pre>
-
-<h3>Percona Toolkit(旧Maatkit)</h3>
-
-<ul>
-<li><p>Install</p>
-
-<ul>
-<li>Perconaからtarを落としてきて、perl Makefile.PL, make &amp;&amp; make install</li>
-<li>rpmは依存関係がうるさいのでtarからのほうが良いと思う</li>
-</ul></li>
-<li><p>How to use</p>
-
-<ul>
-<li>pt-slave-delay -u msandbox -p msandbox --socket /tmp/mysql_sandbox11112.sock</li>
-<li>--daemonize オプションもある</li>
-</ul></li>
-</ul>
-
-		</div>
-		<div class="footer">
-			<time>2012-11-03</time>
-			<ul class="tag">
-				<li><a href="/tag/MySQL">MySQL(3)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/4" class="float-left">≪前のページ</a>
 		<a href="/page/6" class="float-right">次のページ≫</a>
@@ -406,20 +292,20 @@ exit 0
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
-						<li><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
+						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
+						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
 						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
 						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
-						<li><a href="/blog/2013/12/28/20131228/">Vagrant with Virtualbox tips - internal network setting</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(4)</a>
+							<li><a href="/archives/2014">2014年(5)</a>
 								<ul>
-										<li><a href="/archives/2014/06">2014年06月(1)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(2)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
 										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
 										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
@@ -512,6 +398,7 @@ exit 0
 						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
 						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/responsive design">responsive design(1)</a></li>
 						<li class="hide"><a href="/tag/vagrant">vagrant(1)</a></li>
 						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
 						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>

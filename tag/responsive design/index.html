@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title>自分がもしIRCボットっぽいもの作ったとしたら - 萌えキャラとは何だったのか</title>
+		<title>萌えキャラとは何だったのか</title>
 		<meta charset="utf-8" />
 		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
 		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
@@ -42,142 +42,15 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
-			<h2><a href="/blog/2013/10/05/20131005/">自分がもしIRCボットっぽいもの作ったとしたら</a></h2>
-		</div>
-		<div class="social_button">
-				<!-- はてブ -->
-				<div class="hatena">
-					<a href="http://b.hatena.ne.jp/entry/http://mix3.github.io/blog/2013/10/05/20131005/" class="hatena-bookmark-button" data-hatena-bookmark-title="自分がもしIRCボットっぽいもの作ったとしたら - 萌えキャラとは何だったのか" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
-				</div>
-				<!-- Twitter -->
-				<div class="twitter">
-					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mix3.github.io/blog/2013/10/05/20131005/" data-text="自分がもしIRCボットっぽいもの作ったとしたら - 萌えキャラとは何だったのか" data-via="mix3" data-lang="ja">ツイート</a>
-					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-				</div>
-				<!-- Google+ -->
-				<div class="googleplus">
-					<div class="g-plusone" data-size="medium" data-href="http://mix3.github.io/blog/2013/10/05/20131005/"></div>
-					<script type="text/javascript">
-						window.___gcfg = {lang: 'ja'};
-						(function() {
-							var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-							po.src = 'https://apis.google.com/js/platform.js';
-							var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-						})();
-					</script>
-				</div>
-				<!-- facebook -->
-				<div class="facebook">
-					<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmix3.github.io%2Fblog%2F2013%2F10%2F05%2F20131005%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=false&amp;height=21&amp;appId=662642987135668" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
-				</div>
-		</div>
-		<div class="clearer"></div>
-		<div class="content">
-			<p>こうなるなぁというメモ</p>
-
-<h3>ただ世の中にはボット用のモジュールやらなんやらは既にある</h3>
-
-<p>IRCボットとか誰もが考えるし適当に作って捨てて行くので当然そのうちフレームワークっぽいものも出てくる 例えば<a href="http://www.songmu.jp/riji/entry/2013-09-09-unazusan.html">UnazuSan</a>とか</p>
-
-<p>こういうは用途に合っていれば良いし、正規表現だしグループで捕まえたのを後方参照出来るしで大体がカバー出来そうだけど、</p>
-
-<p>例えば「開発環境で使ってるバッチスクリプトをオプション指定しつつ実行するをIRCからやりたい」とか糞みたいな要求には向かなそうだなぁとか思ったり</p>
-
-<h3>無ければ作れば良いじゃない</h3>
-
-<pre><code>#!/usr/bin/env perl
-
-use Ikusan
-  'server url',
-    port       =&gt; &lt;port&gt;,
-    enable_ssl =&gt; 1,
-    password   =&gt; &lt;password&gt;,
-    nickname   =&gt; &lt;nickname&gt;,
-    channels   =&gt; { '#channel_name' =&gt; {} };
-
-# undef_message "およよ…";
-
-register qr/regexp?/ =&gt; sub {
-    my (%opts) = @_;
-    return $opts{error} ? (1, "エラー") : (0, "オッケー");
-} =&gt; qw/
-    error
-/;
-
-register simple =&gt; sub {
-    my (%opts) = @_;
-    return $opts{error} ? 1 : 0;
-} =&gt; qw/
-    error
-/;
-
-register "die" =&gt; sub { die "ぱっつんぱっつん" };
-
-use LWP::UserAgent;
-
-register pixiv =&gt; sub {
-    my $ua  = LWP::UserAgent-&gt;new;
-    my $res = $ua-&gt;get("http://www.pixiv.net/");
-    my @url = ($res-&gt;content =~ /"(member_illust\.php.+?)"/g);
-    my $ret = "http://www.pixiv.net/" . $url[int(rand(scalar(@url)))];
-    return 0, $ret;
-};
-
-register qr/サタデーナイト/ =&gt; sub {
-    return 0, "フィーバー!!";
-};
-
-fever;
-</code></pre>
-
-<p>こんな感じで AnySan に渡すオプションを指定しつつ use Ikusan して regsiter で sub 登録して最後に fever すれば</p>
-
-<pre><code>mix3 &gt; iku: regex
- iku &gt; [OK] オッケー
-mix3 &gt; iku: regexp
- iku &gt; [OK] オッケー
-mix3 &gt; iku: regex --error
- iku &gt; [ERR] エラー
-mix3 &gt; iku: regexp --error
- iku &gt; [ERR] エラー
-mix3 &gt; iku: simple
- iku &gt; [OK]
-mix3 &gt; iku: simple --error
- iku &gt; [ERR]
-mix3 &gt; iku: die
- iku &gt; [ERR] ぱっつんぱっつん at bin/ikusan.pl line 27.
-mix3 &gt; iku: pixiv
- iku &gt; [OK] http://www.pixiv.net/member_illust.php?mode=medium&amp;amp;illust_id=38896869
-mix3 &gt; iku: サタデーナイト
- iku &gt; [OK] フィーバー!!
-mix3 &gt; iku: ふぁ！？
- iku &gt; およよ…
-</code></pre>
-
-<p>という感じになるみたいな？ regsiter で3つ目以降の引数は配列でGetOptionsに渡すようにして、sub に渡ってくるみたいな？</p>
-
-<p>実際には my $ret = &#8245;perl path/to/script.pl --option $opts{option}&#8245;; とかしてバッチスクリプトに右から左へオプション流すだけなのを想像してる</p>
-
-<p><a href="https://gist.github.com/mix3/74d53023818899d49d48">gist</a></p>
-
-<h3>熱は出る、咳は出る、鼻水は出る</h3>
-
-<p>と悲惨な最近なので、現実逃避してたら衣玖さんボットを作りたくなったのでしたマル</p>
-
+			<h2><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></h2>
 		</div>
 		<div class="footer">
-			<time>2013-10-05</time>
+			<time>2014-06-15</time>
 			<ul class="tag">
-				<li><a href="/tag/Bot">Bot(1)</a></li>
-				<li><a href="/tag/IRC">IRC(1)</a></li>
+					<li><a href="/tag/responsive design">responsive design(1)</a></li>
 			</ul>
 			<div class="clearer"></div>
 		</div>
-	</div>
-	<div class="clearer spacer30"></div>
-	<div class="col-1-1 pager">
-	<a href="/blog/2013/08/30/20130830/" class="float-left">≪信じて送り出したfcgiプロセスがulimitの設定によって次々と殺されて行く話</a>
-	<a href="/blog/2013/10/07/20131007/" class="float-right">phpenv+php-buildでphpをinstallしまくる≫</a>
 	</div>
 	<div class="clearer"></div>
 			</article>
