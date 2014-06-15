@@ -1,0 +1,13 @@
+: cascade layout::base with macro { blog => $blog }
+
+: around content -> {
+	: for $blog.page_to_article.1 -> $article {
+		: article({ article => $article });
+	: }
+	<div class="col-1-1 pager">
+	: if ($blog.page_to_article.2) {
+		<a href="/page/2" class="float-right">次のページ≫</a>
+	: }
+	</div>
+	<div class="clearer"></div>
+: }

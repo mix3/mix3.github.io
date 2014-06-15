@@ -1,0 +1,630 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Play framework + Scala に入門してみる - 萌えキャラとは何だったのか</title>
+		<meta charset="utf-8" />
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<script src="/js/app.js"></script>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-48133863-1', 'mix3.github.io');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<header class="grid">
+			<div class="col-1-1">
+				<img src="/images/header.jpg" />
+				<h1><a href="/">萌えキャラとは何だったのか</a></h1>
+				<h2>ギークにも絵描きにもなれない者の末路</h2>
+				<div class="top-menu">
+					<ul>
+						<li><a href="/index.rdf">RSS Feed</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<nav class="grid">
+				<div class="col-1-1">
+					<ul>
+						<li class="current">Blog</li>
+						<li class=""><a href="/archives">Archive</a></li>
+					</ul>
+				</div>
+		</nav>
+		<main class="grid">
+			<article class="col-8-12">
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2011/07/24/20110724/">Play framework + Scala に入門してみる</a></h2>
+		</div>
+		<div class="social_button">
+				<!-- はてブ -->
+				<div class="hatena">
+					<a href="http://b.hatena.ne.jp/entry/http://mix3.github.io/blog/2011/07/24/20110724/" class="hatena-bookmark-button" data-hatena-bookmark-title="Play framework + Scala に入門してみる - 萌えキャラとは何だったのか" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+				</div>
+				<!-- Twitter -->
+				<div class="twitter">
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mix3.github.io/blog/2011/07/24/20110724/" data-text="Play framework + Scala に入門してみる - 萌えキャラとは何だったのか" data-via="mix3" data-lang="ja">ツイート</a>
+					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+				</div>
+				<!-- Google+ -->
+				<div class="googleplus">
+					<div class="g-plusone" data-size="medium" data-href="http://mix3.github.io/blog/2011/07/24/20110724/"></div>
+					<script type="text/javascript">
+						window.___gcfg = {lang: 'ja'};
+						(function() {
+							var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+							po.src = 'https://apis.google.com/js/platform.js';
+							var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+						})();
+					</script>
+				</div>
+				<!-- facebook -->
+				<div class="facebook">
+					<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmix3.github.io%2Fblog%2F2011%2F07%2F24%2F20110724%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=false&amp;height=21&amp;appId=662642987135668" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+				</div>
+		</div>
+		<div class="clearer"></div>
+		<div class="content">
+			<h3>Scalaクラスタの怒りが聞こえる…</h3>
+
+<p>Scalaクラスタの怒りに満ちたTLが見えて当該セッションのUstを見れなかったのが悔しいです。何があったかはTogetterからある程度察する事が出来ます。</p>
+
+<p>参考：<a href="http://togetter.com/li/164689">2011/07/22_Advanced_Tech_Night No.2 「ジャバラーが知っておくべき最近の開発言語のこと」(#atn2011 )</a> </p>
+
+<h3>Play framework + Scala に入門してみる</h3>
+
+<p>そんな流れがあったのでScalaを触りたい気持ちが強くなりPlay frameworkの勉強と一緒にScalaをやってみようかと思い立ちました。Play frameworkというのははJava版Ruby on Railsといった感じでJavaだけれど非常に効率に良い開発が出来るフレームワークです（らしいです）Wicketとはまた違う爽快感のあるフレームワークのようです。</p>
+
+<h3>インストール</h3>
+
+<p>インストールは非常に簡単です。zipを落として適当に配置してPATHを通すだけ。ただしplayのコマンドはpythonで書かれているのでpythonが必要になるかもしれません。[play]とだけ打つとセットアップが出来ていれば以下のように結果が返ってくるでしょう。</p>
+
+<h4>$ play</h4>
+
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Usage: play cmd [app_path] [--options]
+~ 
+~ with,  new      Create a new application
+~        run      Run the application in the current shell
+~        help     Show play help
+~
+</code></pre>
+
+<p>セットアップの確認が出来ればさっそく動作確認してみましょう。</p>
+
+<h3>プロジェクトの作成、アプリケーションの実行</h3>
+
+<p>以下のように打つとプロジェクトが作成出来ます。作成途中アプリケーションの名前を聞かれます。基本デフォルトのままで良いでしょう。スケルトンが作成されます。</p>
+
+<h4>$ play new [project_name] --with scala</h4>
+
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ The new application will be created in /path/to/[project_name]
+~ What is the application name? [project_name] 
+~
+~ OK, the application is created.
+~ Start it with : play run project_name
+~ Have fun!
+~
+</code></pre>
+
+<p>以下のようにして作成されたアプリケーションを起動する事が出来ます。9000番ポートで待っているようなので<a href="http://localhost:9000/">http://localhost:9000/</a>にアクセスしましょう。いかにもな導入ページが返って来たらOKです。</p>
+
+<h4>$ play run [project_name]</h4>
+
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Ctrl+C to stop
+~ 
+Listening for transport dt_socket at address: 8000
+01:35:10,384 INFO  ~ Starting /path/to/[project_name]
+01:35:11,399 WARN  ~ You're running Play! in DEV mode
+01:35:11,609 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+01:43:01,925 INFO  ~ Application '[project_name]' is now started !
+</code></pre>
+
+<h3>Scalaで動作するプロジェクトを作成してみる。</h3>
+
+<p>今度はScalaのプロジェクトを作成してみます。ちなみに以下のように conf/dependencies.yml にScalaに依存することを追記して $ play dependencies [project_name] とすることでScala対応のプロジェクトにすることも出来ますが、スケルトンコードがJavaのままなので作り直したいと思います。</p>
+
+<h4>$ diff -u [project_name]/conf/dependencies.yml.orig [project_name]/conf/dependencies.yml</h4>
+
+<pre><code>--- project_name/conf/dependencies.yml.orig 2011-07-24 02:04:56.000000000 +0900
++++ project_name/conf/dependencies.yml  2011-07-24 02:04:46.000000000 +0900
+@@ -2,3 +2,4 @@
+
+ require:
+     - play
++    - play -&gt; scala 0.9.1
+</code></pre>
+
+<h4>$ play dependencies [project_name]</h4>
+
+<pre><code>~            _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
+~
+~   play-&gt;scala 0.9.1 (from playLocalModules)
+~
+~ Installing resolved dependencies,
+~
+~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
+~
+~ Done!
+~
+</code></pre>
+
+<h3>Scala対応のプロジェクトを作成して動作確認する</h3>
+
+<p>Scala対応のプロジェクトを作成するにはまず以下のようにしてScalaモジュールをインストールする必要があります。</p>
+
+<h4>$ play install scala</h4>
+
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Will install scala-0.9.1
+~ This module is compatible with: 1.2.2
+~ Do you want to install this version (y/n)? y
+~ Installing module scala-0.9.1...
+~
+~ Fetching http://www.playframework.org/modules/scala-0.9.1.zip
+~ [--------------------------100%-------------------------] 60034.6 KiB/s    
+~ Unzipping...
+~
+~ Module scala-0.9.1 is installed!
+~ You can now use it by adding it to the dependencies.yml file:
+~
+~ require:
+~     play -&gt; scala 0.9.1
+~
+</code></pre>
+
+<p>インストールが済んだら実際にScala対応のプロジェクトを作成してみましょう。</p>
+
+<h4>$ play new [project_name] --with scala</h4>
+
+<pre><code>~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ The new application will be created in /path/to/[project_name]
+~ What is the application name? [project_name] 
+~
+~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
+~
+~   play-&gt;scala 0.9.1 (from playLocalModules)
+~
+~ Installing resolved dependencies,
+~
+~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
+~
+~ Done!
+~
+~ OK, the application is created.
+~ Start it with : play run project_name
+~ Have fun!
+~
+</code></pre>
+
+<p>動作確認はJavaの時と同様に $ play run [project_name] で出来ます。</p>
+
+<h4>$ play run project_name/</h4>
+
+<pre><code>~        _                _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.2, http://www.playframework.org
+~
+~ Ctrl+C to stop
+~ 
+Listening for transport dt_socket at address: 8000
+02:15:51,036 INFO  ~ Starting /path/to/[project_name]
+02:15:51,067 INFO  ~ Module scala is available (/path/to/[play]/modules/scala-0.9.1)
+02:15:54,598 INFO  ~ Scala support is active
+02:15:54,598 WARN  ~ You're running Play! in DEV mode
+02:15:54,734 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+Compiling:
+    /path/to/[project_name]/app/controllers.scala
+    /path/to/[play]/modules/docviewer/app/controllers/PlayDocumentation.java
+    /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
+    /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
+    /path/to/[play]/modules/docviewer/app/DocViewerPlugin.java
+    /path/to/[project_name]/tmp/generated/views.html.main.scala
+    /path/to/[play]/modules/docviewer/app/helpers/CheatSheetHelper.java
+Traversing /path/to/[project_name]/app/controllers.scala
+Traversing /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
+Traversing /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
+Traversing /path/to/[project_name]/tmp/generated/views.html.main.scala
+API phase took : 0.503 s
+02:16:21,114 INFO  ~ Application '[project_name]' is now started !
+</code></pre>
+
+<h3>プロジェクト構成</h3>
+
+<p>Playのプロジェクトは以下のような構成となっています。アプリケーションを構築して行く際は主にapp以下を弄って行く事になるでしょう。</p>
+
+<ul>
+<li>app
+<ul>
+<li>コントローラ、モデル、ビューなど。</li>
+</ul></li>
+<li>conf
+<ul>
+<li>アプリケーションの設定。ルーティングの設定もここ。</li>
+</ul></li>
+<li>lib
+<ul>
+<li>jarファイルなどのlib関係。</li>
+</ul></li>
+<li>modules
+<ul>
+<li>プロジェクトが依存しているものがこの下に書き出されるのかな？</li>
+</ul></li>
+<li>public
+<ul>
+<li>静的ファイルなど。</li>
+</ul></li>
+<li>test
+<ul>
+<li>テスト関係など。</li>
+</ul></li>
+<li>tmp
+<ul>
+<li>生成されたclassファイルの配置やキャッシュなど。</li>
+</ul></li>
+</ul>
+
+<h3>とりあえず中身を眺めてみる</h3>
+
+<p>生成されるスケルトンは以下のようになっています。ルーティングとコントローラ/アクションの対応は直感的で分かりやすいですね。Controllerを継承したApplicationがコントローラ、その中で定義したメソッドがアクションのようです。</p>
+
+<p>ただアクションで何を返すかが非常に分りづらいですね（もちろん基本はテンプレートですが）テンプレートそのものも@が出て来て関数定義っぽいし非常に分りづらいです。Webデザイナー殺しですね<s>死ねば良いと思います＾＾</s></p>
+
+<h4>$ cat [project_name]/conf/routes</h4>
+
+<pre><code># Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                                       Application.index
+
+# Ignore favicon requests
+GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/                                staticDir:public
+
+# Catch all
+*       /{controller}/{action}                  {controller}.{action}
+</code></pre>
+
+<h4>$ cat [project_name]/app/controllers.scala</h4>
+
+<pre><code>package controllers
+
+import play._
+import play.mvc._
+
+object Application extends Controller {
+
+    import views.Application._
+
+    def index = {
+        html.index("Your Scala application is ready!")
+    }
+
+}
+</code></pre>
+
+<h4>$ cat [project_name]/app/views/Application/index.scala.html</h4>
+
+<pre><code>@(title:String)
+
+@main(title) {
+
+    @views.defaults.html.welcome(title)
+
+}
+</code></pre>
+
+<h4>$ cat [project_name]/app/views/main.scala.html</h4>
+
+<pre><code>@(title:String = "")(body: =&gt; Html)
+
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;@title&lt;/title&gt;
+        &lt;link rel="stylesheet" media="screen" href="@asset("public/stylesheets/main.css")"&gt;
+        &lt;link rel="shortcut icon" type="image/png" href="@asset("public/images/favicon.png")"&gt;
+        &lt;script src="@asset("public/javascripts/jquery-1.5.2.min.js")" type="text/javascript"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        @body
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3>アクションとビュー</h3>
+
+<p>とりあえずスケルトンでは以下のような感じで動いているようです。</p>
+
+<ul>
+<li>views/[レイアウト].scala.html
+<ul>
+<li>レイアウトを定義</li>
+</ul></li>
+<li>views/[コントローラ]/[アクション].scala.html
+<ul>
+<li>@レイアウト(引数) { HTML }</li>
+<li>レイアウトとHTMLをガッチャンコして返す</li>
+</ul></li>
+</ul>
+
+<p>HTMLの部分が@views.defaults.html.welcome(title)となってこれが何を差しているのかが分りづらくしています。ここを&lt;h1&gt;@title&lt;/h1&gt;とでもすればもう少し見通しが良くなるのではないかと思います。具体的には以下のような感じ。</p>
+
+<h4>$ diff -u [project_name]/app/views/Application/index.scala.html.orig [project_name]/app/views/Application/index.scala.html</h4>
+
+<pre><code>--- project_name/app/views/Application/index.scala.html.orig    2011-07-24 03:45:31.000000000 +0900
++++ project_name/app/views/Application/index.scala.html 2011-07-24 03:47:38.000000000 +0900
+@@ -2,6 +2,6 @@
+
+ @main(title) {
+
+-    @views.defaults.html.welcome(title)
++    &lt;h1&gt;@title&lt;/h1&gt;
+
+-}
+\ No newline at end of file
++}
+</code></pre>
+
+<h4>$ diff -u project_name/app/controllers.scala.orig project_name/app/controllers.scala</h4>
+
+<pre><code>--- project_name/app/controllers.scala.orig 2011-07-24 03:49:42.000000000 +0900
++++ project_name/app/controllers.scala  2011-07-24 03:48:58.000000000 +0900
+@@ -8,7 +8,11 @@
+     import views.Application._
+
+     def index = {
+-        html.index("Your Scala application is ready!")
++        html.index("index")
+     }
+
++    def sample = {
++        html.index("sample")
++    }
++
+ }
+</code></pre>
+
+<p>アクションも増やしてみました。これでルーティング設定も確認出来ます。$ play run [project_name] として以下へアクセスするとそれぞれindex、sampleが&lt;h1&gt;で表示されることが確認出来ると思います。</p>
+
+<ul>
+<li><a href="http://localhost:9000/">http://localhost:9000/</a></li>
+<li><a href="http://localhost:9000/Application/sample">http://localhost:9000/Application/sample</a></li>
+</ul>
+
+<p>なんとなくではありますがアクションからテンプレートが呼ばれ、引数を使ってレイアウトを解決して表示していることが見えてきた感じがします。</p>
+
+<h3>まとめ</h3>
+
+<p>とりあえず一旦ここまで。何をしているか理解出来たらまたコントローラ／アクション／テンプレートの関係を文字に起こしてみたいと思います。</p>
+
+<p>Play frameworkですが面白そうではあるもののやはりテンプレート周りが気に入らないですね。テンプレートの中にコードを埋め込んだり、独自の構文でロジックを埋め込んだりというのはどうしても慣れないです。どんなに簡単な構文でそれが可能だとしてもデザイナーとの連携の時にはやはり困ると思うのです。「ここは動的な情報が入るのでこういう書き方をして下さい」なんて絶対混乱します。テンプレートをHTMLで書くならそのテンプレートはプレーンなHTMLであるべきだと自分は思います。</p>
+
+		</div>
+		<div class="footer">
+			<time>2011-07-24</time>
+			<ul class="tag">
+				<li><a href="/tag/Scala">Scala(1)</a></li>
+				<li><a href="/tag/Play">Play(1)</a></li>
+				<li><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1 pager">
+	<a href="/blog/2011/07/22/20110722/" class="float-left">≪blessとMouse</a>
+	<a href="/blog/2011/11/23/2011123/" class="float-right">bonding設定で死んだ≫</a>
+	</div>
+	<div class="clearer"></div>
+			</article>
+			<aside class="col-4-12">
+				<div class="col-1-1">
+					<h3>Profile</h3>
+					<div class="content">
+						<img src="/images/avatar.png" class="float-left" style="width:100px;" />
+						<a href="https://twitter.com/mix3" target="_blank">twitter @mix3</a><br />
+						<a href="https://github.com/mix3/" target="_blank">github @mix3</a><br />
+						<a href="http://pixiv.me/mix3" target="_blank">pixiv @mix3</a><br />
+						<div class="clearer"></div>
+						Webエンジニアのような何か。絶賛人生の迷子中。スキルセット的には以下のような感じ<br />
+						Perl/MySQL/Linux/ソーシャルアプリ開発・運用
+					</div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>coderwall</h3>
+					<div id="coderwall"></div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Recent Posts</h3>
+					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140615/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
+						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
+						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
+						<li><a href="/blog/2014/01/05/20140105/">あけまして</a></li>
+						<li><a href="/blog/2013/12/28/20131228/">Vagrant with Virtualbox tips - internal network setting</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2014">2014年(4)</a>
+								<ul>
+										<li><a href="/archives/2014/06">2014年06月(1)</a></li>
+										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
+										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
+										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2013">2013年(18)</a>
+								<ul>
+										<li><a href="/archives/2013/12">2013年12月(3)</a></li>
+										<li><a href="/archives/2013/11">2013年11月(2)</a></li>
+										<li><a href="/archives/2013/10">2013年10月(5)</a></li>
+										<li><a href="/archives/2013/08">2013年08月(1)</a></li>
+										<li><a href="/archives/2013/07">2013年07月(1)</a></li>
+										<li><a href="/archives/2013/04">2013年04月(1)</a></li>
+										<li><a href="/archives/2013/03">2013年03月(3)</a></li>
+										<li><a href="/archives/2013/02">2013年02月(1)</a></li>
+										<li><a href="/archives/2013/01">2013年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2012">2012年(7)</a>
+								<ul>
+										<li><a href="/archives/2012/12">2012年12月(1)</a></li>
+										<li><a href="/archives/2012/11">2012年11月(2)</a></li>
+										<li><a href="/archives/2012/08">2012年08月(1)</a></li>
+										<li><a href="/archives/2012/04">2012年04月(3)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2011">2011年(13)</a>
+								<ul>
+										<li><a href="/archives/2011/11">2011年11月(1)</a></li>
+										<li><a href="/archives/2011/07">2011年07月(6)</a></li>
+										<li><a href="/archives/2011/06">2011年06月(3)</a></li>
+										<li><a href="/archives/2011/05">2011年05月(2)</a></li>
+										<li><a href="/archives/2011/04">2011年04月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Tags</h3>
+					<ul class="sidemenu toggle_tree_2">
+						<li class=""><a href="/tag/perl">perl(9)</a></li>
+						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+						<li class=""><a href="/tag/php">php(3)</a></li>
+						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
+						<li class="hide"><a href="/tag/Linux">Linux(2)</a></li>
+						<li class="hide"><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
+						<li class="hide"><a href="/tag/golang">golang(2)</a></li>
+						<li class="hide"><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
+						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
+						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
+						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class="hide"><a href="/tag/Bot">Bot(1)</a></li>
+						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
+						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
+						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
+						<li class="hide"><a href="/tag/Chrome">Chrome(1)</a></li>
+						<li class="hide"><a href="/tag/Hadoop">Hadoop(1)</a></li>
+						<li class="hide"><a href="/tag/IRC">IRC(1)</a></li>
+						<li class="hide"><a href="/tag/Log">Log(1)</a></li>
+						<li class="hide"><a href="/tag/Markdown">Markdown(1)</a></li>
+						<li class="hide"><a href="/tag/Mojolicious">Mojolicious(1)</a></li>
+						<li class="hide"><a href="/tag/Mouse">Mouse(1)</a></li>
+						<li class="hide"><a href="/tag/PhotonCloud">PhotonCloud(1)</a></li>
+						<li class="hide"><a href="/tag/Play">Play(1)</a></li>
+						<li class="hide"><a href="/tag/Qudo">Qudo(1)</a></li>
+						<li class="hide"><a href="/tag/SNBinder">SNBinder(1)</a></li>
+						<li class="hide"><a href="/tag/SQLite">SQLite(1)</a></li>
+						<li class="hide"><a href="/tag/Scala">Scala(1)</a></li>
+						<li class="hide"><a href="/tag/Teng">Teng(1)</a></li>
+						<li class="hide"><a href="/tag/Vagrant">Vagrant(1)</a></li>
+						<li class="hide"><a href="/tag/Virtualbox">Virtualbox(1)</a></li>
+						<li class="hide"><a href="/tag/Xslate">Xslate(1)</a></li>
+						<li class="hide"><a href="/tag/bless">bless(1)</a></li>
+						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
+						<li class="hide"><a href="/tag/bot">bot(1)</a></li>
+						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
+						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
+						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
+						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
+						<li class="hide"><a href="/tag/java">java(1)</a></li>
+						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
+						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/vagrant">vagrant(1)</a></li>
+						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
+						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
+						<li class="hide"><a href="/tag/サーバ管理">サーバ管理(1)</a></li>
+						<li class="hide"><a href="/tag/テスト">テスト(1)</a></li>
+						<li class="hide"><a href="/tag/ネットワーク設定">ネットワーク設定(1)</a></li>
+						<li class="hide"><a href="/tag/パーティショニング">パーティショニング(1)</a></li>
+						<li class="hide"><a href="/tag/ブログ">ブログ(1)</a></li>
+						<li class="hide"><a href="/tag/修士論文">修士論文(1)</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+			</aside>
+		</main>
+		<footer class="grid">
+			<div class="col-1-1">
+				<small>&copy; copyright 2014 mix3.github.io</small>
+			</div>
+		</footer>
+	</body>
+</html>

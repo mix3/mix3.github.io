@@ -1,0 +1,7 @@
+: cascade layout::base with macro { blog => $blog }
+
+: around content -> {
+	: for $blog.year_month_to_article[$year].article -> $article {
+		: archive($article)
+	: }
+: }

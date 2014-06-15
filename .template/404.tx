@@ -1,0 +1,10 @@
+: cascade layout::base with macro { blog => $blog }
+
+: around content -> {
+	<div class="col-1-1">
+		<div class="header">
+			<h2>404 Not Found</h2>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+: }
