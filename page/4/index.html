@@ -61,6 +61,49 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/07/28/20130728/" title="">テスト書くのって難しい</a></h2>
+<p>布都ちゃんが可愛すぎて生きるのが辛い。mix3です。</p>
+
+<p><img src="/images/20130728/futo.png" /></p>
+
+<h3>テスト書くのって難しい</h3>
+
+<p>なんの意味も無い以下のような糞コードがあったとして、各subについてテストを書いたりなんかしてみるとこんな感じだろうか？</p>
+
+<script src="https://gist.github.com/mix3/6097116.js"></script>
+
+<p>なんでこんな糞コード書いたかというと</p>
+
+<ul>
+<li>type_a, type_b
+<ul>
+<li>まあ良い</li>
+</ul></li>
+<li>type_to_execute
+<ul>
+<li>type増えたらやだなぁと思うけどまあ良い</li>
+</ul></li>
+<li>calc_type
+<ul>
+<li>計算複雑になったらやだなぁと思うけどまあ良い</li>
+</ul></li>
+<li>execute
+<ul>
+<li>type_a,type_b,type_to_execute,calc_typeが総じて複雑になった時、全部と通るテスト書くの考えたくないんだけど…</li>
+</ul></li>
+</ul>
+
+<p>普通にアプリ書いてると、色々複雑になった上でexecuteみたいにいくつも関数経由して結果を返すやんちゃな関数が出てきてしまうのですが、そういうののテストは正直書いていて死にたくなります。そして後で機能拡張しようとしてやっぱり死んだりする。</p>
+
+<p>「そもそも設計が悪いよ」「それ◯◯で出来るよ」「糞コードに何を求めてるの」etc… ということなんでしょうか。テスト大事なのは分かるのですが、正しくて網羅的なテストというのはきちんとスキルを身につけてないと出来ないよなぁと思う事が多いです。「書かないよりはずっと良い」と心の中で言い訳しながら書いてますが。</p>
+
+<p>ただ、以下のような事もあるのでやっぱりただ書くだけでもダメなんだなと思いつつ、もやもやする今日この頃です。</p>
+
+<blockquote class="twitter-tweet"><p>リファクタリングに使えないテストのことをレガシーカバーと呼ぶ。結局リファクタリングできないんだからレガシーコードのまま。</p>&mdash; いろふ(成分無調整) (@irof) <a href="https://twitter.com/irof/statuses/346946470890573824">June 18, 2013</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p class="post-footer"><span class="date">2013-07-28</span></p>
 <h2><a href="/2013/04/13/20130413/" title="">phantomjsで遊ぶ</a></h2>
 <p>うわっ…私のチーム、レベル低すぎ…？ mix3です。リードエンジニアとしてどうにかしろって話ですが、コミュ
 障の自分には荷が重いです…</p>
@@ -247,32 +290,6 @@ run;
 <p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
 
 <p class="post-footer"><span class="date">2013-03-09</span></p>
-<h2><a href="/2013/02/14/20130214/" title="">すぐにpixivのランキングイラストを見れるGoogleChromeの拡張を作った。</a></h2>
-<p>生きていればつらいことがある。
-しかし、つらいからと言って簡単に投げ出す事は出来ないということも多い。</p>
-
-<p>みなさんもつらまってる時、よくpixivを見ると思う。
-当然のごとく僕もそうである。</p>
-
-<p>最近つらい事がよくある。
-そんな時のために、pixivのランキングイラストを素早く表示する必要があった。
-なので、pixivのランキングイラストをすぐ見れるGoogle Chromeの拡張を作った。</p>
-
-<p><a href="https://github.com/mix3/chrome-pixiv-illust-daily-ranking-redirect">mix3/chrome-pixiv-illust-daily-ranking-redirect - GitHub</a></p>
-
-<p>「だめだ。もうやってらねー」って時は、空のtabを表示すればすぐpixivのランキングイラストが見れる。最高。自分も絵描きたい。</p>
-
-<p><a href="/images/20130214/pixiv-illust-daily-ranking-redirect.png"><img src="/images/20130214/pixiv-illust-daily-ranking-redirect.png" width="300" /></a></p>
-
-<p>参考</p>
-
-<ul>
-<li><a href="http://blog.hisaichi5518.com/entry/2013/02/01/003820">すぐに吉高由里子を見れるGoogle Chromeの拡張作った。 - パルカワ2</a></li>
-<li><a href="http://soh335.hatenablog.com/entry/2013/02/10/011039">すぐに宮崎あおいを見れるGoogle Chromeの拡張作っ>た。 - soh335 memo</a></li>
-<li><a href="http://mizzy.org/blog/2013/02/11/1/">すぐにハッブル宇宙望遠鏡撮影画像を見れるGoogle Chromeの拡張作った。 - Gosuke Miyashita</a></li>
-</ul>
-
-<p class="post-footer"><span class="date">2013-02-14</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -302,6 +319,7 @@ run;
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2014/06/">2014年06月</a></li>
   <li><a href="/archives/2014/04/">2014年04月</a></li>
   <li><a href="/archives/2014/03/">2014年03月</a></li>
   <li><a href="/archives/2014/01/">2014年01月</a></li>
@@ -387,6 +405,7 @@ span.tagcloud24 {font-size: 36px;}
 span.tagcloud24 a {text-decoration: none;}
 </style><div id="htmltagcloud">
 <span class="tagcloud0"><a href="/tag/Bot/">Bot</a></span>
+<span class="tagcloud0"><a href="/tag/CI/">CI</a></span>
 <span class="tagcloud0"><a href="/tag/CRUD/">CRUD</a></span>
 <span class="tagcloud0"><a href="/tag/Capture%3A%3ATiny/">Capture::Tiny</a></span>
 <span class="tagcloud0"><a href="/tag/Chrome/">Chrome</a></span>
@@ -415,7 +434,8 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/cpan/">cpan</a></span>
 <span class="tagcloud0"><a href="/tag/cpan%20author/">cpan author</a></span>
 <span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
-<span class="tagcloud0"><a href="/tag/golang/">golang</a></span>
+<span class="tagcloud7"><a href="/tag/golang/">golang</a></span>
+<span class="tagcloud0"><a href="/tag/heroku/">heroku</a></span>
 <span class="tagcloud0"><a href="/tag/isucon/">isucon</a></span>
 <span class="tagcloud0"><a href="/tag/java/">java</a></span>
 <span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>

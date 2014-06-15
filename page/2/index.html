@@ -61,6 +61,70 @@
   <div id="content">
     <div id="main">
       <div class="rslt_row autopagerize_page_element">
+<h2><a href="/2013/12/22/20131222_02/" title="">ndenv を homebrew で入れる話 または如何にして心配するのを止めてRequireJSを愛するようになったか</a></h2>
+<p>というようなことを元々は <a href="http://tech.kayac.com/archive/techkayaccom_advent_calendar_2013.html">teck.kayac.com Advent Calender 2013</a> の17日目 の記事として考えてたんだけど、結局なんか無性にWicketの事を書きたくなっちゃったので、お蔵入りになった記事をこっちに書く事にする。</p>
+
+<p>カレンダーのノリで書いてたのをそのまま持ってくると大分寒い感じがするが、面倒なので不自然なカレンダー要素を消す意外は無編集で。</p>
+
+<h3>ndenv を homebrew で入れる話 または如何にして心配するのを止めてRequireJSを愛するようになったか</h3>
+
+<p><s>Advent Calenderネタの捏造のため</s>紆余曲折あって週末Backbone.jsの<a href="https://github.com/jashkenas/backbone/tree/master/examples">example</a>を永続化部分をローカルストレージじゃなくてAPIベースに書き換えつつテストをコマンドライン（Mocha on node）でやる、みたいなことをやってました。</p>
+
+<p>その副産物として<a href="https://github.com/riywo/ndenv">ndenv</a>をhomebrewで入れられるよう<a href="https://github.com/mix3/ndenv">forkして弄りつつ</a>、<a href="https://github.com/mix3/homebrew-ndenv">Formula</a>を書いたりしました。</p>
+
+<pre><code>brew tap mix3/ndenv
+brew install ndenv node-build --HEAD
+</code></pre>
+
+<p>こんな感じで入れられると思います --HEAD なのはお察しください。多分他の誰かが既にやってるんじゃないかと思いますが気にしない事にしました。</p>
+
+<h3>先生助けてっ Mochaが息してないの！</h3>
+
+<p>で、node入れて<a href="https://github.com/jashkenas/backbone/tree/master/examples">backbone-examples</a>を弄ったわけですがAPIベースにするのは割と簡単に出来る（Backboneがモデルの永続化にRESTが使える）のですが「さてRequireJSで分割したのだし何かテスト書くか」と適当に書くとあら不思議。Mochaでテストが全くが実行されません。</p>
+
+<p><a href="http://blog.kjirou.net/p/3206">AMD準拠のmochaテストをWebとCUIで共通化 - それなりブログ</a>にあるように非同期関連でうまく行かないようで同ブログにて書いてある通り「<a href="https://github.com/jrburke/amdefine">amdefine</a>で解決や！」と思ったらcollectionのテストの時にmodelを呼ぼうとして「みつかんねーよ！」と怒られてRequireJSの時と違ってbaseUrl設定してないんだし、そうだよなってなって奇声上げてました。</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>reqirejs で分割した後、mochaでcliテスト書こうとしたら全くテスト走らないので、amdefine 使ったらbaseUrl の関係でエラるしキエェェェーーー！！！ってなってる</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/412135316514820096">2013, 12月 15</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>で色々見ててどうにもならない感じだったけど、なんか他のサンプルとか色々眺めてるとテストの中でrequirejs使ってるのが多いっぽかったので、どうもそっちの方が一般的のようです。</p>
+
+<pre><code>describe("Did it run?", function(){
+    it("model is a model", function(done){
+        // こんな感じで中でrequirejsを呼ぶ
+        requirejs(["model"], function(model) {
+            expect(model).to.be.a("model");
+            done();
+        });
+    }); 
+});
+</code></pre>
+
+<p>無理せずrequirejs使っていきましょう。</p>
+
+<p>もう一つテストで困るのが、コマンドラインテストだとajaxとかで怒られるということ。（domが無いからってことで良いんだよね多分）</p>
+
+<ul>
+<li><a href="https://github.com/NilsLattek/backbone-requirejs-node-boilerplate/blob/master/test/client/requirejs_testing.js">NilsLattek/backbone-requirejs-node-boilerplate</a></li>
+<li><a href="http://www.netboy.pl/2012/10/testing-jquery-code-with-mocha-chai-and-jsdom/">Testing jQuery code with Mocha, Chai and jsdom | Netboy</a></li>
+</ul>
+
+<p>この辺りを<s>コピって</s>参考にして<a href="https://github.com/tmpvar/jsdom">jsdom</a>を使うようにしてあげると良いようです。</p>
+
+<p>ということで出来たのが<a href="https://github.com/mix3/backbone-examples-replace-to-api-base-app">こちら</a>になります。</p>
+
+<p>どうやってコマンドラインでテストするかばかり考えていて「Backbonアプリのテストってどんな感じで書けば良いのか」についてまでたどり着かなかったので次触るときはそこまで考えて触りたいものですね。</p>
+
+<h3>まとめ</h3>
+
+<ul>
+<li>実は一番最初の発端は「<a href="http://angularjs.org/">AngularJS</a>触ろう！」だったのにどうしてこうなった。</li>
+<li>今は<a href="http://marionettejs.com/">Marionette.js</a>が気になります。</li>
+<li>js、結局クライアントとサーバで分かれてるのが少し不幸っぽい（小並感）</li>
+</ul>
+
+<p class="post-footer"><span class="date">2013-12-22</span></p>
 <h2><a href="/2013/12/22/20131222_01/" title="">退勤時間の自動検出ソリューション</a></h2>
 <p>というようなことを元々は <a href="http://tech.kayac.com/archive/techkayaccom_advent_calendar_2013.html">teck.kayac.com Advent Calender 2013</a> の17日目 の記事として考えてたんだけど、結局なんか無性にWicketの事を書きたくなっちゃったので、お蔵入りになった記事をこっちに書く事にする。</p>
 
@@ -798,300 +862,6 @@ disconnected
 <p>これで何かする予定もないので、これぐらいで今は満足満足</p>
 
 <p class="post-footer"><span class="date">2013-10-23</span></p>
-<h2><a href="/2013/10/19/20131019/" title="">AdmingeneratorGeneratorBundleを試す</a></h2>
-<p>php入れたのだから早速admingeneratorを試したいのだが、symfony2になってからのadmingeneratorは2種類あるっぽい</p>
-
-<ul>
-<li><a href="https://github.com/symfony2admingenerator/AdmingeneratorGeneratorBundle">symfony2admingenerator / AdmingeneratorGeneratorBundle</a></li>
-<li><a href="https://github.com/sonata-project/SonataAdminBundle">sonata-project / SonataAdminBundle</a></li>
-</ul>
-
-<p>どっちがどうとか知らないので、今回はとりあえず AdmingeneratorGeneratorBundle の方を試して行く</p>
-
-<h3>インストール</h3>
-
-<p>なにはなくともまずプロジェクトを作る</p>
-
-<pre><code>$ php composer.phar create-project symfony/framework-standard-edition 2.3.6 2.3.6
-</code></pre>
-
-<p>プレーンな状態で動くことを確認</p>
-
-<p><a href="https://github.com/symfony2admingenerator/AdmingeneratorGeneratorBundle/blob/master/Resources/doc/installation/installation-via-composer.md">AdmingeneratorGeneratorBundle / Resources / doc / installation / installation-via-composer.md</a>を参考にインストールを進める <a href="http://symfony2admingenerator.org/installation.html">こっちは自分には全く役に立たなかった</a></p>
-
-<p>composer.jsonを修正してupdateする</p>
-
-<pre><code>--- composer.json.1 2013-10-19 16:26:06.000000000 +0900
-+++ composer.json   2013-10-19 16:27:02.000000000 +0900
-@@ -18,7 +18,8 @@
-         "sensio/distribution-bundle": "2.3.*",
-         "sensio/framework-extra-bundle": "2.3.*",
-         "sensio/generator-bundle": "2.3.*",
--        "incenteev/composer-parameter-handler": "~2.0"
-+        "incenteev/composer-parameter-handler": "~2.0",
-+        "cedriclombardot/admingenerator-generator-bundle": "2.3.*@dev"
-     },
-     "scripts": {
-         "post-install-cmd": [
-@@ -37,7 +38,8 @@
-         ]
-     },
-     "config": {
--        "bin-dir": "bin"
-+        "bin-dir": "bin",
-+        "component-dir": "web/components"
-     },
-     "minimum-stability": "stable",
-     "extra": {
-</code></pre>
-
-<p>たぶん怒られるのでさらにcomposer.jsonを修正してupdateする</p>
-
-<pre><code>--- composer.json.2 2013-10-19 16:48:58.000000000 +0900
-+++ composer.json   2013-10-19 16:51:56.000000000 +0900
-@@ -41,7 +41,7 @@
-         "bin-dir": "bin",
-         "component-dir": "web/components"
-     },
--    "minimum-stability": "stable",
-+    "minimum-stability": "dev",
-     "extra": {
-         "symfony-app-dir": "app",
-         "symfony-web-dir": "web",
-</code></pre>
-
-<p>Symfony\Component\Process\Exception\ProcessTimedOutException などと言って怒られる場合はタイムアウトの時間を伸ばしてみる</p>
-
-<pre><code>$ COMPOSER_PROCESS_TIMEOUT=600 php composer.phar update
-</code></pre>
-
-<p>上手く言ったらBundleを有効にする</p>
-
-<pre><code>--- app/AppKernel.php.1 2013-10-19 17:26:45.000000000 +0900
-+++ app/AppKernel.php   2013-10-19 17:27:12.000000000 +0900
-@@ -16,6 +16,9 @@
-             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
-             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
-             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
-+            new Admingenerator\GeneratorBundle\AdmingeneratorGeneratorBundle(),
-+            new Knp\Bundle\MenuBundle\KnpMenuBundle(),
-+            new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
-         );
-
-         if (in_array($this-&gt;getEnvironment(), array('dev', 'test'))) {
-</code></pre>
-
-<p>app/config/config.yml に admingenerator の設定追加 使うORMとAsseticを使うかで修正内容を変えるっぽい</p>
-
-<pre><code>--- app/config/config.yml.1 2013-10-19 17:28:28.000000000 +0900
-+++ app/config/config.yml   2013-10-19 17:32:20.000000000 +0900
-@@ -64,3 +64,13 @@
-     username:  %mailer_user%
-     password:  %mailer_password%
-     spool:     { type: memory }
-+
-+admingenerator_generator:
-+    # choose  and enable at least one
-+    use_propel:           false
-+    use_doctrine_orm:     true
-+    use_doctrine_odm:     false
-+
-+    # choose and uncomment only one
-+#    base_admin_template: AdmingeneratorGeneratorBundle::base_admin.html.twig
-+    base_admin_template: AdmingeneratorGeneratorBundle::base_admin_assetic_less.html.twig
-</code></pre>
-
-<p>Asseticは無視して Install assets</p>
-
-<pre><code>$ php app/console assets:install web --symlink
-</code></pre>
-
-<p>Dashboard route も無視</p>
-
-<p>AdmingeneratorGeneratorBundle のインストール自体は多分これで完了</p>
-
-<h3>php app/console generate:bundle する</h3>
-
-<p>最初から admin:generate-admin admin:generate-bundle をして admingenerater が適用されたBundleを作っても良いのだが色々面倒だったので</p>
-
-<ul>
-<li>Bundleを作る</li>
-<li>Entityを作る</li>
-<li>admin:generate-admin する</li>
-</ul>
-
-<p>という感じで進める</p>
-
-<pre><code>$ php app/console generate:bundle
-</code></pre>
-
-<ul>
-<li>Bundle namespace: Acme/SampleBundle</li>
-<li>Bundle name [AcmeSampleBundle]:</li>
-<li>Target directory [/project/path/src]:</li>
-<li>Configuration format (yml, xml, php, or annotation): annotation</li>
-<li>Do you want to generate the whole directory structure [no]?</li>
-<li>Do you confirm generation [yes]?</li>
-<li>Confirm automatic update of your Kernel [yes]?</li>
-<li>Confirm automatic update of the Routing [yes]?</li>
-</ul>
-
-<p><a href="http://docs.symfony.gr.jp/symfony2/book/doctrine.html">データベースと Doctrine (“The Model”)</a> ここを参考に適当にEntityを作って行く</p>
-
-<p>確認ごときに mysql は仰々しすぎるので sqlite にする</p>
-
-<pre><code>--- app/config/parameters.yml.1 2013-10-19 19:39:04.000000000 +0900
-+++ app/config/parameters.yml   2013-10-19 19:39:25.000000000 +0900
-@@ -1,6 +1,6 @@
- # This file is auto-generated during the composer install
- parameters:
--    database_driver: pdo_mysql
-+    database_driver: pdo_sqlite
-     database_host: 127.0.0.1
-     database_port: null
-     database_name: symfony
-@@ -10,5 +10,5 @@
-     mailer_host: 127.0.0.1
-     mailer_user: null
-     mailer_password: null
--    locale: en
-+    locale: ja
-     secret: ThisTokenIsNotSoSecretChangeIt
-</code></pre>
-
-<p>この状態で doctrine:database:create するとプロジェクト直下に "symfony" とか出来て悲しみを背負う</p>
-
-<p>よく見ると config.yml に「sqlite では設定を追加しろ」という指示が書いてあるので従う</p>
-
-<pre><code>--- app/config/config.yml.2 2013-10-19 19:43:37.000000000 +0900
-+++ app/config/config.yml   2013-10-19 19:43:50.000000000 +0900
-@@ -51,7 +51,7 @@
-         charset:  UTF8
-         # if using pdo_sqlite as your database driver, add the path in parameters.yml
-         # e.g. database_path: %kernel.root_dir%/data/data.db3
--        # path:     %database_path%
-+        path:     %database_path%
-
-     orm:
-         auto_generate_proxy_classes: %kernel.debug%
-
---- app/config/parameters.yml.2 2013-10-19 19:43:15.000000000 +0900
-+++ app/config/parameters.yml   2013-10-19 19:44:06.000000000 +0900
-@@ -12,3 +12,4 @@
-     mailer_password: null
-     locale: ja
-     secret: ThisTokenIsNotSoSecretChangeIt
-+    database_path: %kernel.root_dir%/data/data.db3
-</code></pre>
-
-<p>この状態で doctrine:database:create すると今度はパスが無くてdbファイルが作れないのでディレクトリを掘る</p>
-
-<pre><code>$ mkdir app/data
-</code></pre>
-
-<p>これでようやく doctrine:database:create が出来る</p>
-
-<h3>Entity を作る</h3>
-
-<p>ドキュメントでは手で作成してたりするが面倒なのでTipに書いてあるコマンドで作る</p>
-
-<pre><code>$ php app/console doctrine:generate:entity --entity="AcmeSampleBundle:Product" --fields="name:string(255) price:float description:text"
-</code></pre>
-
-<ul>
-<li>The Entity shortcut name [AcmeSampleBundle:Product]:</li>
-<li>Configuration format (yml, xml, php, or annotation) [annotation]: annotation</li>
-<li>New field name (press <return> to stop adding fields):</li>
-<li>Do you want to generate an empty repository class [no]?</li>
-<li>Do you confirm generation [yes]?</li>
-</ul>
-
-<p>おそらくこれでEntityは出来たので admin:generate-admin してみる</p>
-
-<pre><code>$ php app/console admin:generate-admin
-</code></pre>
-
-<ul>
-<li>Generator to use (doctrine, doctrine_odm, propel) [doctrine]:</li>
-<li>Bundle namespace: Acme/SampleBundle</li>
-<li>Model name [YourModel]: Product</li>
-<li>Bundle name [AcmeSampleBundle]:</li>
-<li>Target directory [/project/path/src]:</li>
-<li>Prefix of yaml: sample</li>
-<li>Do you confirm generation [yes]?</li>
-<li>Confirm automatic update of the Routing [yes]?</li>
-</ul>
-
-<p>これで諸々最初に必要なものが出来たハズなので http://host:port/app_dev.php/admin/acme_sample_bundle/sample/ を確認するとテーブルが無いと言って怒られるので作る</p>
-
-<pre><code>$ php app/console doctrine:schema:create
-</code></pre>
-
-<p>echo ".schema" | sqlite3 app/data/data.db3 とかして出来てるのを確認</p>
-
-<p>これで再度 http://host:port/app_dev.php/admin/acme_sample_bundle/sample/ を確認するとそれっぽい画面が出てくる</p>
-
-<h3>触ってみる</h3>
-
-<p>とりあえずレコード追加してみるかと触ると setId()ねぇよ 的な怒られ方をする</p>
-
-<p>Productの中を見ると確かに無いがこれはAutoIncrementが効いているからなので、むしろcreate,edit時に編集させないようにするのが正しいと思われる</p>
-
-<pre><code>--- src/Acme/SampleBundle/Resources/config/Sample-generator.yml.1   2013-10-19 20:24:37.000000000 +0900
-+++ src/Acme/SampleBundle/Resources/config/Sample-generator.yml 2013-10-19 20:25:10.000000000 +0900
-@@ -26,14 +26,14 @@
-     new:
-         params:
-             title: New object for SampleBundle
--            display: ~
-+            display: [name, price, description]
-             actions:
-                 save: ~
-                 list: ~
-     edit:
-         params:
-             title: "You're editing the object \"%object%\"|{ %object%: Product.title }|"
--            display: ~
-+            display: [name, price, description]
-             actions:
-                 save: ~
-                 list: ~
-</code></pre>
-
-<p>こんな感じで generator.yml を修正してもう一度試すと今度は title なんてメソッドねぇよ 的な怒られ方をする</p>
-
-<p>レコードは追加されていてレコード追加後 edit へリダイレクトした後にテンプレートのほうで怒られている</p>
-
-<p>これは generator.yml タイトル表示にtitleを参照しようとしてるからなので適当に name に変える</p>
-
-<pre><code>--- src/Acme/SampleBundle/Resources/config/Sample-generator.yml.2   2013-10-19 20:33:43.000000000 +0900
-+++ src/Acme/SampleBundle/Resources/config/Sample-generator.yml 2013-10-19 20:34:02.000000000 +0900
-@@ -32,14 +32,14 @@
-                 list: ~
-     edit:
-         params:
--            title: "You're editing the object \"%object%\"|{ %object%: Product.title }|"
-+            title: "You're editing the object \"%object%\"|{ %object%: Product.name }|"
-             display: [name, price, description]
-             actions:
-                 save: ~
-                 list: ~
-     show:
-         params:
--            title: "You're viewing the object \"%object%\"|{ %object%: Product.title }|"
-+            title: "You're viewing the object \"%object%\"|{ %object%: Product.name }|"
-             display: ~
-             actions:
-                 list: ~
-</code></pre>
-
-<p>これでとりあえず触れる状態になったように思う</p>
-
-<h3>今回はここまで</h3>
-
-<p>次ぎはリレーション作ったときにどうなるのか、色々変えたくなったときにどうしたらいいのかを見たいのとsonataの方も試してみたいと思う</p>
-
-<p class="post-footer"><span class="date">2013-10-19</span></p>
 <!-- X:S ZenBackWidget --><div id="zenback-widget-loader"></div><script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var r=Math.ceil((new Date()*1)*Math.random());var j=d.createElement("script");j.id=i;j.async=true;j.src="//w.zenback.jp/v1/?base_uri=http%3A//mix3.github.io&nsid=96368406281861426%3A%3A112555434182716469&rand="+r;d.body.appendChild(j);}}(document,"zenback-widget-js");</script><!-- X:E ZenBackWidget -->
 <div styel="center" align="center">
 <a href="/page/1/">&lt;&lt;</a>
@@ -1121,6 +891,7 @@ disconnected
 </p>
 <h3>Archives</h3>
 <ul class="sidemenu">
+  <li><a href="/archives/2014/06/">2014年06月</a></li>
   <li><a href="/archives/2014/04/">2014年04月</a></li>
   <li><a href="/archives/2014/03/">2014年03月</a></li>
   <li><a href="/archives/2014/01/">2014年01月</a></li>
@@ -1206,6 +977,7 @@ span.tagcloud24 {font-size: 36px;}
 span.tagcloud24 a {text-decoration: none;}
 </style><div id="htmltagcloud">
 <span class="tagcloud0"><a href="/tag/Bot/">Bot</a></span>
+<span class="tagcloud0"><a href="/tag/CI/">CI</a></span>
 <span class="tagcloud0"><a href="/tag/CRUD/">CRUD</a></span>
 <span class="tagcloud0"><a href="/tag/Capture%3A%3ATiny/">Capture::Tiny</a></span>
 <span class="tagcloud0"><a href="/tag/Chrome/">Chrome</a></span>
@@ -1234,7 +1006,8 @@ span.tagcloud24 a {text-decoration: none;}
 <span class="tagcloud0"><a href="/tag/cpan/">cpan</a></span>
 <span class="tagcloud0"><a href="/tag/cpan%20author/">cpan author</a></span>
 <span class="tagcloud0"><a href="/tag/gist/">gist</a></span>
-<span class="tagcloud0"><a href="/tag/golang/">golang</a></span>
+<span class="tagcloud7"><a href="/tag/golang/">golang</a></span>
+<span class="tagcloud0"><a href="/tag/heroku/">heroku</a></span>
 <span class="tagcloud0"><a href="/tag/isucon/">isucon</a></span>
 <span class="tagcloud0"><a href="/tag/java/">java</a></span>
 <span class="tagcloud0"><a href="/tag/jquery-presentation/">jquery-presentation</a></span>
