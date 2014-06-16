@@ -4,7 +4,16 @@
 	<div class="col-1-1">
 		<div class="header">
 			<h2>404 Not Found</h2>
+			<div id="info"></div>
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
+	<script>
+		$.ajax({
+			type: "HEAD",
+			url: "/blog" + location.pathname,
+		}).success(function(data){
+			$("#info").html('"もしかして: <a href="'+"/blog" + location.pathname+'">'+"/blog" + location.pathname+'</a>');
+		})
+	</script>
 : }
