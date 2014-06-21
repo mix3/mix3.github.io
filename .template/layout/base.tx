@@ -92,7 +92,7 @@
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
 					: for $blog.tag_to_article.keys().sort(-> $a, $b { $blog.tag_to_article[$b].size() cmp $blog.tag_to_article[$a].size() }) -> $tag {
-						<li class="<: if ($blog.tag_to_article[$tag].size() <= $blog.conf.hide_num) { :>hide<: } :>"><a href="/tag/<: $tag :>"><: $tag :>(<: $blog.tag_to_article[$tag].size() :>)</a></li>
+						<li class="<: if ($blog.tag_to_article[$tag].size() <= $blog.conf.hide_num) { :>hide<: } :>"><a href="/tag/<: $tag :>"><: $tag :>(<: $blog.tag_to_count[$tag] :>)</a></li>
 					: }
 					</ul>
 				</div>

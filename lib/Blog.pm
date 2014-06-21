@@ -39,7 +39,7 @@ has 'article_hashref' => (is => 'ro', isa => 'HashRef', default => sub {
 	} $_[0]->resource->children(qr/\.md$/) };
 
 	my %relation = ();
-	my @desc = sort { $b->data->date <=> $a->data->date } values %$ret;
+	my @desc = sort { $b->data->date <=> $a->data->date || $b->name cmp $a->name } values %$ret;
 	for (my $i = 0; $i < @desc; $i++) {
 		my $prev    = $desc[$i + 1];
 		my $current = $desc[$i];
@@ -63,14 +63,44 @@ has 'article_hashref' => (is => 'ro', isa => 'HashRef', default => sub {
 
 has 'tag_to_article' => (is => 'ro', isa => 'HashRef', default => sub {
 	my %ret = ();
+	my %tmp = ();
+	my %map = ();
+	for my $article (
+		sort {
+			$b->data->date <=> $a->data->date || $b->name cmp $a->name
+		} values %{$_[0]->article_hashref}
+	) {
+		for (@{$article->data->tag}) {
+			$map{uc $_} ||= $_;
+			push @{$tmp{uc $_}}, $article;
+		}
+	}
+
+	for my $uctag (keys %tmp) {
+		$ret{$map{$uctag}} = $tmp{$uctag};
+	}
+
+	return \%ret;
+});
+
+has 'tag_to_count' => (is => 'ro', isa => 'HashRef', default => sub {
+	my %ret = ();
+	my %map = ();
+	my %cnt = ();
 	for my $article (values %{$_[0]->article_hashref}) {
-		push @{$ret{$_}}, $article for (@{$article->data->tag});
+		for (@{$article->data->tag}) {
+			$map{$_} = uc $_;
+			$cnt{uc $_}++;
+		}
+	}
+	for my $tag (keys %map) {
+		$ret{$tag} = $cnt{uc $tag};
 	}
 	return \%ret;
 });
 
 has 'archive'  => (is => 'ro', isa => 'ArrayRef[Blog::Article]', default => sub {
-	[sort { $b->data->date <=> $a->data->date } values $_[0]->article_hashref]
+	[sort { $b->data->date <=> $a->data->date || $b->name cmp $a->name } values $_[0]->article_hashref]
 });
 
 has 'year_month_to_article'  => (is => 'ro', isa => 'HashRef', default => sub {

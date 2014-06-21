@@ -51,7 +51,7 @@
 			<time><: $article.data.date.ymd :></time>
 			<ul class="tag">
 				: for $article.data.tag -> $tag {
-				<li><a href="/tag/<: $tag :>"><: $tag :>(<: $blog.tag_to_article[$tag].size() :>)</a></li>
+				<li><a href="/tag/<: $tag :>"><: $tag :>(<: $blog.tag_to_count[$tag] :>)</a></li>
 				: }
 			</ul>
 			<div class="clearer"></div>
@@ -69,7 +69,7 @@
 			<time><: $article.data.date.ymd :></time>
 			<ul class="tag">
 				: for $article.data.tag -> $tag {
-					<li><a href="/tag/<: $tag :>"><: $tag :>(<: $blog.tag_to_article[$tag].size() :>)</a></li>
+					<li><a href="/tag/<: $tag :>"><: $tag :>(<: $blog.tag_to_count[$tag] :>)</a></li>
 				: }
 			</ul>
 			<div class="clearer"></div>

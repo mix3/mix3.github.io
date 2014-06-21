@@ -392,28 +392,28 @@ footer small {
 	height:25px;
 }
 .social_button .twitter {
-	float: right;
+	float: left;
 	display: inline;
 	margin: 0px 10px 0px 0px;
 	padding: 0px;
-	width: 80px;
+	width: 85px;
 }
 .social_button .facebook {
-	float: right;
+	float: left;
 	display: inline;
 	margin: 0px 10px 0px 0px;
 	padding: 0px;
 	width: 90px;
 }
 .social_button .googleplus {
-	float: right;
+	float: left;
 	display: inline;
 	margin: 0px 10px 0px 0px;
 	padding: 0px;
 	width: 50px;
 }
 .social_button .hatena {
-	float: right;
+	float: left;
 	display: inline;
 	margin: 0px 10px 0px 0px;
 	padding: 0px;
