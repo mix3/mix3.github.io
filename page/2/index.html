@@ -42,6 +42,104 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2014/03/08/20140308/">revel入門</a></h2>
+		</div>
+		<div class="content">
+			<p>絶賛人生の迷子中、mix3です</p>
+
+<h3>golangでWebアプリ</h3>
+
+<p>を作ってレビューしてもらったらそれはもうフルボッコでそれこそ雄山のあれな感じでした</p>
+
+<p><img src="/images/20140308/oisinbo_yuzan_arai.gif" alt="このWebアプリを作ったのは誰だぁっ" title="このWebアプリを作ったのは誰だぁっ" /></p>
+
+<p><a href="/2013/11/13/20131113/">isucon3</a>を元に手探りでやったため突っ込みどころを残してしまったようです</p>
+
+<ul>
+<li>panic使ってerror潰すのやめろ</li>
+<li>パス解決にCallerいらねーだろ
+<ul>
+<li>一応カレントディレクトリを判断したいという意図だったけどいらないらしい</li>
+</ul></li>
+<li>動かし方 go run hoge.go じゃなくて go build hoge.go; ./hoge ってちゃんと書け</li>
+</ul>
+
+<p>などなど</p>
+
+<p>golangのWebアプリの良いサンプル、一応最初に自分で探してはみたものの良い感じのを見つけられず、後で「<a href="https://github.com/campoy/todo">campoy/todo</a>が参考になるんじゃない？」と教えてもらいました</p>
+
+<p>最初に知りたかった… ちなみにパス解決の突っ込み</p>
+
+<p><a href="https://gist.github.com/mix3/9430209">https://gist.github.com/mix3/9430209</a></p>
+
+<pre><code>mix3 ~/tmp/caller_sample $ go run main.go
+2014/03/08 21:56:14 loading config (with caller) file: /private/tmp/caller_sample/config/config.json
+2014/03/08 21:56:14 OK
+2014/03/08 21:56:14 loading config file: config/config.json
+2014/03/08 21:56:14 OK
+
+mix3 ~/tmp $ go run caller_sample/main.go
+2014/03/08 21:56:38 loading config (with caller) file: /private/tmp/caller_sample/config/config.json
+2014/03/08 21:56:38 OK
+2014/03/08 21:56:38 loading config file: config/config.json
+2014/03/08 21:56:38 open config/config.json: no such file or directory
+exit status 1
+</code></pre>
+
+<p>こんな感じで実行パスに左右されないパス解決が出来るので使い方間違ってなければ意味はある書き方だとは思うんですが、まあ今回は必要ないよってことですかね</p>
+
+<h3><a href="http://robfig.github.io/revel/index.html">revel</a>使いましょ</h3>
+
+<p>そんな感じで <strong>センスの無い</strong> やつが手探りでやると悲惨なことになるのでWAFに乗っかった方がきっと良いと判断されたっぽい（実はそこらへん曖昧だったり…）のでとりあえず<a href="http://robfig.github.io/revel/index.html">revel</a>にのっかることにしました</p>
+
+<p>使い方は公式<a href="http://robfig.github.io/revel/index.html">http://robfig.github.io/revel/index.html</a>のtutorialとmanualとsample眺めてればなんとなく分かる感じです</p>
+
+<p>以下<a href="http://robfig.github.io/revel/samples/booking.html">revel/samples/booking</a>にはgorpとsqliteを使ったサンプルコードがあるのだけど、「mysqlにするにはどうすれば？」と少し悩んだのでメモ</p>
+
+<h4>conf/app.conf のsqliteの設定をmysqlのものに変更</h4>
+
+<pre><code>db.import = github.com/go-sql-driver/mysql
+db.driver = mysql
+db.spec   = root@tcp(localhost:3306)/alphawing
+</code></pre>
+
+<h4>app/controllers/gorp.go のimportしているドライバをmysqlのものに変更</h4>
+
+<pre><code>_ "github.com/go-sql-driver/mysql"
+</code></pre>
+
+<h4>app/controllers/gorp.go の gorp.DbMap{} を mysqlのものに変更</h4>
+
+<pre><code>Dbm = &amp;gorp.DbMap{Db: db.Db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
+</code></pre>
+
+<p>だいたいこれくらい弄るとmysqlで動く様になるはず</p>
+
+<p>ちなみにsampleだからだと思うのだけど<a href="https://github.com/robfig/revel/blob/master/samples/booking/app/controllers/init.go">以下のような感じ</a>でコントローラ処理の前後にBegin,Commit,Rollback を入れ込んでて吹いた</p>
+
+<pre><code>func init() {
+    revel.OnAppStart(InitDB)
+    revel.InterceptMethod((*GorpController).Begin, revel.BEFORE)
+    revel.InterceptMethod((*GorpController).Commit, revel.AFTER)
+    revel.InterceptMethod((*GorpController).Rollback, revel.FINALLY)
+}
+</code></pre>
+
+<p>modelsでちゃんとやりたいときにはどうしたらいんだろうか…</p>
+
+		</div>
+		<div class="footer">
+			<time>2014-03-08</time>
+			<ul class="tag">
+				<li><a href="/tag/perl">perl(9)</a></li>
+				<li><a href="/tag/bot">bot(2)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2014/01/05/20140105/">あけまして</a></h2>
 		</div>
 		<div class="content">
@@ -312,219 +410,6 @@ fi
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/11/23/20131123/">packerを使ってboxを作ってvagrant upしてansibleでprovisioningしてみるなど</a></h2>
-		</div>
-		<div class="content">
-			<p><a href="/2013/11/13/20131113/">前の記事</a>が <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんにブクマされた後もりもりっとブクマがのびてビビるなど。mix3です。</p>
-
-<p>vagrantやansibleが流行っぽいので、MBP13インチをRetinaモデルに新調してウキウキハイテンションの今のうちに触っておくことにしました。</p>
-
-<p>ちなみにpacker,vagrant,ansibleに対する自分の理解は以下のような感じ</p>
-
-<ul>
-<li>packer
-<ul>
-<li>vagrantのboxを作るためのツール</li>
-</ul></li>
-<li>vagrant
-<ul>
-<li>昔virtualboxのフロントエンドツールだったぽいけど今はvirtualboxに縛られなくなってるんだっけ？</li>
-</ul></li>
-<li>ansible
-<ul>
-<li>provisioningツール chefとかより軽量</li>
-</ul></li>
-</ul>
-
-<p>正しくないかもしれないけど、大きく外してないと思いたい。</p>
-
-<h4>インストール</h4>
-
-<p>packerはbrew install packerか、バージョンを気にする場合はgit clone > make</p>
-
-<p>vagrantは<a href="http://downloads.vagrantup.com/">Vagrant Downloads</a>からdmgを持ってきてインストールでサクっと完了。</p>
-
-<p>ansibleはbrew install ansibleで。なおpyenvを使ってsystemのpythonを使われないようにしました。</p>
-
-<h3>packerを試す</h3>
-
-<p>やったのはcentos5.6のboxを作ること <a href="https://github.com/hnakamur/my-packer-template-files/tree/895f40358ff38328d30a69727bceba5f4962c3e2/centos6.4">my-packer-template-files/centos6.4</a>を元に弄りました</p>
-
-<ul>
-<li>vmwareの項目を削った</li>
-<li>netinstallだと時間がかかるのでDVD1of2をローカルに持ってきておいてそれを使うようにした</li>
-<li>Virutalboxで実際にインストールした後に出来るanaconda.cfgををもとにks.cfgを弄った</li>
-<li>GuestAdditionsのせいで削ったyumが元に戻った</li>
-<li>etc...</li>
-</ul>
-
-<p>色々削れないかなぁと思って色々削った末に色々削れずに元に戻るということをpacker buildを打ちまくって繰り返してました。</p>
-
-<p>なお、最小構成でのOSインストールにしているとはいえboxがexportされるまでそれなりに時間が掛かるのでtry&amp;errorで試すのは結構面倒くさいです。</p>
-
-<ul>
-<li>box作成までの流れ
-<ul>
-<li>vmが立ち上がってkickstartでOSインストール</li>
-<li>vm再起動後、provisionersの設定が走ってyumやら色々インストール</li>
-<li>vm落とした後box作成</li>
-</ul></li>
-</ul>
-
-<p>ちなみにboxは <a href="http://www.vagrantbox.es/">Vagrantbox.es</a>に色々あるのでそれで問題ないのであればpacker使って自作する前にそっちを使うべきかと思います。</p>
-
-<p>centos5.6のboxもあります。</p>
-
-<ul>
-<li><a href="http://yum.mnxsolutions.com/vagrant/centos_56_32.box">CentOS 5.6 32</a></li>
-<li><a href="https://dl.dropbox.com/u/7196/vagrant/CentOS-56-x64-packages-puppet-2.6.10-chef-0.10.6.box">CentOS 5.6 64 Packages (puppet 2.6.10 &amp; chef 0.10.6 from RPM, VirtualBox 4.2.0)</a></li>
-</ul>
-
-<p>ということで自作したpacker templateはこちらになります <a href="https://github.com/mix3/my-packer-template-files/tree/master/centos5.6">my-packer-template-files/centos5.6</a></p>
-
-<p>json手書きとかケツカンマの関係でやりたくなかったのでperlで書いてjsonに直す感じになってます</p>
-
-<h3>vagrant upする</h3>
-
-<p>boxが出来たので起動するのですが、いまいちvagrantの使い方がわかっていないのでとりあえず以下の手順で起動してみた</p>
-
-<ul>
-<li>vagrant box add [box name] [box file]</li>
-<li>cd 適当な場所</li>
-<li>vagrant init [box name]</li>
-<li>vagrant up</li>
-</ul>
-
-<p>vagrant init でVagrantfileが作られるので設定が必要な場合はupするまえに弄る感じになるっぽい 例えばvirtualboxの設定を変えたいときは以下を弄ったりするんだと思われる</p>
-
-<p>packerの時点でGuestAdditionsインストールを削って使わない設定にするとかもここかな？</p>
-
-<pre><code># config.vm.provider :virtualbox do |vb|
-#   # Don't boot with headless mode
-#   vb.gui = true
-#
-#   # Use VBoxManage to customize the VM. For example to change memory:
-#   vb.customize ["modifyvm", :id, "--memory", "1024"]
-# end
-</code></pre>
-
-<p>sshで入るときは vagrant ssh すると入れる vagrant ssh-config で .ssh/config の設定が見えるので手動で何かしたいときはそっちを見ると良いかな</p>
-
-<h3>ansibleを試す</h3>
-
-<p>ansibleを動かすにはINVENTRY（サーバリスト）とplaybook（chefでいうレシピ）が必要になります。今回は配信先が一つなのでINVENTRYはシンプルに一行で良いのですが、意味も無くグルーピングしてみました</p>
-
-<pre><code>$ cat hosts 
-[vagrant]
-127.0.0.1 ansible_ssh_port=2222
-
-# きちんとグルーピング指定するならこんな感じかな？
-# [vagrant-app]
-# 127.0.0.1 ansible_ssh_port=2223
-# 127.0.0.1 ansible_ssh_port=2224
-# 127.0.0.1 ansible_ssh_port=2225
-# 127.0.0.1 ansible_ssh_port=2226
-
-# [vagrant-db]
-# 127.0.0.1 ansible_ssh_port=2227
-
-# [vagrant-app:vars]
-# ...
-# [vagrant-db:vars]
-# ...
-
-[vagrant:vars]
-ansible_ssh_user=vagrant
-ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
-</code></pre>
-
-<p>ansible_*のオプションは<a href="http://yteraoka.github.io/ansible-tutorial/ansible-in-detail.html">Ansible in detail</a> で確認しました</p>
-
-<p>ひとまずはこれで配信が出来るか試したところ</p>
-
-<pre><code>$ ansible all -i hosts -m ping -s
-127.0.0.1 | FAILED &gt;&gt; {
-    "failed": true, 
-    "msg": "SUDO-SUCCESS-moxmhsptrmdnainrjekmubryetybkhrq\r\nError: ansible requires a json module, none found!", 
-    "parsed": false
-}
-</code></pre>
-
-<p>という感じで怒られてしまいました。配信先のpythonにjson moduleが別途必要なようです（python2.6からは不要）文言が違うけど以下参考</p>
-
-<ul>
-<li><a href="http://qiita.com/yamasaki-masahide/items/4485a438125e6b1748ce">Ansible CentOS5で出るImportError: No module named simplejson の対処</a></li>
-</ul>
-
-<p>これはに対して -m raw でjsonを使わず -a "..." で実行内容を直接指定して配信先に対してjson moduleを入れるのが定石のようなようです</p>
-
-<pre><code>$ ansible all -i hosts -m raw -a "yum -y install python-simplejson" -s
-$ ansible all -i hosts -m ping -s
-127.0.0.1 | success &gt;&gt; {
-    "changed": false, 
-    "ping": "pong"
-}
-</code></pre>
-
-<p>これでplaybookを作ってやれば配信できる状態になったと思われます。</p>
-
-<p>ちなみに ansible all -i hosts all -m ping -s のオプションの意味ですが以下のようになっています</p>
-
-<pre><code>$ ansible
-Usage: ansible &lt;host-pattern&gt; [options] # host-pattern は all指定で全グループへ、グループ名指定で特定のグループへ配信
-
-Options:
-  -i INVENTORY, --inventory-file=INVENTORY
-                        specify inventory host file            # ホストリストファイルの指定
-                        (default=/usr/local/etc/ansible/hosts)
-  -s, --sudo            run operations with sudo (nopasswd)    # 配信先での操作でnopassのsudoを使う
-</code></pre>
-
-<h4>playbook</h4>
-
-<p>playbookは以下をつまみ食いしたあと、後公式ドキュメン <a href="http://www.ansibleworks.com/docs/modules.html">Ansible Modules</a> をつまみ食いして作りました</p>
-
-<ul>
-<li><a href="http://d2.haro.jp/2013/08/ansible_start.html">[Ansible] 使いやすい Ansible 、みんな使おう Ansible (1)</a></li>
-<li><a href="http://d.hatena.ne.jp/akishin999/20130815/1376520672">Ansible の Playbook を使ってみる</a></li>
-<li><a href="http://open-groove.net/ansible/nginx-install/">Ansibleでnginxをソースインストール</a></li>
-</ul>
-
-<p>作ったplaybookの内容は以下の通り なにやら怪しい感じですが気にしてはいけません。</p>
-
-<ul>
-<li>apacheのyumインストール</li>
-<li>fcgiのyumインストール</li>
-<li>mod_fastcgi2.4.6のソースインストール</li>
-<li>mysqld5.1のrpmインストール</li>
-<li>memcachedのyumインストール</li>
-</ul>
-
-<p>ということで、具体的には<a href="https://gist.github.com/mix3/7611961">https://gist.github.com/mix3/7611961</a>のようになりました 意味も無くymlを分割したりしています。</p>
-
-<p>rpmモジュールは<a href="http://qiita.com/dayflower/items/21c64a6f5da155a5ade3">Ansible で RPM を扱う</a>から拝借させてもらいました</p>
-
-<p>本来必要の無いものなのですが、CentOS5だとyumモジュールでのrpmインストールがうまく行かないようなので使わせてもらいました</p>
-
-<h3>ということで</h3>
-
-<p>仮想化やらクラウドやらのおかげで複数台のサーバを気軽に扱えるような時代になってるので、気軽に扱えるなら扱えるなりに扱い方を覚えていかないとなぁとそんなこと思いながらpacker, vagrant, ansible とかを触ってみました。</p>
-
-<p>次はserverspecとか触りたいですね。確か今年の新卒たちはchefやらserverspecやらを研修で学んだと聞くのでそろそろ後輩に追いつかないといかんとですよ。</p>
-
-		</div>
-		<div class="footer">
-			<time>2013-11-23</time>
-			<ul class="tag">
-				<li><a href="/tag/packer">packer(1)</a></li>
-				<li><a href="/tag/vagrant">vagrant(2)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/1" class="float-left">≪前のページ</a>
 		<a href="/page/3" class="float-right">次のページ≫</a>
@@ -553,20 +438,20 @@ Options:
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
 						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
 						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
-						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(6)</a>
+							<li><a href="/archives/2014">2014年(7)</a>
 								<ul>
-										<li><a href="/archives/2014/06">2014年06月(3)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(4)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
 										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
 										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
@@ -615,8 +500,8 @@ Options:
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/perl">perl(9)</a></li>
+						<li class=""><a href="/tag/golang">golang(4)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
-						<li class=""><a href="/tag/golang">golang(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
 						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>

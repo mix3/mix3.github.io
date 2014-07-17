@@ -10,6 +10,51 @@
 <description>&#x30AE;&#x30FC;&#x30AF;&#x306B;&#x3082;&#x7D75;&#x63CF;&#x304D;&#x306B;&#x3082;&#x306A;&#x308C;&#x306A;&#x3044;&#x8005;&#x306E;&#x672B;&#x8DEF;</description>
 
 <item>
+<title>rocket</title>
+<description>
+<![CDATA[
+<p>衣玖さんが好きすぎて、最近は衣玖さんの人としてチームメンバーからは認識されているようです。（衣玖さん結婚しよ）mix3です。</p>
+
+<h3>サンプルアプリ</h3>
+
+<p>社内的にgolangを使って行こうか、という流れが出来ていてその流れの中で <a href="https://twitter.com/#!/acidlemon">@acidlemon</a> さん作のWAF、<a href="https://github.com/acidlemon/rocket">rocket</a>が出てきたので使い方の勉強もかねて早速それのサンプルアプリを作ってみました</p>
+
+<h3>リマインダアプリ</h3>
+
+<p>うちの社内IRCではお願いすると指定日時にメンションを飛ばしてくれるremember君というbotが生息してるのですが、それのメール版のようなイメージで作りました</p>
+
+<p>指定アドレスにメールして登録、指定日時にメールが飛んでくるだけの簡単なwebアプリです</p>
+
+<p>世の中便利なもので、<a href="http://www.cloudmailin.com/">指定アドレスにメールが来ると指定URLにPOSTしてくれるサービス</a>（つまりSMTPいらない）があったり、<a href="http://www.mailgun.com/">1日10000通までメール送信出来るサービス</a>（つまりSMTPいらない）があって、herokuとかと組み合わせることで簡単な物なら無料でメールを使ったサービスが作れてしまうようです</p>
+
+<p>物はこちら <a href="https://github.com/mix3/go-rocket-sample-app">go-rocket-sample-app</a> <a href="http://secure-sierra-2582.herokuapp.com/">http://secure-sierra-2582.herokuapp.com/</a></p>
+
+<h3>リマインダ登録までの流れ</h3>
+
+<p>一応登録されたメールアドレス以外のリマインダ登録は受け付けないようにしたかったので、</p>
+
+<ul>
+<li>アドレス登録のアドレスに対して空メールすると、仮登録され本登録のURLが返信される</li>
+<li>URLを踏むと本登録が完了する</li>
+<li>リマインド登録のアドレスに対して、件名に日時指定、本文にリマインドの内容を書いて送ると登録される（認識する日時指定はだいたい以下の通り）
+<ul>
+<li>12:34</li>
+<li>07-01 12:00</li>
+<li>2014-07-01 23:59</li>
+</ul></li>
+</ul>
+
+<p>な感じで動く様になっています　アドレス登録後はリマインド登録用のアドレスを保存しておいて使うことを想定しています</p>
+
+<h3>ということで</h3>
+
+<p><a href="https://github.com/acidlemon/rocket">rocket</a>のサンプルアプリでした</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/blog/2014/06/15/20140717_01/</guid>
+<pubDate>Sun, 15 Jun 2014 18:00:00 -0000</pubDate>
+</item>
+<item>
 <title>go&#x7248;ikachan&#x306E;github.com/mix3/go-ikusan&#x3092;&#x4F5C;&#x3063;&#x305F;&#x8A71;</title>
 <description>
 <![CDATA[
@@ -639,211 +684,6 @@ fi
 </description>
 <guid isPermaLink="true">http://mix3.github.io/blog/2013/12/22/20131222_01/</guid>
 <pubDate>Sun, 22 Dec 2013 00:00:00 -0000</pubDate>
-</item>
-<item>
-<title>packer&#x3092;&#x4F7F;&#x3063;&#x3066;box&#x3092;&#x4F5C;&#x3063;&#x3066;vagrant up&#x3057;&#x3066;ansible&#x3067;provisioning&#x3057;&#x3066;&#x307F;&#x308B;&#x306A;&#x3069;</title>
-<description>
-<![CDATA[
-<p><a href="/2013/11/13/20131113/">前の記事</a>が <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんにブクマされた後もりもりっとブクマがのびてビビるなど。mix3です。</p>
-
-<p>vagrantやansibleが流行っぽいので、MBP13インチをRetinaモデルに新調してウキウキハイテンションの今のうちに触っておくことにしました。</p>
-
-<p>ちなみにpacker,vagrant,ansibleに対する自分の理解は以下のような感じ</p>
-
-<ul>
-<li>packer
-<ul>
-<li>vagrantのboxを作るためのツール</li>
-</ul></li>
-<li>vagrant
-<ul>
-<li>昔virtualboxのフロントエンドツールだったぽいけど今はvirtualboxに縛られなくなってるんだっけ？</li>
-</ul></li>
-<li>ansible
-<ul>
-<li>provisioningツール chefとかより軽量</li>
-</ul></li>
-</ul>
-
-<p>正しくないかもしれないけど、大きく外してないと思いたい。</p>
-
-<h4>インストール</h4>
-
-<p>packerはbrew install packerか、バージョンを気にする場合はgit clone > make</p>
-
-<p>vagrantは<a href="http://downloads.vagrantup.com/">Vagrant Downloads</a>からdmgを持ってきてインストールでサクっと完了。</p>
-
-<p>ansibleはbrew install ansibleで。なおpyenvを使ってsystemのpythonを使われないようにしました。</p>
-
-<h3>packerを試す</h3>
-
-<p>やったのはcentos5.6のboxを作ること <a href="https://github.com/hnakamur/my-packer-template-files/tree/895f40358ff38328d30a69727bceba5f4962c3e2/centos6.4">my-packer-template-files/centos6.4</a>を元に弄りました</p>
-
-<ul>
-<li>vmwareの項目を削った</li>
-<li>netinstallだと時間がかかるのでDVD1of2をローカルに持ってきておいてそれを使うようにした</li>
-<li>Virutalboxで実際にインストールした後に出来るanaconda.cfgををもとにks.cfgを弄った</li>
-<li>GuestAdditionsのせいで削ったyumが元に戻った</li>
-<li>etc...</li>
-</ul>
-
-<p>色々削れないかなぁと思って色々削った末に色々削れずに元に戻るということをpacker buildを打ちまくって繰り返してました。</p>
-
-<p>なお、最小構成でのOSインストールにしているとはいえboxがexportされるまでそれなりに時間が掛かるのでtry&amp;errorで試すのは結構面倒くさいです。</p>
-
-<ul>
-<li>box作成までの流れ
-<ul>
-<li>vmが立ち上がってkickstartでOSインストール</li>
-<li>vm再起動後、provisionersの設定が走ってyumやら色々インストール</li>
-<li>vm落とした後box作成</li>
-</ul></li>
-</ul>
-
-<p>ちなみにboxは <a href="http://www.vagrantbox.es/">Vagrantbox.es</a>に色々あるのでそれで問題ないのであればpacker使って自作する前にそっちを使うべきかと思います。</p>
-
-<p>centos5.6のboxもあります。</p>
-
-<ul>
-<li><a href="http://yum.mnxsolutions.com/vagrant/centos_56_32.box">CentOS 5.6 32</a></li>
-<li><a href="https://dl.dropbox.com/u/7196/vagrant/CentOS-56-x64-packages-puppet-2.6.10-chef-0.10.6.box">CentOS 5.6 64 Packages (puppet 2.6.10 &amp; chef 0.10.6 from RPM, VirtualBox 4.2.0)</a></li>
-</ul>
-
-<p>ということで自作したpacker templateはこちらになります <a href="https://github.com/mix3/my-packer-template-files/tree/master/centos5.6">my-packer-template-files/centos5.6</a></p>
-
-<p>json手書きとかケツカンマの関係でやりたくなかったのでperlで書いてjsonに直す感じになってます</p>
-
-<h3>vagrant upする</h3>
-
-<p>boxが出来たので起動するのですが、いまいちvagrantの使い方がわかっていないのでとりあえず以下の手順で起動してみた</p>
-
-<ul>
-<li>vagrant box add [box name] [box file]</li>
-<li>cd 適当な場所</li>
-<li>vagrant init [box name]</li>
-<li>vagrant up</li>
-</ul>
-
-<p>vagrant init でVagrantfileが作られるので設定が必要な場合はupするまえに弄る感じになるっぽい 例えばvirtualboxの設定を変えたいときは以下を弄ったりするんだと思われる</p>
-
-<p>packerの時点でGuestAdditionsインストールを削って使わない設定にするとかもここかな？</p>
-
-<pre><code># config.vm.provider :virtualbox do |vb|
-#   # Don't boot with headless mode
-#   vb.gui = true
-#
-#   # Use VBoxManage to customize the VM. For example to change memory:
-#   vb.customize ["modifyvm", :id, "--memory", "1024"]
-# end
-</code></pre>
-
-<p>sshで入るときは vagrant ssh すると入れる vagrant ssh-config で .ssh/config の設定が見えるので手動で何かしたいときはそっちを見ると良いかな</p>
-
-<h3>ansibleを試す</h3>
-
-<p>ansibleを動かすにはINVENTRY（サーバリスト）とplaybook（chefでいうレシピ）が必要になります。今回は配信先が一つなのでINVENTRYはシンプルに一行で良いのですが、意味も無くグルーピングしてみました</p>
-
-<pre><code>$ cat hosts 
-[vagrant]
-127.0.0.1 ansible_ssh_port=2222
-
-# きちんとグルーピング指定するならこんな感じかな？
-# [vagrant-app]
-# 127.0.0.1 ansible_ssh_port=2223
-# 127.0.0.1 ansible_ssh_port=2224
-# 127.0.0.1 ansible_ssh_port=2225
-# 127.0.0.1 ansible_ssh_port=2226
-
-# [vagrant-db]
-# 127.0.0.1 ansible_ssh_port=2227
-
-# [vagrant-app:vars]
-# ...
-# [vagrant-db:vars]
-# ...
-
-[vagrant:vars]
-ansible_ssh_user=vagrant
-ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
-</code></pre>
-
-<p>ansible_*のオプションは<a href="http://yteraoka.github.io/ansible-tutorial/ansible-in-detail.html">Ansible in detail</a> で確認しました</p>
-
-<p>ひとまずはこれで配信が出来るか試したところ</p>
-
-<pre><code>$ ansible all -i hosts -m ping -s
-127.0.0.1 | FAILED &gt;&gt; {
-    "failed": true, 
-    "msg": "SUDO-SUCCESS-moxmhsptrmdnainrjekmubryetybkhrq\r\nError: ansible requires a json module, none found!", 
-    "parsed": false
-}
-</code></pre>
-
-<p>という感じで怒られてしまいました。配信先のpythonにjson moduleが別途必要なようです（python2.6からは不要）文言が違うけど以下参考</p>
-
-<ul>
-<li><a href="http://qiita.com/yamasaki-masahide/items/4485a438125e6b1748ce">Ansible CentOS5で出るImportError: No module named simplejson の対処</a></li>
-</ul>
-
-<p>これはに対して -m raw でjsonを使わず -a "..." で実行内容を直接指定して配信先に対してjson moduleを入れるのが定石のようなようです</p>
-
-<pre><code>$ ansible all -i hosts -m raw -a "yum -y install python-simplejson" -s
-$ ansible all -i hosts -m ping -s
-127.0.0.1 | success &gt;&gt; {
-    "changed": false, 
-    "ping": "pong"
-}
-</code></pre>
-
-<p>これでplaybookを作ってやれば配信できる状態になったと思われます。</p>
-
-<p>ちなみに ansible all -i hosts all -m ping -s のオプションの意味ですが以下のようになっています</p>
-
-<pre><code>$ ansible
-Usage: ansible &lt;host-pattern&gt; [options] # host-pattern は all指定で全グループへ、グループ名指定で特定のグループへ配信
-
-Options:
-  -i INVENTORY, --inventory-file=INVENTORY
-                        specify inventory host file            # ホストリストファイルの指定
-                        (default=/usr/local/etc/ansible/hosts)
-  -s, --sudo            run operations with sudo (nopasswd)    # 配信先での操作でnopassのsudoを使う
-</code></pre>
-
-<h4>playbook</h4>
-
-<p>playbookは以下をつまみ食いしたあと、後公式ドキュメン <a href="http://www.ansibleworks.com/docs/modules.html">Ansible Modules</a> をつまみ食いして作りました</p>
-
-<ul>
-<li><a href="http://d2.haro.jp/2013/08/ansible_start.html">[Ansible] 使いやすい Ansible 、みんな使おう Ansible (1)</a></li>
-<li><a href="http://d.hatena.ne.jp/akishin999/20130815/1376520672">Ansible の Playbook を使ってみる</a></li>
-<li><a href="http://open-groove.net/ansible/nginx-install/">Ansibleでnginxをソースインストール</a></li>
-</ul>
-
-<p>作ったplaybookの内容は以下の通り なにやら怪しい感じですが気にしてはいけません。</p>
-
-<ul>
-<li>apacheのyumインストール</li>
-<li>fcgiのyumインストール</li>
-<li>mod_fastcgi2.4.6のソースインストール</li>
-<li>mysqld5.1のrpmインストール</li>
-<li>memcachedのyumインストール</li>
-</ul>
-
-<p>ということで、具体的には<a href="https://gist.github.com/mix3/7611961">https://gist.github.com/mix3/7611961</a>のようになりました 意味も無くymlを分割したりしています。</p>
-
-<p>rpmモジュールは<a href="http://qiita.com/dayflower/items/21c64a6f5da155a5ade3">Ansible で RPM を扱う</a>から拝借させてもらいました</p>
-
-<p>本来必要の無いものなのですが、CentOS5だとyumモジュールでのrpmインストールがうまく行かないようなので使わせてもらいました</p>
-
-<h3>ということで</h3>
-
-<p>仮想化やらクラウドやらのおかげで複数台のサーバを気軽に扱えるような時代になってるので、気軽に扱えるなら扱えるなりに扱い方を覚えていかないとなぁとそんなこと思いながらpacker, vagrant, ansible とかを触ってみました。</p>
-
-<p>次はserverspecとか触りたいですね。確か今年の新卒たちはchefやらserverspecやらを研修で学んだと聞くのでそろそろ後輩に追いつかないといかんとですよ。</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/blog/2013/11/23/20131123/</guid>
-<pubDate>Sat, 23 Nov 2013 00:00:00 -0000</pubDate>
 </item>
 </channel>
 </rss>

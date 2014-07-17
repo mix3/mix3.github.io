@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title>萌えキャラとは何だったのか</title>
+		<title>rocket - 萌えキャラとは何だったのか</title>
 		<meta charset="utf-8" />
 		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
 		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
@@ -42,129 +42,86 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
-			<h2><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></h2>
+			<h2><a href="/blog/2014/06/15/20140717_01/">rocket</a></h2>
+		</div>
+		<div class="social_button">
+				<!-- はてブ -->
+				<div class="hatena">
+					<a href="http://b.hatena.ne.jp/entry/http://mix3.github.io/blog/2014/06/15/20140717_01/" class="hatena-bookmark-button" data-hatena-bookmark-title="rocket - 萌えキャラとは何だったのか" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+				</div>
+				<!-- Twitter -->
+				<div class="twitter">
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mix3.github.io/blog/2014/06/15/20140717_01/" data-text="rocket - 萌えキャラとは何だったのか" data-via="mix3" data-lang="ja">ツイート</a>
+					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+				</div>
+				<!-- Google+ -->
+				<div class="googleplus">
+					<div class="g-plusone" data-size="medium" data-href="http://mix3.github.io/blog/2014/06/15/20140717_01/"></div>
+					<script type="text/javascript">
+						window.___gcfg = {lang: 'ja'};
+						(function() {
+							var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+							po.src = 'https://apis.google.com/js/platform.js';
+							var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+						})();
+					</script>
+				</div>
+				<!-- facebook -->
+				<div class="facebook">
+					<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmix3.github.io%2Fblog%2F2014%2F06%2F15%2F20140717_01%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=false&amp;height=21&amp;appId=662642987135668" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+				</div>
+		</div>
+		<div class="clearer"></div>
+		<div class="content">
+			<p>衣玖さんが好きすぎて、最近は衣玖さんの人としてチームメンバーからは認識されているようです。（衣玖さん結婚しよ）mix3です。</p>
+
+<h3>サンプルアプリ</h3>
+
+<p>社内的にgolangを使って行こうか、という流れが出来ていてその流れの中で <a href="https://twitter.com/#!/acidlemon">@acidlemon</a> さん作のWAF、<a href="https://github.com/acidlemon/rocket">rocket</a>が出てきたので使い方の勉強もかねて早速それのサンプルアプリを作ってみました</p>
+
+<h3>リマインダアプリ</h3>
+
+<p>うちの社内IRCではお願いすると指定日時にメンションを飛ばしてくれるremember君というbotが生息してるのですが、それのメール版のようなイメージで作りました</p>
+
+<p>指定アドレスにメールして登録、指定日時にメールが飛んでくるだけの簡単なwebアプリです</p>
+
+<p>世の中便利なもので、<a href="http://www.cloudmailin.com/">指定アドレスにメールが来ると指定URLにPOSTしてくれるサービス</a>（つまりSMTPいらない）があったり、<a href="http://www.mailgun.com/">1日10000通までメール送信出来るサービス</a>（つまりSMTPいらない）があって、herokuとかと組み合わせることで簡単な物なら無料でメールを使ったサービスが作れてしまうようです</p>
+
+<p>物はこちら <a href="https://github.com/mix3/go-rocket-sample-app">go-rocket-sample-app</a> <a href="http://secure-sierra-2582.herokuapp.com/">http://secure-sierra-2582.herokuapp.com/</a></p>
+
+<h3>リマインダ登録までの流れ</h3>
+
+<p>一応登録されたメールアドレス以外のリマインダ登録は受け付けないようにしたかったので、</p>
+
+<ul>
+<li>アドレス登録のアドレスに対して空メールすると、仮登録され本登録のURLが返信される</li>
+<li>URLを踏むと本登録が完了する</li>
+<li>リマインド登録のアドレスに対して、件名に日時指定、本文にリマインドの内容を書いて送ると登録される（認識する日時指定はだいたい以下の通り）
+<ul>
+<li>12:34</li>
+<li>07-01 12:00</li>
+<li>2014-07-01 23:59</li>
+</ul></li>
+</ul>
+
+<p>な感じで動く様になっています　アドレス登録後はリマインド登録用のアドレスを保存しておいて使うことを想定しています</p>
+
+<h3>ということで</h3>
+
+<p><a href="https://github.com/acidlemon/rocket">rocket</a>のサンプルアプリでした</p>
+
 		</div>
 		<div class="footer">
-			<time>2014-04-12</time>
+			<time>2014-06-15</time>
 			<ul class="tag">
-					<li><a href="/tag/perl">perl(9)</a></li>
-					<li><a href="/tag/cpan">cpan(1)</a></li>
+				<li><a href="/tag/golang">golang(4)</a></li>
 			</ul>
 			<div class="clearer"></div>
 		</div>
 	</div>
-	<div class="clearer"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2014/03/08/20140308/">revel入門</a></h2>
-		</div>
-		<div class="footer">
-			<time>2014-03-08</time>
-			<ul class="tag">
-					<li><a href="/tag/perl">perl(9)</a></li>
-					<li><a href="/tag/bot">bot(2)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/07/28/20130728/">テスト書くのって難しい</a></h2>
-		</div>
-		<div class="footer">
-			<time>2013-07-28</time>
-			<ul class="tag">
-					<li><a href="/tag/perl">perl(9)</a></li>
-					<li><a href="/tag/テスト">テスト(1)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/03/16/20130316/">おれおれWebフレームワーク - Chaco</a></h2>
-		</div>
-		<div class="footer">
-			<time>2013-03-16</time>
-			<ul class="tag">
-					<li><a href="/tag/perl">perl(9)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/03/09/20130309-2/">Plack::App::Directoryで画像を展開する</a></h2>
-		</div>
-		<div class="footer">
-			<time>2013-03-09</time>
-			<ul class="tag">
-					<li><a href="/tag/perl">perl(9)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/03/09/20130309-1/">p5-JQueryPresentationHelper作ってみた</a></h2>
-		</div>
-		<div class="footer">
-			<time>2013-03-09</time>
-			<ul class="tag">
-					<li><a href="/tag/perl">perl(9)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2012/04/14/20120414/">Capture::Tiny</a></h2>
-		</div>
-		<div class="footer">
-			<time>2012-04-14</time>
-			<ul class="tag">
-					<li><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
-					<li><a href="/tag/perl">perl(9)</a></li>
-					<li><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2012/04/10/20120410/">やったー cpan auhor になったよー＼(^o^)／</a></h2>
-		</div>
-		<div class="footer">
-			<time>2012-04-10</time>
-			<ul class="tag">
-					<li><a href="/tag/cpan author">cpan author(1)</a></li>
-					<li><a href="/tag/perl">perl(9)</a></li>
-					<li><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2011/07/22/20110722/">blessとMouse</a></h2>
-		</div>
-		<div class="footer">
-			<time>2011-07-22</time>
-			<ul class="tag">
-					<li><a href="/tag/perl">perl(9)</a></li>
-					<li><a href="/tag/bless">bless(1)</a></li>
-					<li><a href="/tag/Mouse">Mouse(1)</a></li>
-					<li><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1 pager">
+	<a href="/blog/2014/06/15/20140615_03/" class="float-left">≪go版ikachanのgithub.com/mix3/go-ikusanを作った話</a>
 	</div>
 	<div class="clearer"></div>
 			</article>

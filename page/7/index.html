@@ -42,6 +42,37 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2012/04/14/20120414/">Capture::Tiny</a></h2>
+		</div>
+		<div class="content">
+			<p>前回pixivブログは github pages のコピーだから大丈夫とか書いたけど、github pages で書き始める前のpixivブログはバックアップ取ってなかったのでほんとは大丈夫じゃなかった mix3 です。SSH+LDAP とか keepalived を試してみた記事が消えたのはちょっともったいなかったかな。まあ、Google検索でキャッシュ漁ればある程度は発掘出来そうではあるけれども。</p>
+
+<h3>p5-SWFEditor</h3>
+
+<p>アウトプットが無さ過ぎて良くないなぁということでひねり出してみる。</p>
+
+<p>前の記事に書いたp5-SWFEditorですが、swf_info と print_tag_data はCが標準出力をしていて、これをテストしようとすると標準出力をキャプチャしないといけなくてちょっと困ってしまいました。Capture::Tiny というものを使うとキャプチャ出来るというのは<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんから教わって試してみたけれどなぜか上手く行かず。言われて試してみたときは途中までしかキャプチャ出来ませんでした。</p>
+
+<p>ただ、途中までしかキャプチャできないという時点で出力がバッファされているというのはピンと来ていて、実際その通りだったのですが、Perlでこれをどうこうする方法が分からず結局今もどうすれば良いのかというのは分かっていません。今はXSのほうでfflushするようにしてテストが出来るようにしています。</p>
+
+<p>以下標準出力を捕まえる方法を探っていたときに書いたサンプルです。fflushしたときの標準出力とPerlIO_stdoutfを使った標準出力はキャプチャできていますが、素直にprintfしたときはキャプチャできず遅れてバッファに溜まっていたものが標準出力されてしまっています。</p>
+
+<script src="https://gist.github.com/2384966.js"> </script>
+
+		</div>
+		<div class="footer">
+			<time>2012-04-14</time>
+			<ul class="tag">
+				<li><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
+				<li><a href="/tag/perl">perl(9)</a></li>
+				<li><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2012/04/10/20120410/">やったー cpan auhor になったよー＼(^o^)／</a></h2>
 		</div>
 		<div class="content">
@@ -775,127 +806,6 @@ mouse         222222/s 4707%     258%     100%           67%    4%       0%    -
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2011/07/20/20110720/">MySQLのパーティショニングを触ってみる</a></h2>
-		</div>
-		<div class="content">
-			<p>MySQLで大容量のデータを扱うと削除処理が重くて涙目になることがあるので残さないデータを扱うテーブルはパーティショニングしてあげるのが良いようです。ログデータは典型的かもしれませんね。メリットとしては以下のような感じだと思います。</p>
-
-<ul>
-<li>DROP TABLE のようにパーティションのデータをサクっと消せる</li>
-<li>刈り込みが出来る（検索範囲を限定出来る場合が有り、各クエリのパフォーマンスが良くなる可能性がある）</li>
-</ul>
-
-<p>使う場合の注意として<a href="http://nippondanji.blogspot.com/2009/04/1.html">漢のコンピュータ道</a>にてこんな感じに挙げられています。</p>
-
-<ul>
-<li>インデックスをつけるだけでカバー出来る場合が多い。</li>
-<li>パーショニングを使わずに、単にテーブルを分けてしまえばいい。</li>
-<li>テーブルが巨大にならないとあまり効果を実感できない。</li>
-<li>使い方を間違えると性能が落ちてしまう。</li>
-</ul>
-
-<p>以下、日別にパーティションを区切っていくサンプルになります。</p>
-
-<h3>テーブル作成</h3>
-
-<pre><code>DROP TABLE IF EXISTS partition;
-CREATE TABLE partition (
-    id         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    created_at DATETIME            NOT NULL,
-    PRIMARY KEY (id, created_at)
-) ENGINE=InnoDB;
-</code></pre>
-
-<h3>ベースとなるパーティションの作成</h3>
-
-<pre><code>ALTER TABLE partition PARTITION BY RANGE (TO_DAYS(created_at))
-    (PARTITION p20110720 VALUES LESS THAN (TO_DAYS('2011-07-21 00:00:00')) COMMENT = '2011-07-21 00:00:00');
-</code></pre>
-
-<h3>mysql_partition_cron.sh</h3>
-
-<p>cronで順次パーティションを追加していきます。以下では毎日次の日の１日分を追加していますが１週間毎に纏めて追加とかしても良いでしょう。実際に運用する際はログを取ってメールを投げる等監視しておく方が良いですね。</p>
-
-<pre><code>#!/bin/bash
-
-DAYSTR=`date --date '1 day' +"%Y%m%d"`
-DAY_2=`date --date '2 day' +"%Y-%m-%d 00:00:00"`
-
-QUERY="ALTER TABLE partition ADD PARTITION (PARTITION p$DAYSTR VALUES LESS THAN (TO_DAYS('$DAY_2')) COMMENT = '$DAY_2')"
-echo $QUERY
-echo $QUERY | mysql -u root partition
-</code></pre>
-
-<h3>確認</h3>
-
-<h4>INSERT</h4>
-
-<pre><code>mysql&gt; insert into partition value (null, '2011-07-20');
-Query OK, 1 row affected (0.00 sec)
-
-mysql&gt; insert into partition value (null, '2011-07-21');
-Query OK, 1 row affected (0.00 sec)
-
-mysql&gt; insert into partition value (null, '2011-07-22');
-ERROR 1526 (HY000): Table has no partition for value 734705
-</code></pre>
-
-<p>存在しないパーティションへのINSERTはエラーになるので、パーティションの追加忘れ、追加ミスには注意。</p>
-
-<pre><code>mysql&gt; insert into partition value (null, '2011-07-19');
-Query OK, 1 row affected (0.01 sec)
-</code></pre>
-
-<h4>パーティション分布</h4>
-
-<pre><code>mysql&gt; SELECT table_schema, table_name, partition_name, partition_ordinal_position, table_rows FROM information_schema.partitions WHERE table_name = 'partition';
-+--------------+------------+----------------+----------------------------+------------+
-| table_schema | table_name | partition_name | partition_ordinal_position | table_rows |
-+--------------+------------+----------------+----------------------------+------------+
-| partition    | partition  | p20110720      |                          1 |          2 |
-| partition    | partition  | p20110721      |                          2 |          1 |
-+--------------+------------+----------------+----------------------------+------------+
-2 rows in set (0.00 sec)
-</code></pre>
-
-<h4>刈り込み</h4>
-
-<pre><code>mysql&gt; explain partitions select * from partition where created_at &lt; '2011-07-21 00:00:00';
-+----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-| id | select_type | table     | partitions | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
-+----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-|  1 | SIMPLE      | partition | p20110720  | index | NULL          | PRIMARY | 16      | NULL |    2 | Using where; Using index |
-+----+-------------+-----------+------------+-------+---------------+---------+---------+------+------+--------------------------+
-1 row in set (0.00 sec)
-
-mysql&gt; explain partitions select * from partition where created_at &lt; '2011-07-22 00:00:00';
-+----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-| id | select_type | table     | partitions          | type  | possible_keys | key     | key_len | ref  | rows | Extra                    |
-+----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-|  1 | SIMPLE      | partition | p20110720,p20110721 | index | NULL          | PRIMARY | 16      | NULL |    3 | Using where; Using index |
-+----+-------------+-----------+---------------------+-------+---------------+---------+---------+------+------+--------------------------+
-1 row in set (0.01 sec)
-</code></pre>
-
-<p>前者だとp20110720からのみの検索になってるので刈り込み出来ているようです。これが大容量のデータに対してだと本来インデックがメモリに乗りきらずスワップしちゃうという状況でも、刈り込みによってメモリに収まる可能性が出て来るので、そうなった場合にパーティショニングの威力が発揮されるというのが想像出来ますね。</p>
-
-<h3>まとめ</h3>
-
-<p>削除のコストは思いの外大きくて、レプリケーション環境下でしこしこ古いデータを削除するだけのバッチを走らせたときに削除間隔を大きく取らないと同期ズレがずんどこずんどこ溜まっていく、というのを経験したことがあります。パーティションを使うとそういう苦労はせずに済みそうなので有効活用したいですね。</p>
-
-		</div>
-		<div class="footer">
-			<time>2011-07-20</time>
-			<ul class="tag">
-				<li><a href="/tag/MySQL">MySQL(3)</a></li>
-				<li><a href="/tag/パーティショニング">パーティショニング(1)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/6" class="float-left">≪前のページ</a>
 		<a href="/page/8" class="float-right">次のページ≫</a>
@@ -924,20 +834,20 @@ mysql&gt; explain partitions select * from partition where created_at &lt; '2011
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
 						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
 						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
-						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(6)</a>
+							<li><a href="/archives/2014">2014年(7)</a>
 								<ul>
-										<li><a href="/archives/2014/06">2014年06月(3)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(4)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
 										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
 										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
@@ -986,8 +896,8 @@ mysql&gt; explain partitions select * from partition where created_at &lt; '2011
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/perl">perl(9)</a></li>
+						<li class=""><a href="/tag/golang">golang(4)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
-						<li class=""><a href="/tag/golang">golang(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
 						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>

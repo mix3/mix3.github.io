@@ -42,6 +42,187 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2011/06/21/20110621/">MobaSiFを触ってみた</a></h2>
+		</div>
+		<div class="content">
+			<h3>インストール</h3>
+
+<p>環境はCentOS5.6で極力yumで対処してみた。</p>
+
+<ul>
+<li>CentOS 5.6</li>
+<li>Apache 2.2.3 (yum install)</li>
+<li>fastcgi 2.4.0 (yum install)</li>
+<li>mod_fastcgi 2.4.2 (source install)</li>
+<li>mysql 5.1.57 (rpm install)</li>
+<li>perl 5.8.8 (yum install)</li>
+</ul>
+
+<p>ちなみにMobaSiFのdocsに記載されている対応環境の内容は以下の通り</p>
+
+<pre><code>           要求       確認環境
+CentOS     4.x / 5.x  4.5 (i386)
+Apache     1.3.x      1.3.41
+MySQL      5.0.x      5.0.51a
+perl       5.8.x      5.8.0
+fastcgi    2.4.x      2.4.6
+</code></pre>
+
+<h3>詰まった所、注意点</h3>
+
+<ul>
+<li>MobaSiF
+<ul>
+<li>mod_fastcgiとmod_fcgidがあるがMobaSiFはmod_fastcgi</li>
+<li>yumで入れたApacheのバージョンが2.2だったが、mod_fastcgiは2.0までしか対応していない。</li>
+<li>パッチを当てれば2.2にmod_fastcgiを入れるられる⇒'Apache2.2＋fastcgiで Ruby on Rails'</li>
+</ul></li>
+<li>perl
+<ul>
+<li>FastCGIがシステム標準のperlを使うのでperlbrewを使うと混乱する。</li>
+<li>素直にシステム標準のperlを使うのが楽</li>
+</ul></li>
+<li>Apache
+<ul>
+<li>MobaSiFとは全然関係ないがバーチャルホストでDocumentRootの設定に変な癖がある⇒VirtualHost環境化でのPermission Denied</li>
+</ul></li>
+</ul>
+
+<h3>MobaSiFのミニマムサ</h3>
+
+<p>ンプル</p>
+
+<p>MobaSiFでのページとURLの対応は以下のようになる</p>
+
+<ul>
+<li>ルート
+<ul>
+<li>http://[domain]/</li>
+</ul></li>
+<li>各ページ（アンダースコア＋ページ名）
+<ul>
+<li>http://[domain]/[_ページ名前]</li>
+</ul></li>
+</ul>
+
+<h3>ページを追加してみる</h3>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = {
+        .
+        .
+        .
+    'sample' =&gt; [0,    package Page::Sample;
+
+use strict;
+use HTMLTemplate;
+use Response;
+
+sub pageMain {
+    my $func = shift;
+    my $rhData = {};
+
+    my $html = HTMLTemplate::insert("sample/top", $rhData);
+    Response::output(\$html);
+}
+
+1;0,0, 'Page::Sample', 'pageMain'],
+    # http://[domain]/_sample にアクセスすると Page::SampleモジュールのpageMainの処理が走る
+};
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<pre><code>package Page::Sample;
+
+use strict;
+use HTMLTemplate;
+use Response;
+
+sub pageMain {
+    my $func = shift;
+    my $rhData = {};
+
+    my $html = HTMLTemplate::insert("sample/top", $rhData);
+    Response::output(\$html);
+}
+
+1;
+</code></pre>
+
+<h3>テンプレートのコンパイル</h3>
+
+<p>MobaSiFでは速度を出すためにアプリで機種毎に出し分けなどの処理をしないよう最初からテンプレートを機種別に生成したりするようです。（変なバイナリデータをテンプレートに埋め込んでいたり他にも色々やってそうな感じ）</p>
+
+<pre><code>$ perl script/tool/compile_template
+</code></pre>
+
+<h4>conf/pages.confの数字の意味</h4>
+
+<pre><code>'ページ名' =&gt; [ UID_ST, USER_ST, SERV_ST, モジュール, サブルーチン ]
+</code></pre>
+
+<ul>
+<li>UID_ST
+<ul>
+<li>0:情報なし</li>
+<li>2:serial/uid あり</li>
+</ul></li>
+<li>USER_ST
+<ul>
+<li>0:非会員でもOK</li>
+<li>1:会員（メアド未登録でもOK）</li>
+<li>2:会員（メアド登録済）</li>
+</ul></li>
+<li>SERV_ST (以下を足したもの)
+<ul>
+<li>1:自主退会だと不能</li>
+<li>2:運用退会だと不能</li>
+<li>4:PENALTYだと不能</li>
+<li>8:メール不達だと不能</li>
+</ul></li>
+</ul>
+
+<h3>まとめ</h3>
+
+<ul>
+<li>機能は非常にミニマム
+<ul>
+<li>文字コードはテンプレートやコード等でsjis,utf8,eucが入り交じる</li>
+<li>テンプレートの中に絵文字のバイナリを直接書く</li>
+<li>ロジックの所でレスポンスにテンプレートと引数を合成したものの返り値を渡す処理を自分で書く。</li>
+</ul></li>
+</ul>
+
+<p>⇒多分拡張して使われる事が前提と思ってよい。</p>
+
+<ul>
+<li>古いのでPlackに対応していないため、動作確認までの環境構築が非常に面倒。
+<ul>
+<li>開発段階でわざわざApacheとFastCGIを入れないといけない</li>
+</ul></li>
+</ul>
+
+<p>⇒今時Plack対応して欲しいかも。開発段階でFastCGIがどうのとかあんまり考えたく無い。</p>
+
+<p>以下で説明されている通りモダンじゃないのは確かかもしれませんね。 </p>
+
+<p><a href="http://www.slideshare.net/bobpp/42php-mobasif-1351953">第42回PHP勉強会 MobaSiF 発表資料</a></p>
+
+		</div>
+		<div class="footer">
+			<time>2011-06-21</time>
+			<ul class="tag">
+				<li><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
+				<li><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2011/06/12/20110612/">jquery-presentationを弄ってみた</a></h2>
 		</div>
 		<div class="content">
@@ -413,20 +594,20 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
 						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
 						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 						<li><a href="/blog/2014/04/12/20140412/">p5-IkuSanを煩悩のままに公開</a></li>
-						<li><a href="/blog/2014/03/08/20140308/">revel入門</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(6)</a>
+							<li><a href="/archives/2014">2014年(7)</a>
 								<ul>
-										<li><a href="/archives/2014/06">2014年06月(3)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(4)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
 										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
 										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
@@ -475,8 +656,8 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/perl">perl(9)</a></li>
+						<li class=""><a href="/tag/golang">golang(4)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
-						<li class=""><a href="/tag/golang">golang(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
 						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
