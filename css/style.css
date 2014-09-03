@@ -206,7 +206,10 @@ article h2 {
 }
 article h2 a,
 article h2 a:hover,
-article h2 a:visited {
+article h2 a:visited,
+article h3 a,
+article h3 a:hover,
+article h3 a:visited {
 	color: #51432f;
 	text-decoration: none;
 }
