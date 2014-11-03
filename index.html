@@ -42,6 +42,43 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></h2>
+		</div>
+		<div class="content">
+			<p>してしまったmix3だよ!</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>あー今日祝日やん！</p>&mdash; 衣玖さんは天子の嫁 (@mix3) <a href="https://twitter.com/mix3/status/529066233010745344">2014, 11月 3</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>そして意識高いのか社畜なのか良くわからないこと呟いたけど</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>まあいいや オフィス開いてたらすこし仕事してこ</p>&mdash; 衣玖さんは天子の嫁 (@mix3) <a href="https://twitter.com/mix3/status/529066997594611712">2014, 11月 3</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>当然オフィスに誰も居なかったので一人で仕事とか寂しくて死ぬので速攻で帰ったよ!とんでもないクズ野郎だね!</p>
+
+<h3>こんな悲しみ繰り返さないために</h3>
+
+<p>切実に祝日リマインダーが必要だと感じたので以前作った<a href="http://mix3.github.io/blog/2014/06/15/20140717_01/">リマインダアプリ</a>(<a href="https://github.com/mix3/go-rocket-sample-app">github</a>)に祝日も自動で通知するみたいなの追加したいなぁとか思った</p>
+
+<p>で、golangで祝日を取得する方法無いかなぁと適当にググったら見つからない(本当に適当にググっただけなのでちゃんと探したらあるかもしれない)ので<a href="http://d.hatena.ne.jp/fbis/20070616/1181993102">国民の祝日の名称を取得するモジュール</a>(<a href="http://coderepos.org/share/browser/lang/perl/DateTime-Holiday-Japanese">coderepos</a>)をgolangに移植したんだけど、それだけで一日潰してしまって祝日リマインダー出来ませんでした!</p>
+
+<p>また祝日に出勤してしまうかもしれない! やばい!!!</p>
+
+		</div>
+		<div class="footer">
+			<time>2014-11-03</time>
+			<ul class="tag">
+				<li><a href="/tag/golang">golang(5)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></h2>
 		</div>
 		<div class="content">
@@ -228,7 +265,7 @@
 		<div class="footer">
 			<time>2014-06-15</time>
 			<ul class="tag">
-				<li><a href="/tag/golang">golang(4)</a></li>
+				<li><a href="/tag/golang">golang(5)</a></li>
 			</ul>
 			<div class="clearer"></div>
 		</div>
@@ -314,7 +351,7 @@
 		<div class="footer">
 			<time>2014-06-15</time>
 			<ul class="tag">
-				<li><a href="/tag/golang">golang(4)</a></li>
+				<li><a href="/tag/golang">golang(5)</a></li>
 			</ul>
 			<div class="clearer"></div>
 		</div>
@@ -336,178 +373,6 @@
 			<time>2014-06-15</time>
 			<ul class="tag">
 				<li><a href="/tag/responsive design">responsive design(1)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></h2>
-		</div>
-		<div class="content">
-			<p>コートレビューされると毎回マサカリが飛んできて自分はやはり糞コード製造機だなぁと改めて実感しててまた死にたい感じになってます。mix3です。</p>
-
-<h3>golangのWAF調査の一環として</h3>
-
-<p>goによる社内アプリ(?)を後輩らと共同でマサカリを一身に受けて血反吐吐きながら書いていたのですが</p>
-
-<p><a href="http://revel.github.io/">Revel</a>使っていたけど使いこなせてない感じが半端無くて(Revelのセンスが悪いのか自分たちのセンスが悪いのか考えると多分自分たちのセンスが悪いんだろうなと思う)</p>
-
-<p>あらかた動く様になった段階で、最終的にリライトするのも辞さない覚悟でWAF調査から再出発することに。</p>
-
-<ul>
-<li><a href="http://beego.me/">Beego</a></li>
-<li><a href="http://naoina.github.io/kocha/">Kocha</a></li>
-<li><a href="https://github.com/pilu/traffic">traffic</a></li>
-<li><a href="http://martini.codegangsta.io/">Martini</a></li>
-</ul>
-
-<p>とググって見つかったWAFを担当振ってサンプルアプリ作ってどんなもんか調べましょうとなりました。</p>
-
-<p>自分は<a href="https://github.com/pilu/traffic">traffic</a>を担当。</p>
-
-<p>ただ調べるだけだとつまらないので、Travisやheroku使った事無かったというのもあり、タイトルにあるCI連携とherokuへのデプロイまでやることにしました。</p>
-
-<h3>作ったもの</h3>
-
-<p>最初は<a href="http://todomvc.com/">TodoMVC</a>の<a href="http://todomvc.com/architecture-examples/angularjs/">AngularJS</a>を使うかと考えたが<a href="http://bower.io/">Bower</a>が絡んできて余計な事で悩みそうだったのでやめて、<a href="http://dotinstall.com/lessons/todo_angularjs">AngularJSで作るToDoアプリ</a>を見てシコシコとhtml/js/cssを書いてから<a href="https://github.com/pilu/traffic">traffic</a>を書いてみた</p>
-
-<p>最終的に出来たのが以下</p>
-
-<ul>
-<li>github <a href="https://github.com/mix3/go-traffic-sample">https://github.com/mix3/go-traffic-sample</a></li>
-<li>heroku <a href="http://lit-plains-4846.herokuapp.com/">http://lit-plains-4846.herokuapp.com/</a></li>
-</ul>
-
-<h3>CI連携</h3>
-
-<p>最初に<a href="https://travis-ci.org/">Travis</a>を試して、<a href="http://wercker.com/">wercker</a>なるものを後で見つけて追加して、<a href="https://drone.io/">drone.io</a>なるものもあってそれも追加して、と手当たり次第試してみた</p>
-
-<p>基本的にCIは専用のyml(drone.ioはいらないみたい)をコミットして go test ./... を走らせるだけだけど、<a href="https://github.com/naoina/genmai">genmai</a>のTravisのテストが賢くてナルホドなってなった</p>
-
-<p><a href="https://github.com/naoina/genmai/blob/master/genmai_test.go#L110">https://github.com/naoina/genmai/blob/master/genmai_test.go#L110</a></p>
-
-<pre><code>func testDB(dsn ...string) (*DB, error) {
-    switch os.Getenv("DB") {
-    case "mysql":
-        return New(&amp;MySQLDialect{}, "travis@/genmai_test")
-    case "postgres":
-        return New(&amp;PostgresDialect{}, "user=postgres dbname=genmai_test sslmode=disable")
-    default:
-        var DSN string
-        switch len(dsn) {
-        case 0:
-            DSN = ":memory:"
-        case 1:
-            DSN = dsn[0]
-        default:
-            panic(fmt.Errorf("too many arguments"))
-        }
-        return New(&amp;SQLite3Dialect{}, DSN)
-    }
-}
-</code></pre>
-
-<p><a href="https://github.com/naoina/genmai/blob/master/.travis.yml">https://github.com/naoina/genmai/blob/master/.travis.yml</a></p>
-
-<pre><code>language: go
-go:
- - 1.2
- - 1.2.1
- - tip
-install:
- - go get -v github.com/mattn/go-sqlite3
- - go get -v github.com/go-sql-driver/mysql
- - go get -v github.com/lib/pq
- - go get -v github.com/naoina/genmai
-env:
- - DB=sqlite3
- - DB=mysql
- - DB=postgres
-before_script:
- - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'DROP DATABASE IF EXISTS genmai_test;' -U postgres; fi"
- - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'CREATE DATABASE genmai_test;' -U postgres; fi"
- - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE IF NOT EXISTS genmai_test;'; fi"
-script:
- - go test ./...
-</code></pre>
-
-<p>.travis.ymlでenvを複数指定するとそれぞれの環境変数でテストが走るので、テストの方で環境変数で使うDBを変える様にしておくことでいい感じにDB別のテストが走っていてとても賢い</p>
-
-<p>order byしてないせいでsqlite,mysqlでは通るがpostgresでは通らないみたいなことがあったので、DB限定しない作りのアプリのテストはこのやり方を真似しておくと良いなと思った</p>
-
-<p>設定に環境変数を使うというのは<a href="http://twelve-factor-ja.herokuapp.com/config">The Twelve-Factor App</a>で推奨されてて環境に合わせて柔軟に設定出来るのは確かに良いなぁと思った</p>
-
-<h3>heroku</h3>
-
-<p>元々herokuまでやるつもりはなかったけど、作ったものを見える状態にするのも大事だなと思ってCIまでは割とサクサク行ったのでheroku使った事無かったし試してみた</p>
-
-<p>最初 git push heroku master しても全然うまくいかず泣きそうになっていたのだが、最終的には</p>
-
-<ul>
-<li>godepを使わない</li>
-<li>.godirはgithub.com/mix3/go-traffic-sampleじゃなくてgo-traffic-sampleで</li>
-<li>src以下にきちんと配置(最初はシンボリックリンク使って別の場所で開発してた)
-<ul>
-<li>pushが通らなかった一番の理由が多分これ</li>
-</ul></li>
-</ul>
-
-<p>という感じでやるとなんとかpush出来た</p>
-
-<p>ググったりgithubで「golang heroku」とかで検索掛けたりするとgodep使ってたり、srcをリポジトリに含めたり含めなかったりしてどうするのが良いのかいまいち分からなくて非常に困った（し、今も良くわかっていない）</p>
-
-<p>結局traffic作者のブログ記事<a href="http://gravityblast.com/2013/12/05/how-to-deploy-go-with-traffic-on-heroku/">How to deploy Go with Traffic on Heroku</a>をそのままやってうまく行ったので今はそれに合わせている。godepとbuildpack-goは大分トラウマになった気がする。</p>
-
-<p>デプロイしてから静的ファイルが配信出来ていないことに気づいて<a href="http://gravityblast.com/2013/12/05/how-to-deploy-go-with-traffic-on-heroku/">How to deploy Go with Traffic on Heroku</a>をよく見るとproductionでも静的ファイルをアプリ側で返す様に弄るよう指示されていたので修正した。</p>
-
-<p>が、herokuにも静的ファイルの配信は出来るハズなので、workerをアプリにしてwebを<a href="https://github.com/mattn/gorem">gorem</a>にしてやればいけるんじゃないかと思ったが、portが不定なのでjsonにport記述できないし、goremはコマンドだからherokuの場合にどうしたらいいのかサッパリ分からなかったのでそこまでは出来なかった。</p>
-
-<h3>テスト</h3>
-
-<p>revelのときはテスト書いてなかったのでテスト書く場合はどうなるのかなということでCRUDを確認する簡単なモデルテストを書いてみたが、時間が絡むテストが非常に書きにくくて困る（し、今も困っている）</p>
-
-<p>DBから取ってきたデータの比較でreflect.DeepEqualを使ってデータをまるまる比較したのだがdatetime型があるとそれが出来なくて困る。time.Now()をモックできないかとググるも良い情報が無くて詰んでいる。</p>
-
-<p>多分標準パッケージのtimeをどうこうすることは出来ないので、別の時間管理用モジュールを作るか見繕ってきてそれをモックするようにするのが良いのかなと思っている。例えばこれとか？<a href="https://github.com/101loops/clock">https://github.com/101loops/clock</a></p>
-
-<h3><a href="https://github.com/moovweb/gvm">gvm</a></h3>
-
-<p>goの開発環境を綺麗に保つときにgvmを使うと良さそうなことに気づいた</p>
-
-<pre><code>gvm install go1.*.*
-gvm use go1.*.*
-</code></pre>
-
-<p>とかして、簡単に好きなバージョンのgoが使えるし、</p>
-
-<pre><code>gvm pkgset use global
-</code></pre>
-
-<p>とかするとインストールしたgo専用のGOPATHが設定されるし、</p>
-
-<pre><code>gvm pkgset create hoge
-gvm pkgset use hoge
-</code></pre>
-
-<p>とかすると、さらにGOPATHが設定される(GOPATH=/path/to/hoge:/pagh/to/global になるのでhoge優先)</p>
-
-<p>ので、適当にgvm installして適当にgvm pkgset create hogeしてglobal以下で開発、依存パッケージをhogeに入れるようにすると環境を何も汚さない感じで開発出来てよいと思う</p>
-
-<p>ひとつ残念なのはgvmは[GVM](the Groovy enVironment Manager)とコマンド名がバッティングしていてそれだけは勘弁してほしいなってなってる</p>
-
-<h3>なお</h3>
-
-<p>この記事は5/13に書いたのだが、いつのまにか6/15である 時間が経つのは早い</p>
-
-		</div>
-		<div class="footer">
-			<time>2014-06-15</time>
-			<ul class="tag">
-				<li><a href="/tag/golang">golang(4)</a></li>
-				<li><a href="/tag/CI">CI(1)</a></li>
-				<li><a href="/tag/heroku">heroku(1)</a></li>
 			</ul>
 			<div class="clearer"></div>
 		</div>
@@ -540,19 +405,20 @@ gvm pkgset use hoge
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
 						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
-						<li><a href="/blog/2014/06/15/20140615_01/">golangWAFのtrafficを触るついでにサンプルコードを作ってCIサービスを試してherokuに上げてみた</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(8)</a>
+							<li><a href="/archives/2014">2014年(9)</a>
 								<ul>
+										<li><a href="/archives/2014/11">2014年11月(1)</a></li>
 										<li><a href="/archives/2014/09">2014年09月(1)</a></li>
 										<li><a href="/archives/2014/06">2014年06月(4)</a></li>
 										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
@@ -603,7 +469,7 @@ gvm pkgset use hoge
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/perl">perl(9)</a></li>
-						<li class=""><a href="/tag/golang">golang(4)</a></li>
+						<li class=""><a href="/tag/golang">golang(5)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
