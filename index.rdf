@@ -34,6 +34,14 @@
 <p>で、golangで祝日を取得する方法無いかなぁと適当にググったら見つからない(本当に適当にググっただけなのでちゃんと探したらあるかもしれない)ので<a href="http://d.hatena.ne.jp/fbis/20070616/1181993102">国民の祝日の名称を取得するモジュール</a>(<a href="http://coderepos.org/share/browser/lang/perl/DateTime-Holiday-Japanese">coderepos</a>)をgolangに移植したんだけど、それだけで一日潰してしまって祝日リマインダー出来ませんでした!</p>
 
 <p>また祝日に出勤してしまうかもしれない! やばい!!!</p>
+
+<h3>追記</h3>
+
+<p>githubへのリンク貼ってなかったよ!おっちょこちょいだね!</p>
+
+<p><a href="https://github.com/mix3/go-holiday">go-holiday</a></p>
+
+<p>無駄にDriverの仕組みを入れてるので日本の祝日以外の実装も追加しやすいよ!多分ね!</p>
 ]]>
 </description>
 <guid isPermaLink="true">http://mix3.github.io/blog/2014/11/03/20141103/</guid>
