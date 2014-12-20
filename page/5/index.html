@@ -42,6 +42,59 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2013/08/30/20130830/">信じて送り出したfcgiプロセスがulimitの設定によって次々と殺されて行く話</a></h2>
+		</div>
+		<div class="content">
+			<p>ではありません。</p>
+
+<p><a href="http://lestrrat.ldblog.jp/archives/25360109.html">livedoorブログ</a>がpsgiに移行したりなんかするこのご時世になぜかmod_rewriteとfcgiを使って頑張っているmix3です。</p>
+
+<h3>ulimitの話</h3>
+
+<p>とある事情でapacheのinit.dにulimitを設定していて、メモリを使いすぎる、とかCPU使いすぎるとfcgiプロセスを殺してもらうようにしていたのですが、</p>
+
+<p>「それ子(fcgi process)だけじゃなくて親(httpd)まで殺しちゃわない？」</p>
+
+<p>と <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんの有り難いお言葉が飛び出して大慌てでulimitを外すということが発生しました。</p>
+
+<p>しかもgracefulだと設定変更効かないからロードバランサから外して一台ずつリスタート掛けて行かなければならず…</p>
+
+<h3>再度設定する場合にどうするのか</h3>
+
+<p>とある事情は変わらないのでulimitの設定を戻さないと行けないが、どうすれば良いのか思いつかないので <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんに考えて頂いたところ、</p>
+
+<ul>
+<li>index.fcgiをindex.fcgi.plとか適当に変える</li>
+<li>index.fcgiは中身shスクリプトにしてそこにulimitを書く</li>
+</ul>
+
+<p>というのはどうか？と提案を頂きまして、いけそうな感じなのでそれで行こうかなぁとなっています。 <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんありがとうございました。</p>
+
+<h3>ulimitの設定どうやって確認するの？</h3>
+
+<p>と、ロードバランサから1台外してinit.d からulimitを消してリスタートしたところでふと思い聞いたところ</p>
+
+<pre><code>cat /proc/$(cat /var/run/httpd.pid)/limits
+</code></pre>
+
+<p>「こういう感じかな」と教えていただきました。備忘録。</p>
+
+<hr />
+
+<p>という記事を8月中ぐらいに書いていて放置プレイしてたので改めて残しておく</p>
+
+		</div>
+		<div class="footer">
+			<time>2013-08-30</time>
+			<ul class="tag">
+				<li><a href="/tag/Linux">Linux(2)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2013/07/28/20130728/">テスト書くのって難しい</a></h2>
 		</div>
 		<div class="content">
@@ -90,7 +143,7 @@
 		<div class="footer">
 			<time>2013-07-28</time>
 			<ul class="tag">
-				<li><a href="/tag/perl">perl(9)</a></li>
+				<li><a href="/tag/perl">perl(10)</a></li>
 				<li><a href="/tag/テスト">テスト(1)</a></li>
 			</ul>
 			<div class="clearer"></div>
@@ -264,7 +317,7 @@ run;
 		<div class="footer">
 			<time>2013-03-16</time>
 			<ul class="tag">
-				<li><a href="/tag/perl">perl(9)</a></li>
+				<li><a href="/tag/perl">perl(10)</a></li>
 			</ul>
 			<div class="clearer"></div>
 		</div>
@@ -301,35 +354,7 @@ run;
 		<div class="footer">
 			<time>2013-03-09</time>
 			<ul class="tag">
-				<li><a href="/tag/perl">perl(9)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/03/09/20130309-1/">p5-JQueryPresentationHelper作ってみた</a></h2>
-		</div>
-		<div class="content">
-			<p>やりたかったこと。</p>
-
-<ul>
-<li>use Hoge でメソッドが生えるモジュールの習作が作りたかった</li>
-<li><a href="http://code.google.com/p/jquery-presentation/">jquery-presentation</a>:<a href="http://dl.dropbox.com/u/268240/googleCode/jquery-presentation/index.html">demo</a>をmarkdownで書けるようにしたかった</li>
-</ul>
-
-<p>結果、良くわからないものが中途半端に出来てしまって、でも放置してもあれなのでとりあえずgithubにアップ。</p>
-
-<p>git clone を前提としたもっとゆるい感じで作った方が良い感じにおさまった気がしてます。</p>
-
-<p>jquery-presentationに依存したDSLモジュールとかcpanにあげるわけもないのだし。</p>
-
-		</div>
-		<div class="footer">
-			<time>2013-03-09</time>
-			<ul class="tag">
-				<li><a href="/tag/perl">perl(9)</a></li>
+				<li><a href="/tag/perl">perl(10)</a></li>
 			</ul>
 			<div class="clearer"></div>
 		</div>
@@ -363,19 +388,20 @@ run;
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
 						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
-						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(9)</a>
+							<li><a href="/archives/2014">2014年(10)</a>
 								<ul>
+										<li><a href="/archives/2014/12">2014年12月(1)</a></li>
 										<li><a href="/archives/2014/11">2014年11月(1)</a></li>
 										<li><a href="/archives/2014/09">2014年09月(1)</a></li>
 										<li><a href="/archives/2014/06">2014年06月(4)</a></li>
@@ -426,7 +452,6 @@ run;
 				<div class="col-1-1">
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
-						<li class=""><a href="/tag/perl">perl(9)</a></li>
 						<li class=""><a href="/tag/golang">golang(5)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
@@ -440,6 +465,7 @@ run;
 						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
 						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
 						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class=""><a href="/tag/perl">perl(10)</a></li>
 						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
 						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
 						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
@@ -464,6 +490,7 @@ run;
 						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
 						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
 						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/dbic">dbic(1)</a></li>
 						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
 						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
 						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>

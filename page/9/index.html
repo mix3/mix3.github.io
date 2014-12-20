@@ -42,6 +42,63 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2011/07/05/20110705/">さくらVPS借りてみた</a></h2>
+		</div>
+		<div class="content">
+			<h3>さくらVPS借りてみた</h3>
+
+<p>インフラエンジニアを目指す宣言したは良いものの、自分で管理する外部に晒されている環境すら持ってないのはどうかという話があるのでまずはさくらVPSを借りてみることに請求が来る前に試用出来るようですぐに使えるのは凄いですねぇ。さくら様様です。（ちなみに一応自宅サーバ用のマシンは手元にあるのですが外部ディスプレイ手に入れてからとか考えてたら結局こっち来てから起動することはありませんでした…）</p>
+
+<p>インフラやりたいと言いつつミドルウェアの知識はまったく０に近い状態なので、ミドルウェアの勉強用に使って行きたいかなと思います。</p>
+
+<h3>とりあえず入れて最初にやったこと</h3>
+
+<ul>
+<li>ユーザの設定
+<ul>
+<li>rootのパスを変更する</li>
+<li>一般ユーザを追加する(sudoで管理者の権限を得るためにグループはwheelに入れる)</li>
+<li>一般ユーザのパスを変更する</li>
+<li>visudoでwheelグループがsudoで管理者権限で実行できるように変更</li>
+</ul></li>
+<li>SSHのログインを公開鍵に変更
+<ul>
+<li>/etc/ssh/sshd_config を修正</li>
+<li>キーペアを作成してログイン</li>
+</ul></li>
+<li>system-config-securitylevel-tui でssh以外を閉じる</li>
+<li>git,perlbrew,cpanmを入れる</li>
+</ul>
+
+<p>大体こんな感じ。SSHは以下のような感じで設定。コメントアウト外したりyes,no変えたり。</p>
+
+<pre><code>PermitRootLogin no
+AuthorizedKeysFile      .ssh/authorized_keys
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+</code></pre>
+
+<p>「ChallengeResponseAuthentication no」はデフォルトでnoだけれどこれがyesになってると公開鍵の認証に失敗したらパスワード認証も試すといった挙動をするので、公開鍵に限定する場合はちゃんとnoになってることをチェック。</p>
+
+<p>ファイアーウォールの設定は一旦 system-config-securitylevel-tui 使ってやりましたが、細かく設定する場合は当然 iptables を使って設定しないといけないので、おいおいここは最適化していきたいです。</p>
+
+<p>他にもデーモンを止める話とかもあるので以下とか参考にしつつ最適化していきたいです。</p>
+
+<p><a href="http://sakura.off-soft.net/blog/sakura_vps_centos_first_setup.html">さくらVPSを使うときに最初にやっておきたいこと(CentOS編)</a></p>
+
+		</div>
+		<div class="footer">
+			<time>2011-07-05</time>
+			<ul class="tag">
+				<li><a href="/tag/インフラ">インフラ(2)</a></li>
+				<li><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2011/07/03/20110703/">Markdownブログ</a></h2>
 		</div>
 		<div class="content">
@@ -402,66 +459,6 @@ sub pageMain {
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2011/05/04/20110504_02/">Qudoでログ回収</a></h2>
-		</div>
-		<div class="content">
-			<ul>
-<li>SCPやrsyncやらで各アプリケーションサーバから回収
-<ul>
-<li>自由が利く</li>
-</ul></li>
-<li>各アプリケーションサーバから解析サーバへ投げてもらう
-<ul>
-<li>HDFSなどHadoopが扱うファイルシステムに直接入れる事が可能</li>
-<li>※ただし、各アプリケーションサーバがそのファイルシステムを扱えるように色々セットアップが必要</li>
-</ul></li>
-</ul>
-
-<p>後者のアプリから投げてもらう方だと各サーバでファイルシステムを扱えるようセットアップが必要になるので、そこまでアプリ側に負担を掛けられないかなということで今考えているのは前者の方法となります。</p>
-
-<h3>コード</h3>
-
-<p>Hadoopが扱うファイルシステムはHDFSという前提で前回構築した環境でサンプルを作ってみました。</p>
-
-<h3>シェルスクリプトで並列回収</h3>
-
-<p>まず最初にシェルスクリプトで書いてみました。「これだと回収先のアプリが100万個ある場合は100万個同時にダウンロードしちゃうってことだよね？」というもっともな指摘で没になりました。まったくもってその通りだと思います。</p>
-
-<script src="https://gist.github.com/954830.js"> </script>
-
-<h3>Qudoで並列回収</h3>
-
-<ul>
-<li>ジョブ／キューを使いたい
-<ul>
-<li>なんとなくジョブは消えてほしく無い</li>
-<li>失敗したらリトライしてほしい</li>
-</ul></li>
-<li>回収は並列
-<ul>
-<li>でも同時実行数は上限あり</li>
-</ul></li>
-</ul>
-
-<p>以上の要件で最初はTheSchwartz＆Parallel::Preforkで考えていましたが何やらGearmanでもDBを使って動作させられるという話があったりQudoを見つけてみたりで、でもやりたいことって別にそんなに複雑な事でもないので結局何使っても良いかなと思ってQudoを選びました。後々機能を増やしたい時にフックポイントが色々用意されているので悪くないかなと。</p>
-
-<script src="https://gist.github.com/951476.js"> </script>
-
-<p>どうでも良いですがnekokakさん曰くQudoは「駆動」らしいですが「弓道」の方が良いと思います＾＾</p>
-
-		</div>
-		<div class="footer">
-			<time>2011-05-04</time>
-			<ul class="tag">
-				<li><a href="/tag/Qudo">Qudo(1)</a></li>
-				<li><a href="/tag/Log">Log(1)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/8" class="float-left">≪前のページ</a>
 		<a href="/page/10" class="float-right">次のページ≫</a>
@@ -490,19 +487,20 @@ sub pageMain {
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
 						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
-						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(9)</a>
+							<li><a href="/archives/2014">2014年(10)</a>
 								<ul>
+										<li><a href="/archives/2014/12">2014年12月(1)</a></li>
 										<li><a href="/archives/2014/11">2014年11月(1)</a></li>
 										<li><a href="/archives/2014/09">2014年09月(1)</a></li>
 										<li><a href="/archives/2014/06">2014年06月(4)</a></li>
@@ -553,7 +551,6 @@ sub pageMain {
 				<div class="col-1-1">
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
-						<li class=""><a href="/tag/perl">perl(9)</a></li>
 						<li class=""><a href="/tag/golang">golang(5)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
@@ -567,6 +564,7 @@ sub pageMain {
 						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
 						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
 						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class=""><a href="/tag/perl">perl(10)</a></li>
 						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
 						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
 						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
@@ -591,6 +589,7 @@ sub pageMain {
 						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
 						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
 						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/dbic">dbic(1)</a></li>
 						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
 						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
 						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>

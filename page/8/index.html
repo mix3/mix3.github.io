@@ -42,6 +42,46 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2011/11/23/2011123/">bonding設定で死んだ</a></h2>
+		</div>
+		<div class="content">
+			<h3>bondingとは</h3>
+
+<p>bondingというのはNICを冗長化するもののことのようです。ラウンドロビンで負荷分散したりマスタースレーブ構成にして片方が死んでも大丈夫なように出来るようです。</p>
+
+<p>参考<a href="http://d.hatena.ne.jp/sen-u/20061002/p1">意外と知らない？NICを冗長化するボンディング（bonding）Add Star</a></p>
+
+<h3>ネットワークが遅延？</h3>
+
+<p>ネットワークの知識なんてほぼ０なのでbondingなんて当然知らなかったのですが、でも設定しないといけないということなのでWebを漁ってとりあえずラウンドロビンで設定したのですが、これがいけなかった。</p>
+
+<p>並列(最大100プロセス)でアクセス掛ける負荷試験を行ってると、MySQLの接続でtimeoutが結構出る。</p>
+
+<p>根本的な問題として負荷試験のシナリオにミスがあったりはするのですが、それとは別にネットワークに遅延が発生する模様。</p>
+
+<p>インフラのプロフェッショナル<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんや<a href="https://twitter.com/#!/shin1rosei">@shin1rosei</a>さんに調べてもらって自分の設定したbondingの設定がラウンドロビンなのがマズいという事が判明。並列度が上がると、NICの切り替わりで問題が顕在化するみたいです。</p>
+
+<p>正直分った瞬間回線切って首吊って死にたい気分になりました...</p>
+
+<script src="http://togetter.com/js/parts.js"></script>
+
+<script>tgtr.ListWidget({id:'222670',url:'http://togetter.com/',width:'320px',height:'240px'});</script>
+
+<p>自分のした設定にどんな意味があるのか、ちゃんと考える様にします...</p>
+
+		</div>
+		<div class="footer">
+			<time>2011-11-23</time>
+			<ul class="tag">
+				<li><a href="/tag/bonding">bonding(1)</a></li>
+				<li><a href="/tag/ネットワーク設定">ネットワーク設定(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2011/07/24/20110724/">Play framework + Scala に入門してみる</a></h2>
 		</div>
 		<div class="content">
@@ -686,7 +726,7 @@ mouse         222222/s 4707%     258%     100%           67%    4%       0%    -
 		<div class="footer">
 			<time>2011-07-22</time>
 			<ul class="tag">
-				<li><a href="/tag/perl">perl(9)</a></li>
+				<li><a href="/tag/perl">perl(10)</a></li>
 				<li><a href="/tag/bless">bless(1)</a></li>
 				<li><a href="/tag/Mouse">Mouse(1)</a></li>
 				<li><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
@@ -949,63 +989,6 @@ Defaults env_keep+="PATH"
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2011/07/05/20110705/">さくらVPS借りてみた</a></h2>
-		</div>
-		<div class="content">
-			<h3>さくらVPS借りてみた</h3>
-
-<p>インフラエンジニアを目指す宣言したは良いものの、自分で管理する外部に晒されている環境すら持ってないのはどうかという話があるのでまずはさくらVPSを借りてみることに請求が来る前に試用出来るようですぐに使えるのは凄いですねぇ。さくら様様です。（ちなみに一応自宅サーバ用のマシンは手元にあるのですが外部ディスプレイ手に入れてからとか考えてたら結局こっち来てから起動することはありませんでした…）</p>
-
-<p>インフラやりたいと言いつつミドルウェアの知識はまったく０に近い状態なので、ミドルウェアの勉強用に使って行きたいかなと思います。</p>
-
-<h3>とりあえず入れて最初にやったこと</h3>
-
-<ul>
-<li>ユーザの設定
-<ul>
-<li>rootのパスを変更する</li>
-<li>一般ユーザを追加する(sudoで管理者の権限を得るためにグループはwheelに入れる)</li>
-<li>一般ユーザのパスを変更する</li>
-<li>visudoでwheelグループがsudoで管理者権限で実行できるように変更</li>
-</ul></li>
-<li>SSHのログインを公開鍵に変更
-<ul>
-<li>/etc/ssh/sshd_config を修正</li>
-<li>キーペアを作成してログイン</li>
-</ul></li>
-<li>system-config-securitylevel-tui でssh以外を閉じる</li>
-<li>git,perlbrew,cpanmを入れる</li>
-</ul>
-
-<p>大体こんな感じ。SSHは以下のような感じで設定。コメントアウト外したりyes,no変えたり。</p>
-
-<pre><code>PermitRootLogin no
-AuthorizedKeysFile      .ssh/authorized_keys
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-</code></pre>
-
-<p>「ChallengeResponseAuthentication no」はデフォルトでnoだけれどこれがyesになってると公開鍵の認証に失敗したらパスワード認証も試すといった挙動をするので、公開鍵に限定する場合はちゃんとnoになってることをチェック。</p>
-
-<p>ファイアーウォールの設定は一旦 system-config-securitylevel-tui 使ってやりましたが、細かく設定する場合は当然 iptables を使って設定しないといけないので、おいおいここは最適化していきたいです。</p>
-
-<p>他にもデーモンを止める話とかもあるので以下とか参考にしつつ最適化していきたいです。</p>
-
-<p><a href="http://sakura.off-soft.net/blog/sakura_vps_centos_first_setup.html">さくらVPSを使うときに最初にやっておきたいこと(CentOS編)</a></p>
-
-		</div>
-		<div class="footer">
-			<time>2011-07-05</time>
-			<ul class="tag">
-				<li><a href="/tag/インフラ">インフラ(2)</a></li>
-				<li><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/7" class="float-left">≪前のページ</a>
 		<a href="/page/9" class="float-right">次のページ≫</a>
@@ -1034,19 +1017,20 @@ ChallengeResponseAuthentication no
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
 						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
-						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(9)</a>
+							<li><a href="/archives/2014">2014年(10)</a>
 								<ul>
+										<li><a href="/archives/2014/12">2014年12月(1)</a></li>
 										<li><a href="/archives/2014/11">2014年11月(1)</a></li>
 										<li><a href="/archives/2014/09">2014年09月(1)</a></li>
 										<li><a href="/archives/2014/06">2014年06月(4)</a></li>
@@ -1097,7 +1081,6 @@ ChallengeResponseAuthentication no
 				<div class="col-1-1">
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
-						<li class=""><a href="/tag/perl">perl(9)</a></li>
 						<li class=""><a href="/tag/golang">golang(5)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
@@ -1111,6 +1094,7 @@ ChallengeResponseAuthentication no
 						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
 						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
 						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class=""><a href="/tag/perl">perl(10)</a></li>
 						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
 						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
 						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
@@ -1135,6 +1119,7 @@ ChallengeResponseAuthentication no
 						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
 						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
 						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/dbic">dbic(1)</a></li>
 						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
 						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
 						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>

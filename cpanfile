@@ -1,0 +1,12 @@
+requires "Mouse";
+requires "DateTime::Format::MySQL";
+requires "DateTime::TimeZone";
+requires "YAML";
+requires "Text::Markdown";
+requires "Encode";
+requires "DateTime::Format::Mail";
+requires "Path::Tiny";
+requires "Text::Xslate";
+requires "JSON::XS";
+requires "XML::RSS";
+requires "FindBin::libs";

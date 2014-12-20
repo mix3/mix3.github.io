@@ -42,6 +42,132 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2013/10/23/20131023/">Photon Cloud の MacOSX SDK の Demo を動かす</a></h2>
+		</div>
+		<div class="content">
+			<p><a href="http://www.nintendo.co.jp/ds/azwj/02-4.html">アシュリー</a>たんが可愛すぎて生きるのが辛い 任天堂こんな可愛いキャラクタいつの間に生み出してたんや mix3です</p>
+
+<p>Photon Cloud が何とか良くわかってないんだけど、とりあえず試したかった</p>
+
+<p>ちなみに Linux SDK は さくらVPS で 試したところ make すら出来ませんでした</p>
+
+<p>Linux SDK には勝てなかったよ…</p>
+
+<h3>MacOSX SDK の Demo を動かす</h3>
+
+<ul>
+<li>MacOSX SDK をサイトからダウンロードして unzip</li>
+<li>Demos/demo_loadBalancing/iMac/demo_iMac_loadBalancing_cpp.xcodeproj を XCode で開きビルドする</li>
+<li>$ Demos/demo_loadBalancing/iMac/build/debug/demo_iMac_loadBalancing_cpp</li>
+</ul>
+
+<pre><code>
+always:
+0 - exit
+--------------------
+outside a game room:
+1 - create game
+2 - join random game
+--------------------
+inside a game room:
+1 - leave game
+--------------------
+connecting
+2013-10-23 02:06:56,558781 ERROR   NetworkLogic.cpp               connectionErrorReturn()                                      line:   217 - code: 1039
+connection failed with error 1039
+2013-10-23 02:06:56,559703 INFO    NetworkLogic.cpp               disconnectReturn()                                           line:   281 -
+disconnected
+</code></pre>
+
+<ul>
+<li>connection failed するので NetworkLogic.cppを弄る
+<ul>
+<li>80行目 : mLoadBalancingClient(*this, L"if connecting to the exitgamescloud, replace this string with the application id, that can be found after logging in at http://exitgamescloud.com/Dashboard", appVersion, PLAYER_NAME)</li>
+<li>100行目 mLoadBalancingClient.connect(L"localhost:5055"); // specify the ip and port of your local masterserver here; call the parameterless overload instead, if you want to connect to the  exitgamescloud</li>
+<li>80行目はL"<strong>YOUR_APP_ID</strong>"に変更, 100行目は Cloud を使うので空に変更</li>
+</ul></li>
+<li>再度ビルド</li>
+<li>$ Demos/demo_loadBalancing/iMac/build/debug/demo_iMac_loadBalancing_cpp</li>
+</ul>
+
+<pre><code>
+always:
+0 - exit
+--------------------
+outside a game room:
+1 - create game
+2 - join random game
+--------------------
+inside a game room:
+1 - leave game
+--------------------
+connecting
+2013-10-23 02:18:49,198122 INFO    LoadBalancingClient.cpp        onStatusChanged()                                            line:   510 - connected to masterserver
+2013-10-23 02:18:49,507223 INFO    LoadBalancingPeer.cpp          opAuthenticate()                                             line:   100 - OperationRequest - operationCode: 230 {224="YOUR_APP_ID", 220="1.0", 225="OS X"}
+2013-10-23 02:18:49,809279 INFO    EnetPeer.cpp                   dispatchIncomingCommands()                                   line:   290 - command to dispatch not yet needed
+2013-10-23 02:18:49,810149 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 230, returnCode: 0 {}
+2013-10-23 02:18:49,810900 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
+2013-10-23 02:18:50,112417 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 229, returnCode: 0 {}
+2013-10-23 02:18:50,113866 INFO    NetworkLogic.cpp               connectReturn()                                              line:   268 -
+connected
+2013-10-23 02:18:50,114394 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 230
+2013-10-23 02:18:54,824511 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
+1creating game "-517133284"
+2013-10-23 02:18:56,329376 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 227, returnCode: 0 {230="95.211.58.243:5056", 255="-517133284"}
+2013-10-23 02:18:57,333041 INFO    LoadBalancingClient.cpp        onStatusChanged()                                            line:   505 - connected to gameserver
+2013-10-23 02:18:57,640726 INFO    LoadBalancingPeer.cpp          opAuthenticate()                                             line:   100 - OperationRequest - operationCode: 230 {224="YOUR_APP_ID", 220="1.0", 225="OS X"}
+2013-10-23 02:18:58,042258 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 230, returnCode: 0 {}
+2013-10-23 02:18:58,444147 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 227, returnCode: 0 {254=1, 248={250=[]}}
+2013-10-23 02:18:58,445078 INFO    NetworkLogic.cpp               createRoomReturn()                                           line:   288 -
+2013-10-23 02:18:58,445820 INFO    NetworkLogic.cpp               createRoomReturn()                                           line:   296 - localPlayerNr: 1
+game room "-517133284" has been created
+regularly sending dummy events now
+2013-10-23 02:18:58,446940 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 255
+2013-10-23 02:18:58,447675 INFO    NetworkLogic.cpp               joinRoomEventAction()                                        line:   242 - OS X joined the game
+
+player 1 OS X has joined the game
+sssssssssssssssssssssssssssssssssssssssssssssssssssssss1ss
+leaving game room
+2013-10-23 02:19:04,472288 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 254, returnCode: 0 {}
+2013-10-23 02:19:05,478600 INFO    LoadBalancingClient.cpp        onStatusChanged()                                            line:   510 - connected to masterserver
+2013-10-23 02:19:05,786180 INFO    LoadBalancingPeer.cpp          opAuthenticate()                                             line:   100 - OperationRequest - operationCode: 230 {224="YOUR_APP_ID", 220="1.0", 225="OS X"}
+2013-10-23 02:19:06,088374 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
+2013-10-23 02:19:06,089500 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 230, returnCode: 0 {}
+2013-10-23 02:19:06,390775 INFO    LoadBalancingClient.cpp        onOperationResponse()                                        line:   306 - OperationResponse - operationCode: 229, returnCode: 0 {}
+2013-10-23 02:19:06,391676 INFO    NetworkLogic.cpp               leaveRoomReturn()                                            line:   336 -
+game room has been successfully left
+2013-10-23 02:19:06,392076 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 230
+0terminating application
+2013-10-23 02:19:11,103029 INFO    LoadBalancingClient.cpp        onEvent()                                                    line:   579 - EventData - code: 226
+2013-10-23 02:19:11,404197 INFO    NetworkLogic.cpp               disconnectReturn()                                           line:   281 -
+disconnected
+</code></pre>
+
+<p>という感じで動くことを確認 ターミナルを二つ開いて</p>
+
+<ul>
+<li>Aが create game</li>
+<li>Bが random join game（gameが一つしかないので多分確定でAのいるところへ行く）</li>
+<li>Bが leave game</li>
+<li>Aが leave game</li>
+</ul>
+
+<p>みたいなことが出来ることも確認できた</p>
+
+<p>これで何かする予定もないので、これぐらいで今は満足満足</p>
+
+		</div>
+		<div class="footer">
+			<time>2013-10-23</time>
+			<ul class="tag">
+				<li><a href="/tag/PhotonCloud">PhotonCloud(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2013/10/19/20131019/">AdmingeneratorGeneratorBundleを試す</a></h2>
 		</div>
 		<div class="content">
@@ -633,59 +759,6 @@ mix3 &gt; iku: ふぁ！？
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/08/30/20130830/">信じて送り出したfcgiプロセスがulimitの設定によって次々と殺されて行く話</a></h2>
-		</div>
-		<div class="content">
-			<p>ではありません。</p>
-
-<p><a href="http://lestrrat.ldblog.jp/archives/25360109.html">livedoorブログ</a>がpsgiに移行したりなんかするこのご時世になぜかmod_rewriteとfcgiを使って頑張っているmix3です。</p>
-
-<h3>ulimitの話</h3>
-
-<p>とある事情でapacheのinit.dにulimitを設定していて、メモリを使いすぎる、とかCPU使いすぎるとfcgiプロセスを殺してもらうようにしていたのですが、</p>
-
-<p>「それ子(fcgi process)だけじゃなくて親(httpd)まで殺しちゃわない？」</p>
-
-<p>と <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんの有り難いお言葉が飛び出して大慌てでulimitを外すということが発生しました。</p>
-
-<p>しかもgracefulだと設定変更効かないからロードバランサから外して一台ずつリスタート掛けて行かなければならず…</p>
-
-<h3>再度設定する場合にどうするのか</h3>
-
-<p>とある事情は変わらないのでulimitの設定を戻さないと行けないが、どうすれば良いのか思いつかないので <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんに考えて頂いたところ、</p>
-
-<ul>
-<li>index.fcgiをindex.fcgi.plとか適当に変える</li>
-<li>index.fcgiは中身shスクリプトにしてそこにulimitを書く</li>
-</ul>
-
-<p>というのはどうか？と提案を頂きまして、いけそうな感じなのでそれで行こうかなぁとなっています。 <a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんありがとうございました。</p>
-
-<h3>ulimitの設定どうやって確認するの？</h3>
-
-<p>と、ロードバランサから1台外してinit.d からulimitを消してリスタートしたところでふと思い聞いたところ</p>
-
-<pre><code>cat /proc/$(cat /var/run/httpd.pid)/limits
-</code></pre>
-
-<p>「こういう感じかな」と教えていただきました。備忘録。</p>
-
-<hr />
-
-<p>という記事を8月中ぐらいに書いていて放置プレイしてたので改めて残しておく</p>
-
-		</div>
-		<div class="footer">
-			<time>2013-08-30</time>
-			<ul class="tag">
-				<li><a href="/tag/Linux">Linux(2)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/3" class="float-left">≪前のページ</a>
 		<a href="/page/5" class="float-right">次のページ≫</a>
@@ -714,19 +787,20 @@ mix3 &gt; iku: ふぁ！？
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
 						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
-						<li><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2014">2014年(9)</a>
+							<li><a href="/archives/2014">2014年(10)</a>
 								<ul>
+										<li><a href="/archives/2014/12">2014年12月(1)</a></li>
 										<li><a href="/archives/2014/11">2014年11月(1)</a></li>
 										<li><a href="/archives/2014/09">2014年09月(1)</a></li>
 										<li><a href="/archives/2014/06">2014年06月(4)</a></li>
@@ -777,7 +851,6 @@ mix3 &gt; iku: ふぁ！？
 				<div class="col-1-1">
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
-						<li class=""><a href="/tag/perl">perl(9)</a></li>
 						<li class=""><a href="/tag/golang">golang(5)</a></li>
 						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
@@ -791,6 +864,7 @@ mix3 &gt; iku: ふぁ！？
 						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
 						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
 						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class=""><a href="/tag/perl">perl(10)</a></li>
 						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
 						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
 						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
@@ -815,6 +889,7 @@ mix3 &gt; iku: ふぁ！？
 						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
 						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
 						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/dbic">dbic(1)</a></li>
 						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
 						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
 						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
