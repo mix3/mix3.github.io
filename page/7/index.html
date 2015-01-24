@@ -42,6 +42,49 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2012/11/07/20121107/">巨大ファイルの削除</a></h2>
+		</div>
+		<div class="content">
+			<p>DBサーバのslow_queryログがローテートされておらず単一ファイルで100G超えしていて辛いmix3です。</p>
+
+<h3>巨大なファイルを rm するのは危険</h3>
+
+<p>実際に試していないのでどうなるのか分からないですが、おそらく消し終わるまで間IOが占有されてDBのパフォーマンスに影響が出ちゃうのでしょう。</p>
+
+<p>rm はやらないほうが良いねとなりました。</p>
+
+<h3>: > /path/to/file</h3>
+
+<p>じゃあどうすればという事で調べていたら</p>
+
+<pre><code>
+: > /path/to/file
+</code></pre>
+
+<p>を使ってはどうか？というようなものを見かけました</p>
+
+<p><a href="http://serverfault.com/questions/336917/is-there-a-way-to-delete-100gb-file-on-linux-without-thrashing-io-load">Is there a way to delete 100GB file on Linux without thrashing IO / load?</a></p>
+
+<p>容量に余裕のある別サーバで $ dd if=/dev/zero of=tempfile bs=1024000 count=100000 とかしてファイルを作って試したところ、readが発生するもののパフォーマンスにはあまり影響は無い感じで使えそうということに。</p>
+
+<h3>ちなみに</h3>
+
+<p>: > /path/to/file は空ファイルを作るときの方法のようで、<a href="http://d.hatena.ne.jp/japanrock_pg/20100212/1265972572">Linuxでファイルを空にする5つの方法</a> とかで見かけました</p>
+
+<p>他のやり方だとまた違ってくるのでしょうか？</p>
+
+		</div>
+		<div class="footer">
+			<time>2012-11-07</time>
+			<ul class="tag">
+				<li><a href="/tag/Linux">Linux(2)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2012/11/03/20121103/">スレーブ遅延</a></h2>
 		</div>
 		<div class="content">
@@ -176,7 +219,7 @@ exit 0
 		<div class="footer">
 			<time>2012-11-03</time>
 			<ul class="tag">
-				<li><a href="/tag/MySQL">MySQL(3)</a></li>
+				<li><a href="/tag/MySQL">MySQL(4)</a></li>
 			</ul>
 			<div class="clearer"></div>
 		</div>
@@ -340,46 +383,6 @@ exit 0
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2012/04/10/20120410/">やったー cpan auhor になったよー＼(^o^)／</a></h2>
-		</div>
-		<div class="content">
-			<p>今年入ってからミスが多すぎてそろそろ本当に首になるか、潔く自分から辞めるかした方が良いんじゃないかと真剣に考えるmix3です。</p>
-
-<h3><a href="http://pixiv.cc/mix3">pixivブログ消滅</a></h3>
-
-<p>pixivブログで書いていた事は github の pages のコピーだったので、pixivブログのサービス終了には特にどうということは無かったのですが、本当にサービスが終了して見れなくなってしまったので、ようやっと github の方に完全に移行しました。</p>
-
-<p>移行にあたって、ブログ生成スクリプトを改修（リファクタリング的には今も相当酷いが）して、Octpressのような感じでURLがそれっぽくなるようにしてみました。後はカテゴリかタグに対応してページング出来れば良いかなと思っています。</p>
-
-<p>それにしても 元 pixiv ユーザ（本当は今もpixivユーザのつもりだけど今となってはまともに描いてないので…）として pixiv ブログ自体は気に入ってたのでちょっと残念です。</p>
-
-<h3><a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a></h3>
-
-<p>タイトルに書いた通り、<a href="http://search.cpan.org/~himachoco/">cpan author</a> になりました。p5-SWFEditorという swf の画像置換やMovieClipの置換など、swf を perl から色々弄れるライブラリを作成してアップしました。</p>
-
-<p>p5-SWFEditorの中身は <a href="https://twitter.com/#!/yoya">@yoya</a> さんの好意により <a href="https://twitter.com/#!/yoya">@yoya</a> さん作 <a href="http://sourceforge.jp/projects/swfed/">SWFEditor for PHP</a> をまるっとそのまま使わせてもらっています。自分がしたのは C で書かれている SWFEditor の機能を使うためのインタフェースを XS で書いた形になります。
-（そもそも SWFEdito for PHP が移植性などを考慮してSWF操作のコア部分とそれを使うインタフェースに分離して作られているので非常に移植しやすくなっています。素晴らしいですね！）</p>
-
-<p>SWFEditor の Perl バインディングの作成を快く許可して下さった <a href="https://twitter.com/#!/yoya">@yoya</a> さんに心から感謝致します。</p>
-
-<h3>ということで</h3>
-
-<p>ブログ移行にともないpixivブログからCSSを持ってきてそれっぽくしたのでそれのお知らせと、p5-SWFEditor を cpan にアップして cpan author になったよー というお知らせでした。</p>
-
-		</div>
-		<div class="footer">
-			<time>2012-04-10</time>
-			<ul class="tag">
-				<li><a href="/tag/cpan author">cpan author(1)</a></li>
-				<li><a href="/tag/perl">perl(10)</a></li>
-				<li><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/6" class="float-left">≪前のページ</a>
 		<a href="/page/8" class="float-right">次のページ≫</a>
@@ -408,16 +411,23 @@ exit 0
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
-						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2015">2015年(1)</a>
+								<ul>
+										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
 						<ul class="sidemenu toggle_tree">
 							<li><a href="/archives/2014">2014年(10)</a>
 								<ul>
@@ -473,7 +483,7 @@ exit 0
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/golang">golang(5)</a></li>
-						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/mysql">mysql(4)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
 						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>

@@ -42,6 +42,92 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></h2>
+		</div>
+		<div class="content">
+			<blockquote class="twitter-tweet" lang="ja"><p>衣玖さん芸人に!!!俺はなるっ!!!（海賊王的なノリで</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/475532375305109504">2014, 6月 8</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>最近p5-Ikusanを作ったり、それで衣玖さんのIRCボット作ったりして衣玖さんへのロマンティックが止まらないmix3です</p>
+
+<h3><a href="https://github.com/mix3/go-ikusan">github.com/mix3/go-ikusan</a>と<a href="https://github.com/mix3/go-irc">github.com/mix3/go-irc</a></h3>
+
+<p>最近golangを触ってる事が多いのですが（絶賛開発中の社内アプリがgolangだけどそっちにはあんまり関わってなかったりする）</p>
+
+<p>適当になんか作りたいなぁと思っていたところに最近衣玖さんへの愛が溢れ出してきてたので、そりゃ「go版ikachan作ろう」となるのは自然な事ですよね</p>
+
+<p>でgoでircってどう触るんだろうとgithubを漁ったところ</p>
+
+<ul>
+<li><a href="https://github.com/thoj/go-ircevent">github.com/thoj/go-ircevent</a></li>
+<li><a href="https://github.com/fluffle/goirc/tree/master">github.com/fluffle/goirc</a></li>
+</ul>
+
+<p>辺りがirc触るためのライブラリとして有名どころなのかなぁということが分かって、その辺り使って作ろうとしたのですが、</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>go-ikusanのためにgo-irceventの中追いかけてるがエラー検知からのリコネクト処理がダメだこりゃ close(end)して各イベントチャンネルをwaitgroupで待ってるけど、socketのreadで待ってるからtimeoutするまで待ち続けてる</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476224165708451840">2014, 6月 10</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>preadってチャンネル用意してるのにどこにも使ってなくて多分これはsocketから1行読んで解釈するのと、それをcallbackに投げるのを分離するためものだと思うけど、まだ未実装ってことなのかな</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476225950380597248">2014, 6月 10</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>go-ircevent、groupwaitしてるのsocketを安全に閉じるのを保証するためだと思うけど、socketのreadで待ち続けるのもなんとも言えないなぁ</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476226654398709761">2014, 6月 10</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>Errorチャンネルをselectで待ってて、検知したらdisconnectするけどそのdisconnectの中でさらにErrorを投げてるの結構ワンダーな感じする</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476227286870392832">2014, 6月 10</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>とか</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p><a href="http://t.co/jXGwN4arHz">http://t.co/jXGwN4arHz</a> がエラーハンドリングちゃんとしてそうだけど、flag要求されて非常に使いづらい</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476228862263570434">2014, 6月 10</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>とかでなんか微妙に使いづらいなぁとなってしまい、じゃあいっそそっから作るかということで両方の間の子みたなの作ったりしました。<a href="https://github.com/mix3/go-irc">github.com/mix3/go-irc</a></p>
+
+<p>出来るだけ薄くしておきたかったのと、IRCについて知識はまるでないので難しいことはしないようにしたかったので</p>
+
+<ul>
+<li>ircサーバへのリクエストが出来る</li>
+<li>ircサーバからのレスポンスを受け取れる</li>
+<li>ircサーバからのレスポンスを元にコールバックを呼ぶがディスパッチャみたいなことはしない</li>
+<li>ircサーバからのレスポンスのtimeoutを待たずに落ちる事が出来る</li>
+<li>落ちたタイミングで何かしたいこともあるだろうから、別途落ちたタイミングでコールバックを呼ぶようにする</li>
+<li>flagは使わない</li>
+<li>loggerはデフォルトで<a href="https://github.com/umisama/golog">github.com/umisama/golog</a>を使うけどinterfaceが定義されてるので差し替え出来るハズ</li>
+</ul>
+
+<p>ぐらいを満たすような感じで<a href="https://github.com/thoj/go-ircevent">github.com/thoj/go-ircevent</a>と<a href="https://github.com/fluffle/goirc/tree/master">github.com/fluffle/goirc</a>からコピペしたりしなかったりしました</p>
+
+<p>たまに落ちるときにWaitしたまま帰ってこないみたいなことがある感じなので、明らかにここマズいとかあったらプルリクあると嬉しいです</p>
+
+<p>で、これを元にgo版<a href="https://github.com/yappo/p5-App-Ikachan">ikachan</a>こと<a href="https://github.com/mix3/go-ikusan">go-ikusann</a>を作りましたとさ</p>
+
+<p>とってもキュートな衣玖さんがお出迎えしてくれるwebインタフェースも作ってやはり衣玖さんは最高だなって思いました</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>go-ikusanのwebインタフェース作った　衣玖さんマジかわ <a href="http://t.co/sAcXgUZJP1">pic.twitter.com/sAcXgUZJP1</a></p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/477786314641657857">2014, 6月 14</a></blockquote>
+
+<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>なおAAの画像は「衣玖 AA」で検索して見繕ったAAなので著作権的に問題あったら非常に心苦しいですが消します</p>
+
+		</div>
+		<div class="footer">
+			<time>2014-06-15</time>
+			<ul class="tag">
+				<li><a href="/tag/golang">golang(5)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2014/06/15/20140615_02/">ブログデザインを変えてみる</a></h2>
 		</div>
 		<div class="content">
@@ -381,29 +467,6 @@ db.spec   = root@tcp(localhost:3306)/alphawing
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2014/01/05/20140105/">あけまして</a></h2>
-		</div>
-		<div class="content">
-			<p>おめでとうございます</p>
-
-<script src="http://source.pixiv.net/source/embed.js" data-id="40785050_59a1632c438aa0ce5c78b15331e9b533" data-size="large" data-border="off" charset="utf-8"></script>
-
-<noscript><p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=40785050" target="_blank">ヲ正月</a> by <a href="http://www.pixiv.net/member.php?id=88339" target="_blank">mix3</a> on <a href="http://www.pixiv.net/" target="_blank">pixiv</a></p></noscript>
-
-<p>今年もよろしくお願いします</p>
-
-		</div>
-		<div class="footer">
-			<time>2014-01-05</time>
-			<ul class="tag">
-				<li><a href="/tag/落書き">落書き(2)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/1" class="float-left">≪前のページ</a>
 		<a href="/page/3" class="float-right">次のページ≫</a>
@@ -432,16 +495,23 @@ db.spec   = root@tcp(localhost:3306)/alphawing
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
-						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2015">2015年(1)</a>
+								<ul>
+										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
 						<ul class="sidemenu toggle_tree">
 							<li><a href="/archives/2014">2014年(10)</a>
 								<ul>
@@ -497,7 +567,7 @@ db.spec   = root@tcp(localhost:3306)/alphawing
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/golang">golang(5)</a></li>
-						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/mysql">mysql(4)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
 						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>

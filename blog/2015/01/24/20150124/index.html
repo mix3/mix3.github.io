@@ -1,0 +1,468 @@
+<!doctype html>
+<html>
+	<head>
+		<title>ORDER BY や LIMIT を含む場合の select for update - 萌えキャラとは何だったのか</title>
+		<meta charset="utf-8" />
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<script src="/js/app.js"></script>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-48133863-1', 'mix3.github.io');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<header class="grid">
+			<div class="col-1-1">
+				<img src="/images/header.jpg" />
+				<h1><a href="/">萌えキャラとは何だったのか</a></h1>
+				<h2>ギークにも絵描きにもなれない者の末路</h2>
+				<div class="top-menu">
+					<ul>
+						<li><a href="/index.rdf">RSS Feed</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<nav class="grid">
+				<div class="col-1-1">
+					<ul>
+						<li class="current">Blog</li>
+						<li class=""><a href="/archives">Archive</a></li>
+					</ul>
+				</div>
+		</nav>
+		<main class="grid">
+			<article class="col-8-12">
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></h2>
+		</div>
+		<div class="social_button">
+				<!-- はてブ -->
+				<div class="hatena">
+					<a href="http://b.hatena.ne.jp/entry/http://mix3.github.io/blog/2015/01/24/20150124/" class="hatena-bookmark-button" data-hatena-bookmark-title="ORDER BY や LIMIT を含む場合の select for update - 萌えキャラとは何だったのか" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+				</div>
+				<!-- Twitter -->
+				<div class="twitter">
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mix3.github.io/blog/2015/01/24/20150124/" data-text="ORDER BY や LIMIT を含む場合の select for update - 萌えキャラとは何だったのか" data-via="mix3" data-lang="ja">ツイート</a>
+					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+				</div>
+				<!-- Google+ -->
+				<div class="googleplus">
+					<div class="g-plusone" data-size="medium" data-href="http://mix3.github.io/blog/2015/01/24/20150124/"></div>
+					<script type="text/javascript">
+						window.___gcfg = {lang: 'ja'};
+						(function() {
+							var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+							po.src = 'https://apis.google.com/js/platform.js';
+							var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+						})();
+					</script>
+				</div>
+				<!-- facebook -->
+				<div class="facebook">
+					<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmix3.github.io%2Fblog%2F2015%2F01%2F24%2F20150124%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=false&amp;height=21&amp;appId=662642987135668" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+				</div>
+		</div>
+		<div class="clearer"></div>
+		<div class="content">
+			<p>最近 DBIC を使ってコードを書いてるけどオブジェクトの永続化の功罪について想いを馳せることが多いmix3です</p>
+
+<pre><code>CREATE TABLE user_item (
+  id           BIGINT  UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id      INTEGER UNSIGNED NOT NULL DEFAULT 0,
+  item_id      INTEGER UNSIGNED NOT NULL DEFAULT 0,
+  is_equiped   TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  is_protected TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  INDEX idx_1 (user_id, item_id, is_protected),
+  INDEX idx_2 (user_id, item_id, is_protected, is_equiped),
+  INDEX idx_3 (user_id, item_id, is_protected, id),
+  INDEX idx_4 (user_id, item_id, is_protected, is_equiped, id),
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
+</code></pre>
+
+<p>こんなテーブルがあったとして、以下の優先順位で抽出したい</p>
+
+<ul>
+<li>is_protected = 1 は保護されているので除外</li>
+<li>id 順に SELECT
+<ul>
+<li>ただし is_equiped = 1 は SELECT の対象だが装備してるので優先度を低く</li>
+</ul></li>
+</ul>
+
+<p>このとき user_id = 1, item_id = 1 のものを 2個 SELECT する場合</p>
+
+<pre><code>SELECT * FROM user_item
+WHERE user_id = 1
+AND   item_id = 1
+AND   is_protected = 0
+ORDER BY is_equiped, id ASC LIMIT 2;
+</code></pre>
+
+<p>多分こんなクエリになると思う　実際にINSERTして試してみる</p>
+
+<pre><code>INSERT into user_item
+  (user_id, item_id, is_equiped, is_protected)
+VALUES
+  (1, 1, 1, 1), -- 装備中 &amp; 保護されてる
+  (1, 1, 1, 0), -- 装備中
+  (1, 1, 0, 0),
+  (1, 1, 0, 0),
+  (1, 1, 0, 0),
+  (1, 2, 0, 0);
+
+mysql&gt; SELECT * FROM user_item WHERE user_id = 1 AND item_id = 1 AND is_protected = 0 ORDER BY is_equiped, id ASC LIMIT 2;
++----+---------+---------+------------+--------------+
+| id | user_id | item_id | is_equiped | is_protected |
++----+---------+---------+------------+--------------+
+|  3 |       1 |       1 |          0 |            0 |
+|  4 |       1 |       1 |          0 |            0 |
++----+---------+---------+------------+--------------+
+</code></pre>
+
+<p>期待通り id:1 は除外 id:2 は優先度低いので id:3,4 が帰ってきている</p>
+
+<h3>select for update</h3>
+
+<p>トランザクション内で select for update するとロックしてくれる</p>
+
+<pre><code>BEGIN;
+SELECT * FROM user_item WHERE id = 1 FOR UPDATE;
+</code></pre>
+
+<p>ターミナルを二つ開いてそれぞれで上記SQLを流すと片方の SELECT が待たされる</p>
+
+<p>ところで select for update に ORDER BY LIMIT が含まれる場合はどうなるのだろうか？</p>
+
+<pre><code>SELECT * FROM user_item FORCE INDEX (idx_N)
+WHERE user_id = 1
+AND   item_id = 1
+AND   is_protected = 0
+ORDER BY is_equiped, id ASC LIMIT 2 FOR UPDATE;
+</code></pre>
+
+<p>したあとに</p>
+
+<pre><code>SELECT * FROM user_item WHERE id = N FOR UPDATE;
+</code></pre>
+
+<p>を idx_1~4, id = 1 ~ 6 まで試してみた</p>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>
+
+            </th>
+            <th>
+                id=1
+            </th>
+            <th>
+                id=2
+            </th>
+            <th>
+                id=3
+            </th>
+            <th>
+                Id=4
+            </th>
+            <th>
+                id=5
+            </th>
+            <th>
+                id=6
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>
+                idx_1
+            </th>
+            <td>
+
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <th>
+                idx_2
+            </th>
+            <td>
+
+            </td>
+            <td>
+
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+
+            </td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <th>
+                idx_3
+            </th>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <th>
+                idx_4
+            </th>
+            <td>
+
+            </td>
+            <td>
+
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+
+            </td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<p>こんな感じになった</p>
+
+<p>ORDER BY や LIMIT などを含む select for update も index を張っていればロック範囲を最小限に抑えらえるようだ</p>
+
+<p>ただ idx_3 は id=1 までロックされて変な index を張るとロックの範囲も変な感じになるようだ</p>
+
+<p>idx_2 が idx_4 と同じ最小範囲のロックをしているのは id が primary key だからだろうか？</p>
+
+<h3>結論</h3>
+
+<p>index は大事</p>
+
+		</div>
+		<div class="footer">
+			<time>2015-01-24</time>
+			<ul class="tag">
+				<li><a href="/tag/mysql">mysql(4)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1 pager">
+	<a href="/blog/2014/12/21/20141221/" class="float-left">≪DBICのprefetch</a>
+	</div>
+	<div class="clearer"></div>
+			</article>
+			<aside class="col-4-12">
+				<div class="col-1-1">
+					<h3>Profile</h3>
+					<div class="content">
+						<img src="/images/avatar.png" class="float-left" style="width:100px;" />
+						<a href="https://twitter.com/mix3" target="_blank">twitter @mix3</a><br />
+						<a href="https://github.com/mix3/" target="_blank">github @mix3</a><br />
+						<a href="http://pixiv.me/mix3" target="_blank">pixiv @mix3</a><br />
+						<div class="clearer"></div>
+						Webエンジニアのような何か。絶賛人生の迷子中。スキルセット的には以下のような感じ<br />
+						Perl/MySQL/Linux/ソーシャルアプリ開発・運用
+					</div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>coderwall</h3>
+					<div id="coderwall"></div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Recent Posts</h3>
+					<ul class="sidemenu">
+						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
+						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
+						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
+						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
+						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2015">2015年(1)</a>
+								<ul>
+										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2014">2014年(10)</a>
+								<ul>
+										<li><a href="/archives/2014/12">2014年12月(1)</a></li>
+										<li><a href="/archives/2014/11">2014年11月(1)</a></li>
+										<li><a href="/archives/2014/09">2014年09月(1)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(4)</a></li>
+										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
+										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
+										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2013">2013年(18)</a>
+								<ul>
+										<li><a href="/archives/2013/12">2013年12月(3)</a></li>
+										<li><a href="/archives/2013/11">2013年11月(2)</a></li>
+										<li><a href="/archives/2013/10">2013年10月(5)</a></li>
+										<li><a href="/archives/2013/08">2013年08月(1)</a></li>
+										<li><a href="/archives/2013/07">2013年07月(1)</a></li>
+										<li><a href="/archives/2013/04">2013年04月(1)</a></li>
+										<li><a href="/archives/2013/03">2013年03月(3)</a></li>
+										<li><a href="/archives/2013/02">2013年02月(1)</a></li>
+										<li><a href="/archives/2013/01">2013年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2012">2012年(7)</a>
+								<ul>
+										<li><a href="/archives/2012/12">2012年12月(1)</a></li>
+										<li><a href="/archives/2012/11">2012年11月(2)</a></li>
+										<li><a href="/archives/2012/08">2012年08月(1)</a></li>
+										<li><a href="/archives/2012/04">2012年04月(3)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2011">2011年(13)</a>
+								<ul>
+										<li><a href="/archives/2011/11">2011年11月(1)</a></li>
+										<li><a href="/archives/2011/07">2011年07月(6)</a></li>
+										<li><a href="/archives/2011/06">2011年06月(3)</a></li>
+										<li><a href="/archives/2011/05">2011年05月(2)</a></li>
+										<li><a href="/archives/2011/04">2011年04月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Tags</h3>
+					<ul class="sidemenu toggle_tree_2">
+						<li class=""><a href="/tag/golang">golang(5)</a></li>
+						<li class=""><a href="/tag/mysql">mysql(4)</a></li>
+						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+						<li class=""><a href="/tag/php">php(3)</a></li>
+						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
+						<li class="hide"><a href="/tag/Linux">Linux(2)</a></li>
+						<li class="hide"><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
+						<li class="hide"><a href="/tag/Vagrant">Vagrant(2)</a></li>
+						<li class="hide"><a href="/tag/bot">bot(2)</a></li>
+						<li class="hide"><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
+						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
+						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
+						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class=""><a href="/tag/perl">perl(10)</a></li>
+						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
+						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
+						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
+						<li class="hide"><a href="/tag/Chrome">Chrome(1)</a></li>
+						<li class="hide"><a href="/tag/Hadoop">Hadoop(1)</a></li>
+						<li class="hide"><a href="/tag/IRC">IRC(1)</a></li>
+						<li class="hide"><a href="/tag/Log">Log(1)</a></li>
+						<li class="hide"><a href="/tag/Markdown">Markdown(1)</a></li>
+						<li class="hide"><a href="/tag/Mojolicious">Mojolicious(1)</a></li>
+						<li class="hide"><a href="/tag/Mouse">Mouse(1)</a></li>
+						<li class="hide"><a href="/tag/PhotonCloud">PhotonCloud(1)</a></li>
+						<li class="hide"><a href="/tag/Play">Play(1)</a></li>
+						<li class="hide"><a href="/tag/Qudo">Qudo(1)</a></li>
+						<li class="hide"><a href="/tag/SNBinder">SNBinder(1)</a></li>
+						<li class="hide"><a href="/tag/SQLite">SQLite(1)</a></li>
+						<li class="hide"><a href="/tag/Scala">Scala(1)</a></li>
+						<li class="hide"><a href="/tag/Teng">Teng(1)</a></li>
+						<li class="hide"><a href="/tag/Virtualbox">Virtualbox(1)</a></li>
+						<li class="hide"><a href="/tag/Xslate">Xslate(1)</a></li>
+						<li class="hide"><a href="/tag/YAPC">YAPC(1)</a></li>
+						<li class="hide"><a href="/tag/bless">bless(1)</a></li>
+						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
+						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
+						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/dbic">dbic(1)</a></li>
+						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
+						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
+						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
+						<li class="hide"><a href="/tag/java">java(1)</a></li>
+						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
+						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/responsive design">responsive design(1)</a></li>
+						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
+						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
+						<li class="hide"><a href="/tag/サーバ管理">サーバ管理(1)</a></li>
+						<li class="hide"><a href="/tag/テスト">テスト(1)</a></li>
+						<li class="hide"><a href="/tag/ネットワーク設定">ネットワーク設定(1)</a></li>
+						<li class="hide"><a href="/tag/パーティショニング">パーティショニング(1)</a></li>
+						<li class="hide"><a href="/tag/ブログ">ブログ(1)</a></li>
+						<li class="hide"><a href="/tag/修士論文">修士論文(1)</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+			</aside>
+		</main>
+		<footer class="grid">
+			<div class="col-1-1">
+				<small>&copy; copyright 2014 mix3.github.io</small>
+			</div>
+		</footer>
+	</body>
+</html>

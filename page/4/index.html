@@ -42,6 +42,354 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2013/11/13/20131113/">isucon3のリファレンス実装をGoに移植した話</a></h2>
+		</div>
+		<div class="content">
+			<p>isucon3スタッフとして本選運営のお手伝いをしてきましたが、参加者ではないのでisuconについて特に書くことが見つからないmix3です。一つ言えるのはみんな凄すぎでそれに比べて自分は本当になにも出来ない無能なんだなぁと再認識させられました。死にたい。</p>
+
+<p><a href="/images/20131113/201311102153000.jpg"><img src="/images/20131113/201311102153000.jpg" width="300" alt="スタッフの証" /></a><br /></p>
+
+<h3>移植を引き受けた話</h3>
+
+<p>isuconでは最初に動く状態のアプリが用意されるのですが、そのアプリは問題が確定した後にまずリファレンス実装（今回はPerl）がされ、その後予選を抜けた人たちが使用していた言語（Perl含むRuby,Python,PHP,NodeJS,Go）に移植する、という流れで作られました。自分はその中でGo言語移植を担当しました。</p>
+
+<p>ちなみにPerl以外の移植言語の中ではPHPぐらいしか触ったことがなく、PHPもかれこれ２,３年は触っておらずすっかり忘れてしまってるので、何の言語を担当しようと何も分からない状態から始まるという「なんで移植担当引き受けちゃったの？」と言われても仕方ないような状態でした。</p>
+
+<p>なんでだろう？きっと<s>暇だった</s>仕事に余裕があったんだね</p>
+
+<h3>移植コトハジメ</h3>
+
+<p>そんな状態だったので、移植する前に「Goの勉強しないとなぁ」となり、以下のサイトを参考にGoの書き方、Goでwebappを作る場合にどうするのか調べたりしてました。なお、予選コードがあったおかげでベタ移植には困ることが無かったのでとてもとても助かりました。動くコードがあるというのは大事です。</p>
+
+<ul>
+<li><a href="http://qiita.com/tenntenn/items/0e33a4959250d1a55045">Go言語の初心者が見ると幸せになれる場所</a></li>
+<li><a href="http://qiita.com/tenntenn/items/b8b27e32c28f7569f41a">Go言語でWebAppの開発に必要なN個のこと</a></li>
+<li>予選のコード
+<ul>
+<li>jsonのconfigファイルのロードや、<a href="http://www.gorillatoolkit.org/pkg/mux">gorilla/mux</a>などは予選コードを<s>コピペ</s>参考にしました</li>
+</ul></li>
+</ul>
+
+<h3>移植戦略</h3>
+
+<p>今回の移植で予選コードに追加して必要だったのは以下3点</p>
+
+<ul>
+<li>外部コマンド
+<ul>
+<li>画像リサイズにリファレンス実装ではImageMagickのconvertコマンドを使用するため</li>
+</ul></li>
+<li>JSONのレスポンス生成
+<ul>
+<li>予選とは違いAPIベースだったのでJSONを返す必要があった</li>
+</ul></li>
+<li>ロングポーリングの実現</li>
+</ul>
+
+<p>これらが出来れば後は予選コードを<s>コピペ</s>参考にすれば移植は出来そうでした</p>
+
+<h3>外部コマンド, JSONレスポンス</h3>
+
+<p>外部コマンドについてはパッケージドキュメント <a href="http://golang.org/pkg/os/exec/">os/exec</a> 見たまんまです。捻りようもありませんね。</p>
+
+<p>JSONレスポンスは<a href="http://nesv.blogspot.jp/2012/09/super-easy-json-http-responses-in-go.html">Super-easy JSON HTTP responses, in Go</a>を<s>パクりました</s>参考にしました。</p>
+
+<p>へーと思ったのがtype Response map[string]interface{} の書き方。mapの値の型をinterface{}にするとinterface{}は何でも受け取れるので自身（この場合Response型）を入れ子にすることが出来るので、いわゆる連想配列やらMapやらと同じ感じで扱える型が出来るわけですね。まあJavaでMap&lt;String, Object&gt;とかする感じでしょうか。</p>
+
+<h3>goroutin サイコー</h3>
+
+<p>ロングポーリングは<a href="https://sites.google.com/site/gopatterns/web/long-poll-server">Go Language Patterns web/Long-Poll Server</a>にてgoroutinを使った例があり、これを<s>パクりました</s>参考にしました。</p>
+
+<p>ここで始めてgoroutinを知りました。Goの話を聞くときは大抵並列の話が出るな、と思っていたのですが「なるほど」となりました。たしかにgoroutinすごいです。</p>
+
+<ul>
+<li>message/channel で排他制御とか考えずにデータをやり取り出来る</li>
+<li>selectでmessage/channelを通してイベントドリブン制御</li>
+<li>go func () { ... } () でさくっと並列処理を走らせる</li>
+</ul>
+
+<p>確かにこれはそういった処理実装するの「簡単だわー」ってなります。</p>
+
+<p>ただまあロングポーリング程度の実装で何が分かる？という向きもあると思うし、これでヒャッホーってなってプロダクション環境で使ったりした日には何か罠踏むんだろうな、とは思いますが…。</p>
+
+<h3>Kossyのfilterと例外処理</h3>
+
+<p>ここまでで移植は可能だったので割合サクっと移植してしまい本選でもそれをgoの初期アプリとして出しました。が、正直なところ本戦に出した移植アプリは移植としては不完全だったかなぁという思いがありました。</p>
+
+<p>なぜならPerlのリファレンス実装で使われているKossyというフレームワークにはfilterという機能があり、Sinatraルーティングに追加してコントローラ処理の前後に処理を挟めるようになっており、リファレンス実装ではそれを使って、ユーザ情報の取得、ユーザ情報取得失敗時の400エラーを実装していました。抜粋すると以下のような感じ。</p>
+
+<pre><code>filter get_user =&gt; sub {
+    # userの取得してstashに保存 別にundefでも構わない
+};
+filter require_user =&gt; sub {
+    # stashにuserが無かったら400エラー
+};
+post '/signup' =&gt; sub {
+};
+get '/image/:image' =&gt; [qw/ get_user /] =&gt; sub {
+    # 先に get_user が実行される
+};
+get '/me' =&gt; [qw/ get_user require_user /] =&gt; sub {
+    # 先に get_user, require_user が並びの順で実行される
+};
+</code></pre>
+
+<p>これに対してGoのベタ移植ではgetUser関数を呼んで nilチェックするコードを各コントローラにコピペしていました。「こんなの業務で書いたら殺されるかもしれない」という思いが渦巻くぐらいには良くない書き方だと思います。</p>
+
+<p>それともう一つよく無かったなと思ったのがエラー時のレスポンス処理。Kossyでは$c->halt(500)などとしてExceptionを投げれば後はKossyがそれを捕まえてエラーレスポンスを返してくれます。これがGoのベタ移植では必要なときに毎度レスポンスを設定してreturnして関数を抜けるという素朴なことをしていました。</p>
+
+<p>この「Kossyのfilter」「エラー時のレスポンス処理」２点が移植していてすごくもやもやしていたので、本選のアプリとしては使わないかもしれないけど「こうしたほうが良いんじゃないか？」というのを盛りこんだ実装も別で書いたりしていました</p>
+
+<h3>Goにおける例外処理</h3>
+
+<p>Goにはtry-catch-finallyがない代わりにpanic/recoverというものがあり、deferと組み合わせて例外処理っぽいことが出来ます <a href="http://blog.golang.org/defer-panic-and-recover">Defer, Panic, and Recover</a></p>
+
+<ul>
+<li>defer
+<ul>
+<li>関数を抜けた後に実行する遅延処理を定義出来る</li>
+</ul></li>
+<li>panic
+<ul>
+<li>関数を即抜ける perlで言うとdieみたいな感じ またそのときに遅延処理を実行する</li>
+</ul></li>
+<li>recover
+<ul>
+<li>panicから復帰する perlで言うとevalみたいな感じ deferの中で使うのが基本？</li>
+</ul></li>
+</ul>
+
+<p>組み合わせて書くと例えば以下のような感じになります</p>
+
+<pre><code>func main() {
+    // (1) mainを抜けると実行される処理の定義
+    defer func() {
+        // (3) panicから復帰する
+        if err := recover(); err != nil {
+            fmt.Printf("recover: %v\n", err)
+        }
+    }()
+
+    // (2) mainから即抜ける
+    panic("panic")
+}
+// (4) output
+// recover: panic
+</code></pre>
+
+<h3>defer panic/recoverを使ったエラーレスポンス処理</h3>
+
+<p>これを使ってwebappのエラー処理をするならこうなるかな？というのを書いてみたのが以下になります（ちなみに以下のサンプルを書いていてswitch文にbreak使わなくてもよいことを初めて知りました）</p>
+
+<pre><code>package main
+
+import (
+    "net/http"
+    "github.com/gorilla/mux"
+    "fmt"
+)
+
+func main() {
+    r := mux.NewRouter()
+    r.HandleFunc("/",       handler).Methods("GET")
+    r.HandleFunc("/{code}", handler).Methods("GET")
+    http.Handle("/", r)
+    http.ListenAndServe(":5000", nil)
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+    defer func () {
+        if err := recover(); err != nil {
+            var code int
+            switch err {
+                case "400": code = http.StatusBadRequest
+                case "404": code = http.StatusNotFound
+                case "500": fallthrough
+                default   : code = http.StatusInternalServerError
+            }
+            http.Error(w, http.StatusText(code), code)
+        }
+    } ()
+    vars := mux.Vars(r)
+    if code := vars["code"]; code != "" {
+        panic(code)
+    }
+    fmt.Fprint(w, "OK")
+}
+
+// [output]
+// http://loclahost:5000/    =&gt; OK
+// http://loclahost:5000/400 =&gt; Bad Request
+// http://loclahost:5000/404 =&gt; Not Found
+// http://loclahost:5000/500 =&gt; Internal Server Error
+// http://loclahost:5000/999 =&gt; Internal Server Error
+</code></pre>
+
+<p>panicの引数はinterface{}型なのでつまり何でも渡せるので、自前の型を定義して便利機能を付けておくとrecover()で受け取った後が捗りそうですね。</p>
+
+<p>例外処理自体はこれで良いのですが、ただこのままだとdeferをコントローラ毎に書いて行かないと行けなくなるので、当然それは嬉しくありません。</p>
+
+<pre><code>func main() {
+    r := mux.NewRouter()
+    r.HandleFunc("/hoge", hoge).Methods("GET")
+    r.HandleFunc("/fuga", fuga).Methods("GET")
+    r.HandleFunc("/bar",  bar ).Methods("GET")
+    http.Handle("/", r)
+    http.ListenAndServe(":5000", nil)
+}
+func hoge(w http.ResponseWriter, r *http.Request) {
+    defer func () {
+        if err := recover(); err != nil {
+            // ...
+        }
+    } ()
+    fmt.Fprint(w, "hoge")
+}
+func fuga(w http.ResponseWriter, r *http.Request) {
+    defer func () {
+        if err := recover(); err != nil {
+            // ...
+        }
+    } ()
+    fmt.Fprint(w, "hoge")
+}
+func bar(w http.ResponseWriter, r *http.Request) {
+.
+.
+.
+// deferコピペしないといけないのでは嬉しく無い
+</code></pre>
+
+<p>で、どうしようか考えた結果、defer,recoverするラッパー関数にコントローラを渡してあげれば良いんじゃないかと考えてみました、具体的には以下のような感じ。</p>
+
+<pre><code>func main() {
+    r := mux.NewRouter()
+    r.HandleFunc("/hoge", wrapper(hoge).Methods("GET")
+    r.HandleFunc("/fuga", wrapper(fuga).Methods("GET")
+    r.HandleFunc("/bar",  wrapper(bar ).Methods("GET")
+    http.Handle("/", r)
+    http.ListenAndServe(":5000", nil)
+}
+func wrapper(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+    return func (w http.ResponseWriter, r *http.Request) {
+        defer func () {
+            if err := recover(); err != nil {
+                // ....
+            }
+        } ()
+        handler(w, r)
+    }
+}
+func hoge(w http.ResponseWriter, r *http.Request) {
+    panic("hoge")
+}
+func fuga(w http.ResponseWriter, r *http.Request) {
+    panic("fuga")
+}
+func bar(w http.ResponseWriter, r *http.Request) {
+.
+.
+.
+</code></pre>
+
+<p>こうすることで例外処理の復帰部分をラッパー関数に押し込むことができました。例外処理のためにHandleFuncに渡すコントローラはラッパー関数を必ず噛ませないといけないルールが出来てしまうので、そこはちょっとアレな感じですが。</p>
+
+<p>そしてさらにこのラッパー関数を多段にするとKossyのfilterっぽいことが出来そうです。（Kossyでは配列で順序を自由に設定出来るので、実際にはそれっぽく出来るってだけですけども）</p>
+
+<pre><code>package main
+
+import (
+    "net/http"
+    "github.com/gorilla/mux"
+    "fmt"
+)
+
+type Stash map[string]interface{}
+
+func main() {
+    r := mux.NewRouter()
+    r.HandleFunc("/pass",   base(pass(handler))).Methods("GET")
+    r.HandleFunc("/{code}", base(     handler )).Methods("GET")
+    r.HandleFunc("/",       base(     handler )).Methods("GET")
+    http.Handle("/", r)
+    http.ListenAndServe(":5000", nil)
+}
+
+func base(handler func(w http.ResponseWriter, r *http.Request, s Stash)) func(w http.ResponseWriter, r *http.Request) {
+    return func (w http.ResponseWriter, r *http.Request) {
+        defer func () {
+            if err := recover(); err != nil {
+                var code int
+                switch err {
+                    case "400": code = http.StatusBadRequest
+                    case "404": code = http.StatusNotFound
+                    case "500": fallthrough
+                    default   : code = http.StatusInternalServerError
+                }
+                http.Error(w, http.StatusText(code), code)
+            }
+        } ()
+        handler(w, r, Stash{})
+    }
+}
+
+func pass(handler func(w http.ResponseWriter, r *http.Request, s Stash)) func(w http.ResponseWriter, r *http.Request, s Stash) {
+    return func (w http.ResponseWriter, r *http.Request, s Stash) {
+        s["msg"] = "PASS"
+        handler(w, r, s)
+    }
+}
+
+func handler(w http.ResponseWriter, r *http.Request, s Stash) {
+    vars := mux.Vars(r)
+    if code := vars["code"]; code != "" {
+        panic(code)
+    }
+    if msg, ok := s["msg"]; !ok || msg == "" {
+        fmt.Fprint(w, "OK")
+    } else {
+        fmt.Fprint(w, msg)
+    }
+}
+
+// [output]
+// http://loclahost:5000/     =&gt; OK
+// http://loclahost:5000/pass =&gt; PASS
+// http://loclahost:5000/400  =&gt; Bad Request
+// http://loclahost:5000/404  =&gt; Not Found
+// http://loclahost:5000/500  =&gt; Internal Server Error
+// http://loclahost:5000/999  =&gt; Internal Server Error
+</code></pre>
+
+<p>どうでしょうか。ラッパー関数を多段にすることでfilterっぽい感じが表現出来たり、panic/recoverでエラーレスポンスをサクッと作れたり、なんとなくフレームワーク支援を受けて書いてるような気分に浸れそうな感じがしてきませんかね。</p>
+
+<p>予選コードから考えるとちょっと手を入れ過ぎ感が否めなかったり、移植と言っても機能を満たせば良いわけでフレームワークがやってる処理までそれっぽく移植する必要はないので、結局は本戦の移植アプリにはしませんでしたが、実際にGoでこういうの書く場合はこれぐらいの工夫はしても良いんじゃないかなと思ったりします。ただでさえGoだとまじめにエラーハンドリングする必要があって縦にコードが伸び易いので、少しでもコードを減らす工夫はしたほうが良いように思います。</p>
+
+<p>なお、これを適用することによって900行あった本戦の移植アプリが800行になりました。やったねたえちゃん！100行も減ったよ！でもperlはそもそも400行ありませんでしたね。切ない。</p>
+
+<h3>ということで</h3>
+
+<p>自己満足も満たしつつ移植作業が出来たので楽しかったです。なによりgoroutinを知れたのが良かったです。「Goが良いというのはこういうことか」みたいなのが少しだけ実感を持って感じられました。</p>
+
+<h3>おわりに</h3>
+
+<p>今回はisuconにスタッフとして関わったけれどもisucon自体には一度も参加してないので、来年isuconあったら予選ぐらいは参加してボコボコにされてこようかな、とかそんなこと考えるくらいにはisucon3の盛り上がりが凄かったです。</p>
+
+<p>isucon関係者、参加者のみなさま、本当にお疲れさまでした。</p>
+
+		</div>
+		<div class="footer">
+			<time>2013-11-13</time>
+			<ul class="tag">
+				<li><a href="/tag/isucon">isucon(1)</a></li>
+				<li><a href="/tag/golang">golang(5)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2013/10/23/20131023/">Photon Cloud の MacOSX SDK の Demo を動かす</a></h2>
 		</div>
 		<div class="content">
@@ -652,113 +1000,6 @@ configure_option -R OPTION VALUE -- replace
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/10/05/20131005/">自分がもしIRCボットっぽいもの作ったとしたら</a></h2>
-		</div>
-		<div class="content">
-			<p>こうなるなぁというメモ</p>
-
-<h3>ただ世の中にはボット用のモジュールやらなんやらは既にある</h3>
-
-<p>IRCボットとか誰もが考えるし適当に作って捨てて行くので当然そのうちフレームワークっぽいものも出てくる 例えば<a href="http://www.songmu.jp/riji/entry/2013-09-09-unazusan.html">UnazuSan</a>とか</p>
-
-<p>こういうは用途に合っていれば良いし、正規表現だしグループで捕まえたのを後方参照出来るしで大体がカバー出来そうだけど、</p>
-
-<p>例えば「開発環境で使ってるバッチスクリプトをオプション指定しつつ実行するをIRCからやりたい」とか糞みたいな要求には向かなそうだなぁとか思ったり</p>
-
-<h3>無ければ作れば良いじゃない</h3>
-
-<pre><code>#!/usr/bin/env perl
-
-use Ikusan
-  'server url',
-    port       =&gt; &lt;port&gt;,
-    enable_ssl =&gt; 1,
-    password   =&gt; &lt;password&gt;,
-    nickname   =&gt; &lt;nickname&gt;,
-    channels   =&gt; { '#channel_name' =&gt; {} };
-
-# undef_message "およよ…";
-
-register qr/regexp?/ =&gt; sub {
-    my (%opts) = @_;
-    return $opts{error} ? (1, "エラー") : (0, "オッケー");
-} =&gt; qw/
-    error
-/;
-
-register simple =&gt; sub {
-    my (%opts) = @_;
-    return $opts{error} ? 1 : 0;
-} =&gt; qw/
-    error
-/;
-
-register "die" =&gt; sub { die "ぱっつんぱっつん" };
-
-use LWP::UserAgent;
-
-register pixiv =&gt; sub {
-    my $ua  = LWP::UserAgent-&gt;new;
-    my $res = $ua-&gt;get("http://www.pixiv.net/");
-    my @url = ($res-&gt;content =~ /"(member_illust\.php.+?)"/g);
-    my $ret = "http://www.pixiv.net/" . $url[int(rand(scalar(@url)))];
-    return 0, $ret;
-};
-
-register qr/サタデーナイト/ =&gt; sub {
-    return 0, "フィーバー!!";
-};
-
-fever;
-</code></pre>
-
-<p>こんな感じで AnySan に渡すオプションを指定しつつ use Ikusan して regsiter で sub 登録して最後に fever すれば</p>
-
-<pre><code>mix3 &gt; iku: regex
- iku &gt; [OK] オッケー
-mix3 &gt; iku: regexp
- iku &gt; [OK] オッケー
-mix3 &gt; iku: regex --error
- iku &gt; [ERR] エラー
-mix3 &gt; iku: regexp --error
- iku &gt; [ERR] エラー
-mix3 &gt; iku: simple
- iku &gt; [OK]
-mix3 &gt; iku: simple --error
- iku &gt; [ERR]
-mix3 &gt; iku: die
- iku &gt; [ERR] ぱっつんぱっつん at bin/ikusan.pl line 27.
-mix3 &gt; iku: pixiv
- iku &gt; [OK] http://www.pixiv.net/member_illust.php?mode=medium&amp;amp;illust_id=38896869
-mix3 &gt; iku: サタデーナイト
- iku &gt; [OK] フィーバー!!
-mix3 &gt; iku: ふぁ！？
- iku &gt; およよ…
-</code></pre>
-
-<p>という感じになるみたいな？ regsiter で3つ目以降の引数は配列でGetOptionsに渡すようにして、sub に渡ってくるみたいな？</p>
-
-<p>実際には my $ret = &#8245;perl path/to/script.pl --option $opts{option}&#8245;; とかしてバッチスクリプトに右から左へオプション流すだけなのを想像してる</p>
-
-<p><a href="https://gist.github.com/mix3/74d53023818899d49d48">gist</a></p>
-
-<h3>熱は出る、咳は出る、鼻水は出る</h3>
-
-<p>と悲惨な最近なので、現実逃避してたら衣玖さんボットを作りたくなったのでしたマル</p>
-
-		</div>
-		<div class="footer">
-			<time>2013-10-05</time>
-			<ul class="tag">
-				<li><a href="/tag/Bot">Bot(2)</a></li>
-				<li><a href="/tag/IRC">IRC(1)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/3" class="float-left">≪前のページ</a>
 		<a href="/page/5" class="float-right">次のページ≫</a>
@@ -787,16 +1028,23 @@ mix3 &gt; iku: ふぁ！？
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
-						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2015">2015年(1)</a>
+								<ul>
+										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
 						<ul class="sidemenu toggle_tree">
 							<li><a href="/archives/2014">2014年(10)</a>
 								<ul>
@@ -852,7 +1100,7 @@ mix3 &gt; iku: ふぁ！？
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/golang">golang(5)</a></li>
-						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/mysql">mysql(4)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
 						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>

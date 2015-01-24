@@ -42,6 +42,239 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></h2>
+		</div>
+		<div class="content">
+			<p>最近 DBIC を使ってコードを書いてるけどオブジェクトの永続化の功罪について想いを馳せることが多いmix3です</p>
+
+<pre><code>CREATE TABLE user_item (
+  id           BIGINT  UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id      INTEGER UNSIGNED NOT NULL DEFAULT 0,
+  item_id      INTEGER UNSIGNED NOT NULL DEFAULT 0,
+  is_equiped   TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  is_protected TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  INDEX idx_1 (user_id, item_id, is_protected),
+  INDEX idx_2 (user_id, item_id, is_protected, is_equiped),
+  INDEX idx_3 (user_id, item_id, is_protected, id),
+  INDEX idx_4 (user_id, item_id, is_protected, is_equiped, id),
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
+</code></pre>
+
+<p>こんなテーブルがあったとして、以下の優先順位で抽出したい</p>
+
+<ul>
+<li>is_protected = 1 は保護されているので除外</li>
+<li>id 順に SELECT
+<ul>
+<li>ただし is_equiped = 1 は SELECT の対象だが装備してるので優先度を低く</li>
+</ul></li>
+</ul>
+
+<p>このとき user_id = 1, item_id = 1 のものを 2個 SELECT する場合</p>
+
+<pre><code>SELECT * FROM user_item
+WHERE user_id = 1
+AND   item_id = 1
+AND   is_protected = 0
+ORDER BY is_equiped, id ASC LIMIT 2;
+</code></pre>
+
+<p>多分こんなクエリになると思う　実際にINSERTして試してみる</p>
+
+<pre><code>INSERT into user_item
+  (user_id, item_id, is_equiped, is_protected)
+VALUES
+  (1, 1, 1, 1), -- 装備中 &amp; 保護されてる
+  (1, 1, 1, 0), -- 装備中
+  (1, 1, 0, 0),
+  (1, 1, 0, 0),
+  (1, 1, 0, 0),
+  (1, 2, 0, 0);
+
+mysql&gt; SELECT * FROM user_item WHERE user_id = 1 AND item_id = 1 AND is_protected = 0 ORDER BY is_equiped, id ASC LIMIT 2;
++----+---------+---------+------------+--------------+
+| id | user_id | item_id | is_equiped | is_protected |
++----+---------+---------+------------+--------------+
+|  3 |       1 |       1 |          0 |            0 |
+|  4 |       1 |       1 |          0 |            0 |
++----+---------+---------+------------+--------------+
+</code></pre>
+
+<p>期待通り id:1 は除外 id:2 は優先度低いので id:3,4 が帰ってきている</p>
+
+<h3>select for update</h3>
+
+<p>トランザクション内で select for update するとロックしてくれる</p>
+
+<pre><code>BEGIN;
+SELECT * FROM user_item WHERE id = 1 FOR UPDATE;
+</code></pre>
+
+<p>ターミナルを二つ開いてそれぞれで上記SQLを流すと片方の SELECT が待たされる</p>
+
+<p>ところで select for update に ORDER BY LIMIT が含まれる場合はどうなるのだろうか？</p>
+
+<pre><code>SELECT * FROM user_item FORCE INDEX (idx_N)
+WHERE user_id = 1
+AND   item_id = 1
+AND   is_protected = 0
+ORDER BY is_equiped, id ASC LIMIT 2 FOR UPDATE;
+</code></pre>
+
+<p>したあとに</p>
+
+<pre><code>SELECT * FROM user_item WHERE id = N FOR UPDATE;
+</code></pre>
+
+<p>を idx_1~4, id = 1 ~ 6 まで試してみた</p>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>
+
+            </th>
+            <th>
+                id=1
+            </th>
+            <th>
+                id=2
+            </th>
+            <th>
+                id=3
+            </th>
+            <th>
+                Id=4
+            </th>
+            <th>
+                id=5
+            </th>
+            <th>
+                id=6
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>
+                idx_1
+            </th>
+            <td>
+
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <th>
+                idx_2
+            </th>
+            <td>
+
+            </td>
+            <td>
+
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+
+            </td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <th>
+                idx_3
+            </th>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <th>
+                idx_4
+            </th>
+            <td>
+
+            </td>
+            <td>
+
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+                ×
+            </td>
+            <td>
+
+            </td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<p>こんな感じになった</p>
+
+<p>ORDER BY や LIMIT などを含む select for update も index を張っていればロック範囲を最小限に抑えらえるようだ</p>
+
+<p>ただ idx_3 は id=1 までロックされて変な index を張るとロックの範囲も変な感じになるようだ</p>
+
+<p>idx_2 が idx_4 と同じ最小範囲のロックをしているのは id が primary key だからだろうか？</p>
+
+<h3>結論</h3>
+
+<p>index は大事</p>
+
+		</div>
+		<div class="footer">
+			<time>2015-01-24</time>
+			<ul class="tag">
+				<li><a href="/tag/mysql">mysql(4)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></h2>
 		</div>
 		<div class="content">
@@ -398,92 +631,6 @@
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></h2>
-		</div>
-		<div class="content">
-			<blockquote class="twitter-tweet" lang="ja"><p>衣玖さん芸人に!!!俺はなるっ!!!（海賊王的なノリで</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/475532375305109504">2014, 6月 8</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p>最近p5-Ikusanを作ったり、それで衣玖さんのIRCボット作ったりして衣玖さんへのロマンティックが止まらないmix3です</p>
-
-<h3><a href="https://github.com/mix3/go-ikusan">github.com/mix3/go-ikusan</a>と<a href="https://github.com/mix3/go-irc">github.com/mix3/go-irc</a></h3>
-
-<p>最近golangを触ってる事が多いのですが（絶賛開発中の社内アプリがgolangだけどそっちにはあんまり関わってなかったりする）</p>
-
-<p>適当になんか作りたいなぁと思っていたところに最近衣玖さんへの愛が溢れ出してきてたので、そりゃ「go版ikachan作ろう」となるのは自然な事ですよね</p>
-
-<p>でgoでircってどう触るんだろうとgithubを漁ったところ</p>
-
-<ul>
-<li><a href="https://github.com/thoj/go-ircevent">github.com/thoj/go-ircevent</a></li>
-<li><a href="https://github.com/fluffle/goirc/tree/master">github.com/fluffle/goirc</a></li>
-</ul>
-
-<p>辺りがirc触るためのライブラリとして有名どころなのかなぁということが分かって、その辺り使って作ろうとしたのですが、</p>
-
-<blockquote class="twitter-tweet" lang="ja"><p>go-ikusanのためにgo-irceventの中追いかけてるがエラー検知からのリコネクト処理がダメだこりゃ close(end)して各イベントチャンネルをwaitgroupで待ってるけど、socketのreadで待ってるからtimeoutするまで待ち続けてる</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476224165708451840">2014, 6月 10</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<blockquote class="twitter-tweet" lang="ja"><p>preadってチャンネル用意してるのにどこにも使ってなくて多分これはsocketから1行読んで解釈するのと、それをcallbackに投げるのを分離するためものだと思うけど、まだ未実装ってことなのかな</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476225950380597248">2014, 6月 10</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<blockquote class="twitter-tweet" lang="ja"><p>go-ircevent、groupwaitしてるのsocketを安全に閉じるのを保証するためだと思うけど、socketのreadで待ち続けるのもなんとも言えないなぁ</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476226654398709761">2014, 6月 10</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<blockquote class="twitter-tweet" lang="ja"><p>Errorチャンネルをselectで待ってて、検知したらdisconnectするけどそのdisconnectの中でさらにErrorを投げてるの結構ワンダーな感じする</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476227286870392832">2014, 6月 10</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p>とか</p>
-
-<blockquote class="twitter-tweet" lang="ja"><p><a href="http://t.co/jXGwN4arHz">http://t.co/jXGwN4arHz</a> がエラーハンドリングちゃんとしてそうだけど、flag要求されて非常に使いづらい</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476228862263570434">2014, 6月 10</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p>とかでなんか微妙に使いづらいなぁとなってしまい、じゃあいっそそっから作るかということで両方の間の子みたなの作ったりしました。<a href="https://github.com/mix3/go-irc">github.com/mix3/go-irc</a></p>
-
-<p>出来るだけ薄くしておきたかったのと、IRCについて知識はまるでないので難しいことはしないようにしたかったので</p>
-
-<ul>
-<li>ircサーバへのリクエストが出来る</li>
-<li>ircサーバからのレスポンスを受け取れる</li>
-<li>ircサーバからのレスポンスを元にコールバックを呼ぶがディスパッチャみたいなことはしない</li>
-<li>ircサーバからのレスポンスのtimeoutを待たずに落ちる事が出来る</li>
-<li>落ちたタイミングで何かしたいこともあるだろうから、別途落ちたタイミングでコールバックを呼ぶようにする</li>
-<li>flagは使わない</li>
-<li>loggerはデフォルトで<a href="https://github.com/umisama/golog">github.com/umisama/golog</a>を使うけどinterfaceが定義されてるので差し替え出来るハズ</li>
-</ul>
-
-<p>ぐらいを満たすような感じで<a href="https://github.com/thoj/go-ircevent">github.com/thoj/go-ircevent</a>と<a href="https://github.com/fluffle/goirc/tree/master">github.com/fluffle/goirc</a>からコピペしたりしなかったりしました</p>
-
-<p>たまに落ちるときにWaitしたまま帰ってこないみたいなことがある感じなので、明らかにここマズいとかあったらプルリクあると嬉しいです</p>
-
-<p>で、これを元にgo版<a href="https://github.com/yappo/p5-App-Ikachan">ikachan</a>こと<a href="https://github.com/mix3/go-ikusan">go-ikusann</a>を作りましたとさ</p>
-
-<p>とってもキュートな衣玖さんがお出迎えしてくれるwebインタフェースも作ってやはり衣玖さんは最高だなって思いました</p>
-
-<blockquote class="twitter-tweet" lang="ja"><p>go-ikusanのwebインタフェース作った　衣玖さんマジかわ <a href="http://t.co/sAcXgUZJP1">pic.twitter.com/sAcXgUZJP1</a></p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/477786314641657857">2014, 6月 14</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p>なおAAの画像は「衣玖 AA」で検索して見繕ったAAなので著作権的に問題あったら非常に心苦しいですが消します</p>
-
-		</div>
-		<div class="footer">
-			<time>2014-06-15</time>
-			<ul class="tag">
-				<li><a href="/tag/golang">golang(5)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/2" class="float-right">次のページ≫</a>
 	</div>
@@ -511,16 +658,23 @@
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
-						<li><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2015">2015年(1)</a>
+								<ul>
+										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
 						<ul class="sidemenu toggle_tree">
 							<li><a href="/archives/2014">2014年(10)</a>
 								<ul>
@@ -576,7 +730,7 @@
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
 						<li class=""><a href="/tag/golang">golang(5)</a></li>
-						<li class=""><a href="/tag/MySQL">MySQL(3)</a></li>
+						<li class=""><a href="/tag/mysql">mysql(4)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
 						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
