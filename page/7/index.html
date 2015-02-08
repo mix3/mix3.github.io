@@ -42,6 +42,97 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2012/12/30/20121230/">トランザクション</a></h2>
+		</div>
+		<div class="content">
+			<p>トランザクションってなーに？mix3です</p>
+
+<h3>同時更新処理</h3>
+
+<p><a href="http://mix3.github.io/2012/11/03/20121103/">スレーブ遅延</a>のときにSELECT > UPDATEで古い情報をもとにUPDATEしてしまうと不整合が発生すると書きましたが、</p>
+
+<p>たとえば同じ行を複数で同時にSELECT > UPDATEすると同じように不整合が発生することがあります。</p>
+
+<ol>
+<li>AがT1からSELECT</li>
+<li>BがT1からSELECT</li>
+<li>AがT1をUPDATE</li>
+<li>BがT1をUPDATE</li>
+</ol>
+
+<p>このような順序で更新がかかると、BがAの更新を上書きしてしまうため、実質Aの更新が無かった事になってしまいます。</p>
+
+<p>これも更新がアトミックであれば発生しないので可能であればアトミックな更新にするのが良いですが、更新が複数ある場合はそういった変更も出来ません。</p>
+
+<h3>そんなときこそトランザクション。そんなふうに考えていた時期が僕にもありました。</h3>
+
+<p>で、そういうときはトランザクションを使う物だと思っていました。トランザクションは複数の処理を一つの処理としてまとめて成功するか失敗するか、どちらかを保証してくれます。</p>
+
+<p>なので、SELECT > UPDATEをトランザクションでまとめてしまえば大丈夫だよね！と思っていたので、以下のようなコードを書いて確認しました。</p>
+
+<script src="https://gist.github.com/4411441.js"></script>
+
+<script src="https://gist.github.com/4411446.js"></script>
+
+<p>scoreが更新回数になるので、'v' => '&lt;更新回数>' と揃えば不整合無く更新出来たことになるのですが、</p>
+
+<p>見ての通りトランザクションを使った方は残念な結果になっています。で、すこしググッた結果トランザクションとロックは別で考えないと行けないことを知りました。</p>
+
+<p><strong>トランザクションを使ったからといって勝手に行読み込みなどをロックして整合性を保証してくれるとかでは全然無いんですね。</strong></p>
+
+<p>当たり前だろダラズ！と言われても仕方ないような勘違いですが、いやトランザクションを使わない世界でしばらく生きていたので…</p>
+
+<p>で、SELECTにテーブルロックや行ロックが掛かってないためにSELECT > UPDATEの不整合が防げていないようなので、SELECT文にFOR UPDATE を付けてそれを防いでみました</p>
+
+<script src="https://gist.github.com/4411474.js"></script>
+
+<p>結果またしても残念な結果になりました…</p>
+
+<h3>ちゃんとストレージエンジンを指定しましょう</h3>
+
+<p>結果から言うとストレージエンジンを指定していなかったのでトランザクションの使えないMyISAMでテーブルが作られていたからでした。</p>
+
+<script src="https://gist.github.com/4411511.js"></script>
+
+<p>こんな感じでInnoDBを指定する事で期待通り、不整合なく更新されるようになりました。めでたしめでたし。</p>
+
+<p>ちなみにSELECTのロックには共有ロックと排他ロックとあり、FOR UPDATEは排他ロックになります。LOCK IN SHARE MODEだと共有ロックになります。</p>
+
+<p>今回の場合にLOCK IN SHARE MODEを使うと10ものプロセスが共有ロックを取り合って凄い勢いでデッドロックしました。</p>
+
+<script src="https://gist.github.com/4411540.js"></script>
+
+<p>ロックするということは同時にデッドロックする可能性もあるということなので、適切なロックを選択して使い、デッドロックの可能性を減らしながら上手く付き合っていきたいですね。</p>
+
+<h3>まとめ</h3>
+
+<ul>
+<li>トランザクションはロックとはまた別問題
+<ul>
+<li>不整合を防ぎたいならちゃんとロックのことを考えてSQLを書く</li>
+</ul></li>
+<li>MySQLのデフォルトストレージエンジンはMyISAMだけど、それトランザクション使えないからね？</li>
+<li>ロックにも種類はあり、デッドロックには気をつける</li>
+</ul>
+
+<h3>今年のブログはこれが最後な気がするので。</h3>
+
+<p>来年はもっとブログをコードを書いてアウトプットを増やして行きたいです。</p>
+
+<h3>それでは良いお年を！</h3>
+
+		</div>
+		<div class="footer">
+			<time>2012-12-30</time>
+			<ul class="tag">
+				<li><a href="/tag/MySQL">MySQL(4)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2012/11/07/20121107/">巨大ファイルの削除</a></h2>
 		</div>
 		<div class="content">
@@ -352,37 +443,6 @@ exit 0
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2012/04/14/20120414/">Capture::Tiny</a></h2>
-		</div>
-		<div class="content">
-			<p>前回pixivブログは github pages のコピーだから大丈夫とか書いたけど、github pages で書き始める前のpixivブログはバックアップ取ってなかったのでほんとは大丈夫じゃなかった mix3 です。SSH+LDAP とか keepalived を試してみた記事が消えたのはちょっともったいなかったかな。まあ、Google検索でキャッシュ漁ればある程度は発掘出来そうではあるけれども。</p>
-
-<h3>p5-SWFEditor</h3>
-
-<p>アウトプットが無さ過ぎて良くないなぁということでひねり出してみる。</p>
-
-<p>前の記事に書いたp5-SWFEditorですが、swf_info と print_tag_data はCが標準出力をしていて、これをテストしようとすると標準出力をキャプチャしないといけなくてちょっと困ってしまいました。Capture::Tiny というものを使うとキャプチャ出来るというのは<a href="https://twitter.com/#!/fujiwara">@fujiwara</a>さんから教わって試してみたけれどなぜか上手く行かず。言われて試してみたときは途中までしかキャプチャ出来ませんでした。</p>
-
-<p>ただ、途中までしかキャプチャできないという時点で出力がバッファされているというのはピンと来ていて、実際その通りだったのですが、Perlでこれをどうこうする方法が分からず結局今もどうすれば良いのかというのは分かっていません。今はXSのほうでfflushするようにしてテストが出来るようにしています。</p>
-
-<p>以下標準出力を捕まえる方法を探っていたときに書いたサンプルです。fflushしたときの標準出力とPerlIO_stdoutfを使った標準出力はキャプチャできていますが、素直にprintfしたときはキャプチャできず遅れてバッファに溜まっていたものが標準出力されてしまっています。</p>
-
-<script src="https://gist.github.com/2384966.js"> </script>
-
-		</div>
-		<div class="footer">
-			<time>2012-04-14</time>
-			<ul class="tag">
-				<li><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
-				<li><a href="/tag/perl">perl(10)</a></li>
-				<li><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/6" class="float-left">≪前のページ</a>
 		<a href="/page/8" class="float-right">次のページ≫</a>
@@ -411,19 +471,20 @@ exit 0
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/02/08/20150208/">plantumlのリアルタイムプレビュー</a></li>
 						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
-						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2015">2015年(1)</a>
+							<li><a href="/archives/2015">2015年(2)</a>
 								<ul>
+										<li><a href="/archives/2015/02">2015年02月(1)</a></li>
 										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
 								</ul>
 							</li>
@@ -482,7 +543,7 @@ exit 0
 				<div class="col-1-1">
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
-						<li class=""><a href="/tag/golang">golang(5)</a></li>
+						<li class=""><a href="/tag/golang">golang(6)</a></li>
 						<li class=""><a href="/tag/mysql">mysql(4)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
@@ -528,6 +589,7 @@ exit 0
 						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
 						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/plantuml">plantuml(1)</a></li>
 						<li class="hide"><a href="/tag/responsive design">responsive design(1)</a></li>
 						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
 						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>

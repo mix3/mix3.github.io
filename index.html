@@ -42,6 +42,158 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2015/02/08/20150208/">plantumlのリアルタイムプレビュー</a></h2>
+		</div>
+		<div class="content">
+			<p><a href="http://plantuml.sourceforge.net/">plantuml</a> にはいつもお世話になっております。mix3です。</p>
+
+<h3>リアルタイムプレビュー</h3>
+
+<p>plantuml のサイトにリアルタイムプレビューはあってレスポンンスが早いので重宝するのですが</p>
+
+<ul>
+<li>広告がチラチラして邪魔</li>
+<li>普通のフォームなのでインデント効かない
+<ul>
+<li>タブ使えない</li>
+</ul></li>
+<li>狭い</li>
+</ul>
+
+<p>と不満がなくもないので自前のプレビュー環境を作りたいな、とは過去に思ってやろうとしたもあるのですが、</p>
+
+<p>plantumlのコマンドを使うとどうもフォーカスが移ってしまうらしくコンソールが前面に来るという問題があって諦めた経緯があります。</p>
+
+<p>が、最近になってこんな記事を見つけました</p>
+
+<p><a href="http://blog.yappo.jp/yappo/archives/000847.html">Mac + emacs + PlantUML でさくさく UML 職人</a></p>
+
+<pre><code>JAVA_TOOL_OPTIONS="-Djava.awt.headless=true" watcher --dir ./uml/ -- 'java -jar /foo/bar/plantuml.jar ./uml/*.uml &amp;&amp; open -g -a Preview ./img/*.png'
+</code></pre>
+
+<p>どうやら JAVA_TOOL_OPTIONS="-Djava.awt.headless=true" で awt の設定を変更することでフォーカスの問題を回避出来るようです</p>
+
+<p>ということで全然サクっとはいかなかったっけど作りました。</p>
+
+<p><a href="https://github.com/mix3/plantumlor">plantumlor</a></p>
+
+<h3>go-bindata-assetfs なるものがある</h3>
+
+<p>goで静的ファイル配信をするときは <a href="http://golang.org/pkg/net/http/#FileServer">net/http/#FileServer</a> を使うと思うのですが <a href="https://github.com/jteeuwen/go-bindata">go-bindata</a> でまとめたときにどうしたらいいか、という問題があって、</p>
+
+<p><a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんが記事にしていた <a href="http://sfujiwara.hatenablog.com/entry/2015/01/30/221553">Consul KVSをバックエンドにしたリアルタイムダッシュボード #monitoringcasual</a> では、http.Dir のところを自作していているようだったので、それを拝借しようかなと思ったのですが、</p>
+
+<p>よくよく探してみると <a href="https://github.com/elazarl/go-bindata-assetfs">go-bindata-assetfs</a> という bindata の生成から対応しているものがあったのでそっちを使うようにしてみました。</p>
+
+<h3>go-server-starter と manners</h3>
+
+<p>別にいらないんだけど <a href="https://github.com/braintree/manners">manners</a> を使って graceful shutdown に対応させて <a href="https://github.com/lestrrat/go-server-starter">go-server-startar</a> を使って graceful restart も出来るようにしています。</p>
+
+<pre><code>func serve(mux http.Handler) {
+    l, _ := ss.NewListener()
+    if l == nil {
+        var err error
+        l, err = net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
+        if err != nil {
+            log.Fatalf("Failed to listen to port %d", port)
+        }
+    }
+    s := manners.NewServer()
+    s.Serve(manners.NewListener(l, s), mux)
+}
+</code></pre>
+
+<p>ちゃんと確認してないけど多分これでいけるはず</p>
+
+<h3>WAF無し</h3>
+
+<p><a href="http://nicolasmerouze.com/build-web-framework-golang/">Build You Own Web Framework In Go</a> を参考にWAF無しで作ってみました。</p>
+
+<p>middleware のところで func を返すようにして <a href="https://github.com/justinas/alice">Alice</a> でメソッドチェインにするところとかなんかスマートな感じがして好き。</p>
+
+<pre><code>func hogeHandler(next http.Handler) http.Handler {
+    fn := func(w http.ResponseWriter, r *http.Request) {
+        // before
+        next.ServeHTTP(w, r)
+        // after
+    }
+    return http.HandlerFunc(fn)
+}
+
+func hogeHandler(w http.ResponseWriter, r *http.Request) {
+    // ...
+}
+
+func main() {
+    commonHandlers := alice.New(hogeMiddleware)
+    http.Handle("/about", commonHandlers.ThenFunc(hogeHandler))
+    http.ListenAndServe(":8080", nil)
+}
+</code></pre>
+
+<p>contextとか、サードパーティの routing ライブラリの組み込みとか色々参考になる。まあWAF使わない場合の話だけども。</p>
+
+<h3>js-base64</h3>
+
+<p>リアルタイムプビューを作る上で一番詰まったのが <a href="https://github.com/dankogai/js-base64">js-base64</a></p>
+
+<ul>
+<li>$.base64.encode(RawDeflate.deflate(Base64.utob("hoge"))
+<ul>
+<li>y8hPTwUA</li>
+</ul></li>
+<li>Base64.encode(RawDeflate.deflate(Base64.utob("hoge")))
+<ul>
+<li>w4vDiE9PBQA=</li>
+</ul></li>
+</ul>
+
+<p>こんな感じで js-base64 を使うと encode の結果が違って「サーバで上手く解答出来ないむきーっ！！！」て半日潰してしまった。</p>
+
+<p>結局 Base64.btoa(RawDeflate.deflate(Base64.utob("hoge"))) とすると大丈夫だった。encode と btoa って違うのん？と未だに良くわかっていません。</p>
+
+<h3>react.js</h3>
+
+<p>せっかくだから色々試さないと、ということで最初はjqueryでごりごりやるかなと思ったけど consul-kv-dashboard で <a href="http://facebook.github.io/react/">react.js</a> を使っているのを見て試してみました</p>
+
+<pre><code>Content
+┗ Editor
+┗ Image
+</code></pre>
+
+<p>こんな感じで Component を用意</p>
+
+<ul>
+<li>Editor は onChange で textarea の入力内容を Content に通知</li>
+<li>Content は1秒毎に変更をチェックして変更があったら Image を更新</li>
+<li>Image は更新毎に渡された入力内容を元に rawdeflate と base64 (と / が混じるので _ にreplace) して url を生成して img タグを描画</li>
+</ul>
+
+<p>こんな感じで <a href="http://qiita.com/advent-calendar/2014/reactjs">一人React.js Advent Calendar 2014</a> の10日目あたりまでを参考にしてみた</p>
+
+<p>コンポーネントはモデルを持っていて、どう描画したら良いかを知っているという点で wicket の View に近いなぁと感じた。もっとプレーンな html で構築出来たら最高だなぁって思った。</p>
+
+<p>テンプレートエンジン的な考え方や、vue.js angular.js のような MVVM の感覚に慣れていると大分混乱するなぁってぐらい考え方が違ってて面白い。</p>
+
+<p>どちらかというと angular.js よりも好みなのでもっとメジャーになるといいなぁ。</p>
+
+<h3>ということで</h3>
+
+<p>まとめて書き出してみるとなんか色々触った感があって楽しかった。react.js が今後どうなるか注目ですね。</p>
+
+		</div>
+		<div class="footer">
+			<time>2015-02-08</time>
+			<ul class="tag">
+				<li><a href="/tag/golang">golang(6)</a></li>
+				<li><a href="/tag/plantuml">plantuml(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></h2>
 		</div>
 		<div class="content">
@@ -431,7 +583,7 @@ ORDER BY is_equiped, id ASC LIMIT 2 FOR UPDATE;
 		<div class="footer">
 			<time>2014-11-03</time>
 			<ul class="tag">
-				<li><a href="/tag/golang">golang(5)</a></li>
+				<li><a href="/tag/golang">golang(6)</a></li>
 			</ul>
 			<div class="clearer"></div>
 		</div>
@@ -579,58 +731,6 @@ ORDER BY is_equiped, id ASC LIMIT 2 FOR UPDATE;
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2014/06/15/20140717_01/">rocket</a></h2>
-		</div>
-		<div class="content">
-			<p>衣玖さんが好きすぎて、最近は衣玖さんの人としてチームメンバーからは認識されているようです。（衣玖さん結婚しよ）mix3です。</p>
-
-<h3>サンプルアプリ</h3>
-
-<p>社内的にgolangを使って行こうか、という流れが出来ていてその流れの中で <a href="https://twitter.com/#!/acidlemon">@acidlemon</a> さん作のWAF、<a href="https://github.com/acidlemon/rocket">rocket</a>が出てきたので使い方の勉強もかねて早速それのサンプルアプリを作ってみました</p>
-
-<h3>リマインダアプリ</h3>
-
-<p>うちの社内IRCではお願いすると指定日時にメンションを飛ばしてくれるremember君というbotが生息してるのですが、それのメール版のようなイメージで作りました</p>
-
-<p>指定アドレスにメールして登録、指定日時にメールが飛んでくるだけの簡単なwebアプリです</p>
-
-<p>世の中便利なもので、<a href="http://www.cloudmailin.com/">指定アドレスにメールが来ると指定URLにPOSTしてくれるサービス</a>（つまりSMTPいらない）があったり、<a href="http://www.mailgun.com/">1日10000通までメール送信出来るサービス</a>（つまりSMTPいらない）があって、herokuとかと組み合わせることで簡単な物なら無料でメールを使ったサービスが作れてしまうようです</p>
-
-<p>物はこちら <a href="https://github.com/mix3/go-rocket-sample-app">go-rocket-sample-app</a> <a href="http://secure-sierra-2582.herokuapp.com/">http://secure-sierra-2582.herokuapp.com/</a></p>
-
-<h3>リマインダ登録までの流れ</h3>
-
-<p>一応登録されたメールアドレス以外のリマインダ登録は受け付けないようにしたかったので、</p>
-
-<ul>
-<li>アドレス登録のアドレスに対して空メールすると、仮登録され本登録のURLが返信される</li>
-<li>URLを踏むと本登録が完了する</li>
-<li>リマインド登録のアドレスに対して、件名に日時指定、本文にリマインドの内容を書いて送ると登録される（認識する日時指定はだいたい以下の通り）
-<ul>
-<li>12:34</li>
-<li>07-01 12:00</li>
-<li>2014-07-01 23:59</li>
-</ul></li>
-</ul>
-
-<p>な感じで動く様になっています　アドレス登録後はリマインド登録用のアドレスを保存しておいて使うことを想定しています</p>
-
-<h3>ということで</h3>
-
-<p><a href="https://github.com/acidlemon/rocket">rocket</a>のサンプルアプリでした</p>
-
-		</div>
-		<div class="footer">
-			<time>2014-06-15</time>
-			<ul class="tag">
-				<li><a href="/tag/golang">golang(5)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/2" class="float-right">次のページ≫</a>
 	</div>
@@ -658,19 +758,20 @@ ORDER BY is_equiped, id ASC LIMIT 2 FOR UPDATE;
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/02/08/20150208/">plantumlのリアルタイムプレビュー</a></li>
 						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
-						<li><a href="/blog/2014/06/15/20140717_01/">rocket</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2015">2015年(1)</a>
+							<li><a href="/archives/2015">2015年(2)</a>
 								<ul>
+										<li><a href="/archives/2015/02">2015年02月(1)</a></li>
 										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
 								</ul>
 							</li>
@@ -729,7 +830,7 @@ ORDER BY is_equiped, id ASC LIMIT 2 FOR UPDATE;
 				<div class="col-1-1">
 					<h3>Tags</h3>
 					<ul class="sidemenu toggle_tree_2">
-						<li class=""><a href="/tag/golang">golang(5)</a></li>
+						<li class=""><a href="/tag/golang">golang(6)</a></li>
 						<li class=""><a href="/tag/mysql">mysql(4)</a></li>
 						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
 						<li class=""><a href="/tag/php">php(3)</a></li>
@@ -775,6 +876,7 @@ ORDER BY is_equiped, id ASC LIMIT 2 FOR UPDATE;
 						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
 						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/plantuml">plantuml(1)</a></li>
 						<li class="hide"><a href="/tag/responsive design">responsive design(1)</a></li>
 						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
 						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>

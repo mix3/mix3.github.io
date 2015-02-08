@@ -1,0 +1,389 @@
+<!doctype html>
+<html>
+	<head>
+		<title>plantumlのリアルタイムプレビュー - 萌えキャラとは何だったのか</title>
+		<meta charset="utf-8" />
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
+		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<script src="/js/app.js"></script>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-48133863-1', 'mix3.github.io');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<header class="grid">
+			<div class="col-1-1">
+				<img src="/images/header.jpg" />
+				<h1><a href="/">萌えキャラとは何だったのか</a></h1>
+				<h2>ギークにも絵描きにもなれない者の末路</h2>
+				<div class="top-menu">
+					<ul>
+						<li><a href="/index.rdf">RSS Feed</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<nav class="grid">
+				<div class="col-1-1">
+					<ul>
+						<li class="current">Blog</li>
+						<li class=""><a href="/archives">Archive</a></li>
+					</ul>
+				</div>
+		</nav>
+		<main class="grid">
+			<article class="col-8-12">
+	<div class="col-1-1">
+		<div class="header">
+			<h2><a href="/blog/2015/02/08/20150208/">plantumlのリアルタイムプレビュー</a></h2>
+		</div>
+		<div class="social_button">
+				<!-- はてブ -->
+				<div class="hatena">
+					<a href="http://b.hatena.ne.jp/entry/http://mix3.github.io/blog/2015/02/08/20150208/" class="hatena-bookmark-button" data-hatena-bookmark-title="plantumlのリアルタイムプレビュー - 萌えキャラとは何だったのか" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+				</div>
+				<!-- Twitter -->
+				<div class="twitter">
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mix3.github.io/blog/2015/02/08/20150208/" data-text="plantumlのリアルタイムプレビュー - 萌えキャラとは何だったのか" data-via="mix3" data-lang="ja">ツイート</a>
+					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+				</div>
+				<!-- Google+ -->
+				<div class="googleplus">
+					<div class="g-plusone" data-size="medium" data-href="http://mix3.github.io/blog/2015/02/08/20150208/"></div>
+					<script type="text/javascript">
+						window.___gcfg = {lang: 'ja'};
+						(function() {
+							var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+							po.src = 'https://apis.google.com/js/platform.js';
+							var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+						})();
+					</script>
+				</div>
+				<!-- facebook -->
+				<div class="facebook">
+					<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmix3.github.io%2Fblog%2F2015%2F02%2F08%2F20150208%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=false&amp;height=21&amp;appId=662642987135668" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+				</div>
+		</div>
+		<div class="clearer"></div>
+		<div class="content">
+			<p><a href="http://plantuml.sourceforge.net/">plantuml</a> にはいつもお世話になっております。mix3です。</p>
+
+<h3>リアルタイムプレビュー</h3>
+
+<p>plantuml のサイトにリアルタイムプレビューはあってレスポンンスが早いので重宝するのですが</p>
+
+<ul>
+<li>広告がチラチラして邪魔</li>
+<li>普通のフォームなのでインデント効かない
+<ul>
+<li>タブ使えない</li>
+</ul></li>
+<li>狭い</li>
+</ul>
+
+<p>と不満がなくもないので自前のプレビュー環境を作りたいな、とは過去に思ってやろうとしたもあるのですが、</p>
+
+<p>plantumlのコマンドを使うとどうもフォーカスが移ってしまうらしくコンソールが前面に来るという問題があって諦めた経緯があります。</p>
+
+<p>が、最近になってこんな記事を見つけました</p>
+
+<p><a href="http://blog.yappo.jp/yappo/archives/000847.html">Mac + emacs + PlantUML でさくさく UML 職人</a></p>
+
+<pre><code>JAVA_TOOL_OPTIONS="-Djava.awt.headless=true" watcher --dir ./uml/ -- 'java -jar /foo/bar/plantuml.jar ./uml/*.uml &amp;&amp; open -g -a Preview ./img/*.png'
+</code></pre>
+
+<p>どうやら JAVA_TOOL_OPTIONS="-Djava.awt.headless=true" で awt の設定を変更することでフォーカスの問題を回避出来るようです</p>
+
+<p>ということで全然サクっとはいかなかったっけど作りました。</p>
+
+<p><a href="https://github.com/mix3/plantumlor">plantumlor</a></p>
+
+<h3>go-bindata-assetfs なるものがある</h3>
+
+<p>goで静的ファイル配信をするときは <a href="http://golang.org/pkg/net/http/#FileServer">net/http/#FileServer</a> を使うと思うのですが <a href="https://github.com/jteeuwen/go-bindata">go-bindata</a> でまとめたときにどうしたらいいか、という問題があって、</p>
+
+<p><a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんが記事にしていた <a href="http://sfujiwara.hatenablog.com/entry/2015/01/30/221553">Consul KVSをバックエンドにしたリアルタイムダッシュボード #monitoringcasual</a> では、http.Dir のところを自作していているようだったので、それを拝借しようかなと思ったのですが、</p>
+
+<p>よくよく探してみると <a href="https://github.com/elazarl/go-bindata-assetfs">go-bindata-assetfs</a> という bindata の生成から対応しているものがあったのでそっちを使うようにしてみました。</p>
+
+<h3>go-server-starter と manners</h3>
+
+<p>別にいらないんだけど <a href="https://github.com/braintree/manners">manners</a> を使って graceful shutdown に対応させて <a href="https://github.com/lestrrat/go-server-starter">go-server-startar</a> を使って graceful restart も出来るようにしています。</p>
+
+<pre><code>func serve(mux http.Handler) {
+    l, _ := ss.NewListener()
+    if l == nil {
+        var err error
+        l, err = net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
+        if err != nil {
+            log.Fatalf("Failed to listen to port %d", port)
+        }
+    }
+    s := manners.NewServer()
+    s.Serve(manners.NewListener(l, s), mux)
+}
+</code></pre>
+
+<p>ちゃんと確認してないけど多分これでいけるはず</p>
+
+<h3>WAF無し</h3>
+
+<p><a href="http://nicolasmerouze.com/build-web-framework-golang/">Build You Own Web Framework In Go</a> を参考にWAF無しで作ってみました。</p>
+
+<p>middleware のところで func を返すようにして <a href="https://github.com/justinas/alice">Alice</a> でメソッドチェインにするところとかなんかスマートな感じがして好き。</p>
+
+<pre><code>func hogeHandler(next http.Handler) http.Handler {
+    fn := func(w http.ResponseWriter, r *http.Request) {
+        // before
+        next.ServeHTTP(w, r)
+        // after
+    }
+    return http.HandlerFunc(fn)
+}
+
+func hogeHandler(w http.ResponseWriter, r *http.Request) {
+    // ...
+}
+
+func main() {
+    commonHandlers := alice.New(hogeMiddleware)
+    http.Handle("/about", commonHandlers.ThenFunc(hogeHandler))
+    http.ListenAndServe(":8080", nil)
+}
+</code></pre>
+
+<p>contextとか、サードパーティの routing ライブラリの組み込みとか色々参考になる。まあWAF使わない場合の話だけども。</p>
+
+<h3>js-base64</h3>
+
+<p>リアルタイムプビューを作る上で一番詰まったのが <a href="https://github.com/dankogai/js-base64">js-base64</a></p>
+
+<ul>
+<li>$.base64.encode(RawDeflate.deflate(Base64.utob("hoge"))
+<ul>
+<li>y8hPTwUA</li>
+</ul></li>
+<li>Base64.encode(RawDeflate.deflate(Base64.utob("hoge")))
+<ul>
+<li>w4vDiE9PBQA=</li>
+</ul></li>
+</ul>
+
+<p>こんな感じで js-base64 を使うと encode の結果が違って「サーバで上手く解答出来ないむきーっ！！！」て半日潰してしまった。</p>
+
+<p>結局 Base64.btoa(RawDeflate.deflate(Base64.utob("hoge"))) とすると大丈夫だった。encode と btoa って違うのん？と未だに良くわかっていません。</p>
+
+<h3>react.js</h3>
+
+<p>せっかくだから色々試さないと、ということで最初はjqueryでごりごりやるかなと思ったけど consul-kv-dashboard で <a href="http://facebook.github.io/react/">react.js</a> を使っているのを見て試してみました</p>
+
+<pre><code>Content
+┗ Editor
+┗ Image
+</code></pre>
+
+<p>こんな感じで Component を用意</p>
+
+<ul>
+<li>Editor は onChange で textarea の入力内容を Content に通知</li>
+<li>Content は1秒毎に変更をチェックして変更があったら Image を更新</li>
+<li>Image は更新毎に渡された入力内容を元に rawdeflate と base64 (と / が混じるので _ にreplace) して url を生成して img タグを描画</li>
+</ul>
+
+<p>こんな感じで <a href="http://qiita.com/advent-calendar/2014/reactjs">一人React.js Advent Calendar 2014</a> の10日目あたりまでを参考にしてみた</p>
+
+<p>コンポーネントはモデルを持っていて、どう描画したら良いかを知っているという点で wicket の View に近いなぁと感じた。もっとプレーンな html で構築出来たら最高だなぁって思った。</p>
+
+<p>テンプレートエンジン的な考え方や、vue.js angular.js のような MVVM の感覚に慣れていると大分混乱するなぁってぐらい考え方が違ってて面白い。</p>
+
+<p>どちらかというと angular.js よりも好みなのでもっとメジャーになるといいなぁ。</p>
+
+<h3>ということで</h3>
+
+<p>まとめて書き出してみるとなんか色々触った感があって楽しかった。react.js が今後どうなるか注目ですね。</p>
+
+		</div>
+		<div class="footer">
+			<time>2015-02-08</time>
+			<ul class="tag">
+				<li><a href="/tag/golang">golang(6)</a></li>
+				<li><a href="/tag/plantuml">plantuml(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1 pager">
+	<a href="/blog/2015/01/24/20150124/" class="float-left">≪ORDER BY や LIMIT を含む場合の select for update</a>
+	</div>
+	<div class="clearer"></div>
+			</article>
+			<aside class="col-4-12">
+				<div class="col-1-1">
+					<h3>Profile</h3>
+					<div class="content">
+						<img src="/images/avatar.png" class="float-left" style="width:100px;" />
+						<a href="https://twitter.com/mix3" target="_blank">twitter @mix3</a><br />
+						<a href="https://github.com/mix3/" target="_blank">github @mix3</a><br />
+						<a href="http://pixiv.me/mix3" target="_blank">pixiv @mix3</a><br />
+						<div class="clearer"></div>
+						Webエンジニアのような何か。絶賛人生の迷子中。スキルセット的には以下のような感じ<br />
+						Perl/MySQL/Linux/ソーシャルアプリ開発・運用
+					</div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>coderwall</h3>
+					<div id="coderwall"></div>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Recent Posts</h3>
+					<ul class="sidemenu">
+						<li><a href="/blog/2015/02/08/20150208/">plantumlのリアルタイムプレビュー</a></li>
+						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
+						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
+						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
+						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Archives</h3>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2015">2015年(2)</a>
+								<ul>
+										<li><a href="/archives/2015/02">2015年02月(1)</a></li>
+										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2014">2014年(10)</a>
+								<ul>
+										<li><a href="/archives/2014/12">2014年12月(1)</a></li>
+										<li><a href="/archives/2014/11">2014年11月(1)</a></li>
+										<li><a href="/archives/2014/09">2014年09月(1)</a></li>
+										<li><a href="/archives/2014/06">2014年06月(4)</a></li>
+										<li><a href="/archives/2014/04">2014年04月(1)</a></li>
+										<li><a href="/archives/2014/03">2014年03月(1)</a></li>
+										<li><a href="/archives/2014/01">2014年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2013">2013年(18)</a>
+								<ul>
+										<li><a href="/archives/2013/12">2013年12月(3)</a></li>
+										<li><a href="/archives/2013/11">2013年11月(2)</a></li>
+										<li><a href="/archives/2013/10">2013年10月(5)</a></li>
+										<li><a href="/archives/2013/08">2013年08月(1)</a></li>
+										<li><a href="/archives/2013/07">2013年07月(1)</a></li>
+										<li><a href="/archives/2013/04">2013年04月(1)</a></li>
+										<li><a href="/archives/2013/03">2013年03月(3)</a></li>
+										<li><a href="/archives/2013/02">2013年02月(1)</a></li>
+										<li><a href="/archives/2013/01">2013年01月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2012">2012年(7)</a>
+								<ul>
+										<li><a href="/archives/2012/12">2012年12月(1)</a></li>
+										<li><a href="/archives/2012/11">2012年11月(2)</a></li>
+										<li><a href="/archives/2012/08">2012年08月(1)</a></li>
+										<li><a href="/archives/2012/04">2012年04月(3)</a></li>
+								</ul>
+							</li>
+						</ul>
+						<ul class="sidemenu toggle_tree">
+							<li><a href="/archives/2011">2011年(13)</a>
+								<ul>
+										<li><a href="/archives/2011/11">2011年11月(1)</a></li>
+										<li><a href="/archives/2011/07">2011年07月(6)</a></li>
+										<li><a href="/archives/2011/06">2011年06月(3)</a></li>
+										<li><a href="/archives/2011/05">2011年05月(2)</a></li>
+										<li><a href="/archives/2011/04">2011年04月(1)</a></li>
+								</ul>
+							</li>
+						</ul>
+				</div>
+				<div class="clearer"></div>
+				<div class="col-1-1">
+					<h3>Tags</h3>
+					<ul class="sidemenu toggle_tree_2">
+						<li class=""><a href="/tag/golang">golang(6)</a></li>
+						<li class=""><a href="/tag/mysql">mysql(4)</a></li>
+						<li class=""><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+						<li class=""><a href="/tag/php">php(3)</a></li>
+						<li class=""><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
+						<li class="hide"><a href="/tag/Linux">Linux(2)</a></li>
+						<li class="hide"><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
+						<li class="hide"><a href="/tag/Vagrant">Vagrant(2)</a></li>
+						<li class="hide"><a href="/tag/bot">bot(2)</a></li>
+						<li class="hide"><a href="/tag/さくらVPS">さくらVPS(2)</a></li>
+						<li class="hide"><a href="/tag/インフラ">インフラ(2)</a></li>
+						<li class="hide"><a href="/tag/落書き">落書き(2)</a></li>
+						<li class="hide"><a href="/tag/雑記">雑記(2)</a></li>
+						<li class=""><a href="/tag/perl">perl(10)</a></li>
+						<li class="hide"><a href="/tag/CI">CI(1)</a></li>
+						<li class="hide"><a href="/tag/CRUD">CRUD(1)</a></li>
+						<li class="hide"><a href="/tag/Capture::Tiny">Capture::Tiny(1)</a></li>
+						<li class="hide"><a href="/tag/Chrome">Chrome(1)</a></li>
+						<li class="hide"><a href="/tag/Hadoop">Hadoop(1)</a></li>
+						<li class="hide"><a href="/tag/IRC">IRC(1)</a></li>
+						<li class="hide"><a href="/tag/Log">Log(1)</a></li>
+						<li class="hide"><a href="/tag/Markdown">Markdown(1)</a></li>
+						<li class="hide"><a href="/tag/Mojolicious">Mojolicious(1)</a></li>
+						<li class="hide"><a href="/tag/Mouse">Mouse(1)</a></li>
+						<li class="hide"><a href="/tag/PhotonCloud">PhotonCloud(1)</a></li>
+						<li class="hide"><a href="/tag/Play">Play(1)</a></li>
+						<li class="hide"><a href="/tag/Qudo">Qudo(1)</a></li>
+						<li class="hide"><a href="/tag/SNBinder">SNBinder(1)</a></li>
+						<li class="hide"><a href="/tag/SQLite">SQLite(1)</a></li>
+						<li class="hide"><a href="/tag/Scala">Scala(1)</a></li>
+						<li class="hide"><a href="/tag/Teng">Teng(1)</a></li>
+						<li class="hide"><a href="/tag/Virtualbox">Virtualbox(1)</a></li>
+						<li class="hide"><a href="/tag/Xslate">Xslate(1)</a></li>
+						<li class="hide"><a href="/tag/YAPC">YAPC(1)</a></li>
+						<li class="hide"><a href="/tag/bless">bless(1)</a></li>
+						<li class="hide"><a href="/tag/bonding">bonding(1)</a></li>
+						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
+						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
+						<li class="hide"><a href="/tag/dbic">dbic(1)</a></li>
+						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
+						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
+						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
+						<li class="hide"><a href="/tag/java">java(1)</a></li>
+						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
+						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
+						<li class="hide"><a href="/tag/plantuml">plantuml(1)</a></li>
+						<li class="hide"><a href="/tag/responsive design">responsive design(1)</a></li>
+						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
+						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
+						<li class="hide"><a href="/tag/サーバ管理">サーバ管理(1)</a></li>
+						<li class="hide"><a href="/tag/テスト">テスト(1)</a></li>
+						<li class="hide"><a href="/tag/ネットワーク設定">ネットワーク設定(1)</a></li>
+						<li class="hide"><a href="/tag/パーティショニング">パーティショニング(1)</a></li>
+						<li class="hide"><a href="/tag/ブログ">ブログ(1)</a></li>
+						<li class="hide"><a href="/tag/修士論文">修士論文(1)</a></li>
+					</ul>
+				</div>
+				<div class="clearer"></div>
+			</aside>
+		</main>
+		<footer class="grid">
+			<div class="col-1-1">
+				<small>&copy; copyright 2014 mix3.github.io</small>
+			</div>
+		</footer>
+	</body>
+</html>

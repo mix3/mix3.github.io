@@ -10,6 +10,150 @@
 <description>&#x30AE;&#x30FC;&#x30AF;&#x306B;&#x3082;&#x7D75;&#x63CF;&#x304D;&#x306B;&#x3082;&#x306A;&#x308C;&#x306A;&#x3044;&#x8005;&#x306E;&#x672B;&#x8DEF;</description>
 
 <item>
+<title>plantuml&#x306E;&#x30EA;&#x30A2;&#x30EB;&#x30BF;&#x30A4;&#x30E0;&#x30D7;&#x30EC;&#x30D3;&#x30E5;&#x30FC;</title>
+<description>
+<![CDATA[
+<p><a href="http://plantuml.sourceforge.net/">plantuml</a> にはいつもお世話になっております。mix3です。</p>
+
+<h3>リアルタイムプレビュー</h3>
+
+<p>plantuml のサイトにリアルタイムプレビューはあってレスポンンスが早いので重宝するのですが</p>
+
+<ul>
+<li>広告がチラチラして邪魔</li>
+<li>普通のフォームなのでインデント効かない
+<ul>
+<li>タブ使えない</li>
+</ul></li>
+<li>狭い</li>
+</ul>
+
+<p>と不満がなくもないので自前のプレビュー環境を作りたいな、とは過去に思ってやろうとしたもあるのですが、</p>
+
+<p>plantumlのコマンドを使うとどうもフォーカスが移ってしまうらしくコンソールが前面に来るという問題があって諦めた経緯があります。</p>
+
+<p>が、最近になってこんな記事を見つけました</p>
+
+<p><a href="http://blog.yappo.jp/yappo/archives/000847.html">Mac + emacs + PlantUML でさくさく UML 職人</a></p>
+
+<pre><code>JAVA_TOOL_OPTIONS="-Djava.awt.headless=true" watcher --dir ./uml/ -- 'java -jar /foo/bar/plantuml.jar ./uml/*.uml &amp;&amp; open -g -a Preview ./img/*.png'
+</code></pre>
+
+<p>どうやら JAVA_TOOL_OPTIONS="-Djava.awt.headless=true" で awt の設定を変更することでフォーカスの問題を回避出来るようです</p>
+
+<p>ということで全然サクっとはいかなかったっけど作りました。</p>
+
+<p><a href="https://github.com/mix3/plantumlor">plantumlor</a></p>
+
+<h3>go-bindata-assetfs なるものがある</h3>
+
+<p>goで静的ファイル配信をするときは <a href="http://golang.org/pkg/net/http/#FileServer">net/http/#FileServer</a> を使うと思うのですが <a href="https://github.com/jteeuwen/go-bindata">go-bindata</a> でまとめたときにどうしたらいいか、という問題があって、</p>
+
+<p><a href="https://twitter.com/#!/fujiwara">@fujiwara</a> さんが記事にしていた <a href="http://sfujiwara.hatenablog.com/entry/2015/01/30/221553">Consul KVSをバックエンドにしたリアルタイムダッシュボード #monitoringcasual</a> では、http.Dir のところを自作していているようだったので、それを拝借しようかなと思ったのですが、</p>
+
+<p>よくよく探してみると <a href="https://github.com/elazarl/go-bindata-assetfs">go-bindata-assetfs</a> という bindata の生成から対応しているものがあったのでそっちを使うようにしてみました。</p>
+
+<h3>go-server-starter と manners</h3>
+
+<p>別にいらないんだけど <a href="https://github.com/braintree/manners">manners</a> を使って graceful shutdown に対応させて <a href="https://github.com/lestrrat/go-server-starter">go-server-startar</a> を使って graceful restart も出来るようにしています。</p>
+
+<pre><code>func serve(mux http.Handler) {
+    l, _ := ss.NewListener()
+    if l == nil {
+        var err error
+        l, err = net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
+        if err != nil {
+            log.Fatalf("Failed to listen to port %d", port)
+        }
+    }
+    s := manners.NewServer()
+    s.Serve(manners.NewListener(l, s), mux)
+}
+</code></pre>
+
+<p>ちゃんと確認してないけど多分これでいけるはず</p>
+
+<h3>WAF無し</h3>
+
+<p><a href="http://nicolasmerouze.com/build-web-framework-golang/">Build You Own Web Framework In Go</a> を参考にWAF無しで作ってみました。</p>
+
+<p>middleware のところで func を返すようにして <a href="https://github.com/justinas/alice">Alice</a> でメソッドチェインにするところとかなんかスマートな感じがして好き。</p>
+
+<pre><code>func hogeHandler(next http.Handler) http.Handler {
+    fn := func(w http.ResponseWriter, r *http.Request) {
+        // before
+        next.ServeHTTP(w, r)
+        // after
+    }
+    return http.HandlerFunc(fn)
+}
+
+func hogeHandler(w http.ResponseWriter, r *http.Request) {
+    // ...
+}
+
+func main() {
+    commonHandlers := alice.New(hogeMiddleware)
+    http.Handle("/about", commonHandlers.ThenFunc(hogeHandler))
+    http.ListenAndServe(":8080", nil)
+}
+</code></pre>
+
+<p>contextとか、サードパーティの routing ライブラリの組み込みとか色々参考になる。まあWAF使わない場合の話だけども。</p>
+
+<h3>js-base64</h3>
+
+<p>リアルタイムプビューを作る上で一番詰まったのが <a href="https://github.com/dankogai/js-base64">js-base64</a></p>
+
+<ul>
+<li>$.base64.encode(RawDeflate.deflate(Base64.utob("hoge"))
+<ul>
+<li>y8hPTwUA</li>
+</ul></li>
+<li>Base64.encode(RawDeflate.deflate(Base64.utob("hoge")))
+<ul>
+<li>w4vDiE9PBQA=</li>
+</ul></li>
+</ul>
+
+<p>こんな感じで js-base64 を使うと encode の結果が違って「サーバで上手く解答出来ないむきーっ！！！」て半日潰してしまった。</p>
+
+<p>結局 Base64.btoa(RawDeflate.deflate(Base64.utob("hoge"))) とすると大丈夫だった。encode と btoa って違うのん？と未だに良くわかっていません。</p>
+
+<h3>react.js</h3>
+
+<p>せっかくだから色々試さないと、ということで最初はjqueryでごりごりやるかなと思ったけど consul-kv-dashboard で <a href="http://facebook.github.io/react/">react.js</a> を使っているのを見て試してみました</p>
+
+<pre><code>Content
+┗ Editor
+┗ Image
+</code></pre>
+
+<p>こんな感じで Component を用意</p>
+
+<ul>
+<li>Editor は onChange で textarea の入力内容を Content に通知</li>
+<li>Content は1秒毎に変更をチェックして変更があったら Image を更新</li>
+<li>Image は更新毎に渡された入力内容を元に rawdeflate と base64 (と / が混じるので _ にreplace) して url を生成して img タグを描画</li>
+</ul>
+
+<p>こんな感じで <a href="http://qiita.com/advent-calendar/2014/reactjs">一人React.js Advent Calendar 2014</a> の10日目あたりまでを参考にしてみた</p>
+
+<p>コンポーネントはモデルを持っていて、どう描画したら良いかを知っているという点で wicket の View に近いなぁと感じた。もっとプレーンな html で構築出来たら最高だなぁって思った。</p>
+
+<p>テンプレートエンジン的な考え方や、vue.js angular.js のような MVVM の感覚に慣れていると大分混乱するなぁってぐらい考え方が違ってて面白い。</p>
+
+<p>どちらかというと angular.js よりも好みなのでもっとメジャーになるといいなぁ。</p>
+
+<h3>ということで</h3>
+
+<p>まとめて書き出してみるとなんか色々触った感があって楽しかった。react.js が今後どうなるか注目ですね。</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/blog/2015/02/08/20150208/</guid>
+<pubDate>Sun,  8 Feb 2015 00:00:00 -0000</pubDate>
+</item>
+<item>
 <title>ORDER BY &#x3084; LIMIT &#x3092;&#x542B;&#x3080;&#x5834;&#x5408;&#x306E; select for update</title>
 <description>
 <![CDATA[
@@ -861,96 +1005,6 @@ gvm pkgset use hoge
 </description>
 <guid isPermaLink="true">http://mix3.github.io/blog/2014/04/12/20140412/</guid>
 <pubDate>Sat, 12 Apr 2014 00:00:00 -0000</pubDate>
-</item>
-<item>
-<title>revel&#x5165;&#x9580;</title>
-<description>
-<![CDATA[
-<p>絶賛人生の迷子中、mix3です</p>
-
-<h3>golangでWebアプリ</h3>
-
-<p>を作ってレビューしてもらったらそれはもうフルボッコでそれこそ雄山のあれな感じでした</p>
-
-<p><img src="/images/20140308/oisinbo_yuzan_arai.gif" alt="このWebアプリを作ったのは誰だぁっ" title="このWebアプリを作ったのは誰だぁっ" /></p>
-
-<p><a href="/2013/11/13/20131113/">isucon3</a>を元に手探りでやったため突っ込みどころを残してしまったようです</p>
-
-<ul>
-<li>panic使ってerror潰すのやめろ</li>
-<li>パス解決にCallerいらねーだろ
-<ul>
-<li>一応カレントディレクトリを判断したいという意図だったけどいらないらしい</li>
-</ul></li>
-<li>動かし方 go run hoge.go じゃなくて go build hoge.go; ./hoge ってちゃんと書け</li>
-</ul>
-
-<p>などなど</p>
-
-<p>golangのWebアプリの良いサンプル、一応最初に自分で探してはみたものの良い感じのを見つけられず、後で「<a href="https://github.com/campoy/todo">campoy/todo</a>が参考になるんじゃない？」と教えてもらいました</p>
-
-<p>最初に知りたかった… ちなみにパス解決の突っ込み</p>
-
-<p><a href="https://gist.github.com/mix3/9430209">https://gist.github.com/mix3/9430209</a></p>
-
-<pre><code>mix3 ~/tmp/caller_sample $ go run main.go
-2014/03/08 21:56:14 loading config (with caller) file: /private/tmp/caller_sample/config/config.json
-2014/03/08 21:56:14 OK
-2014/03/08 21:56:14 loading config file: config/config.json
-2014/03/08 21:56:14 OK
-
-mix3 ~/tmp $ go run caller_sample/main.go
-2014/03/08 21:56:38 loading config (with caller) file: /private/tmp/caller_sample/config/config.json
-2014/03/08 21:56:38 OK
-2014/03/08 21:56:38 loading config file: config/config.json
-2014/03/08 21:56:38 open config/config.json: no such file or directory
-exit status 1
-</code></pre>
-
-<p>こんな感じで実行パスに左右されないパス解決が出来るので使い方間違ってなければ意味はある書き方だとは思うんですが、まあ今回は必要ないよってことですかね</p>
-
-<h3><a href="http://robfig.github.io/revel/index.html">revel</a>使いましょ</h3>
-
-<p>そんな感じで <strong>センスの無い</strong> やつが手探りでやると悲惨なことになるのでWAFに乗っかった方がきっと良いと判断されたっぽい（実はそこらへん曖昧だったり…）のでとりあえず<a href="http://robfig.github.io/revel/index.html">revel</a>にのっかることにしました</p>
-
-<p>使い方は公式<a href="http://robfig.github.io/revel/index.html">http://robfig.github.io/revel/index.html</a>のtutorialとmanualとsample眺めてればなんとなく分かる感じです</p>
-
-<p>以下<a href="http://robfig.github.io/revel/samples/booking.html">revel/samples/booking</a>にはgorpとsqliteを使ったサンプルコードがあるのだけど、「mysqlにするにはどうすれば？」と少し悩んだのでメモ</p>
-
-<h4>conf/app.conf のsqliteの設定をmysqlのものに変更</h4>
-
-<pre><code>db.import = github.com/go-sql-driver/mysql
-db.driver = mysql
-db.spec   = root@tcp(localhost:3306)/alphawing
-</code></pre>
-
-<h4>app/controllers/gorp.go のimportしているドライバをmysqlのものに変更</h4>
-
-<pre><code>_ "github.com/go-sql-driver/mysql"
-</code></pre>
-
-<h4>app/controllers/gorp.go の gorp.DbMap{} を mysqlのものに変更</h4>
-
-<pre><code>Dbm = &amp;gorp.DbMap{Db: db.Db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
-</code></pre>
-
-<p>だいたいこれくらい弄るとmysqlで動く様になるはず</p>
-
-<p>ちなみにsampleだからだと思うのだけど<a href="https://github.com/robfig/revel/blob/master/samples/booking/app/controllers/init.go">以下のような感じ</a>でコントローラ処理の前後にBegin,Commit,Rollback を入れ込んでて吹いた</p>
-
-<pre><code>func init() {
-    revel.OnAppStart(InitDB)
-    revel.InterceptMethod((*GorpController).Begin, revel.BEFORE)
-    revel.InterceptMethod((*GorpController).Commit, revel.AFTER)
-    revel.InterceptMethod((*GorpController).Rollback, revel.FINALLY)
-}
-</code></pre>
-
-<p>modelsでちゃんとやりたいときにはどうしたらいんだろうか…</p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/blog/2014/03/08/20140308/</guid>
-<pubDate>Sat,  8 Mar 2014 00:00:00 -0000</pubDate>
 </item>
 </channel>
 </rss>
