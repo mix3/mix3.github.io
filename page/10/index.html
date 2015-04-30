@@ -42,6 +42,96 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2011/06/22/20110622/">MobaSiFを弄ってみた</a></h2>
+		</div>
+		<div class="content">
+			<p>MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。</p>
+
+<ul>
+<li>アプリケーションロジックを記述</li>
+<li>レスポンスの値を生成＆セット</li>
+</ul>
+
+<p>具体的に書くと以下のような感じ。</p>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = (
+    'test' =&gt; [0,0,0, 'Page::Sample', 'pageMain'],
+);
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<pre><code>package Page::Sample;
+sub pageMain {
+    my $func = shift;
+    # レスポンスの生成
+    my $html = HTMLTemplate::insert('sample/index', $rhData);
+    # レスポンスヘッダに値をセット
+    Response::output(¥$html);
+}
+</code></pre>
+
+<h4>template/_system/sample/index.html</h4>
+
+<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;$CON:title$&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    test
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>普段触るフレームワークだと「レスポンスの生成」も「レスポンスヘッダへの値のセット」も自分ですることはまず無くて。テンプレートに渡す値をハッシュで用意して、テンプレート自体はクエリパスなどから自動で判断するかもしくは明示的に指定するかする場合が多い。</p>
+
+<p>ということでこの辺り結構違和感が大きいのでちょっとそれっぽくなるように手を入れてみた。</p>
+
+<h4>pm/Context.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Context.pm"></script>
+
+<h4>pm/Page/Main.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Main.pm"></script>
+
+<h4>conf/pages.conf</h4>
+
+<pre><code>our %PAGE = (
+        .
+        .
+        .
+    'test'  =&gt; [0,0,0, 'Page::Sample', 'test'],
+    'test1' =&gt; [0,0,0, 'Page::Sample', 'test1'],
+    'test2' =&gt; [0,0,0, 'Page::Sample', 'test2'],
+);
+</code></pre>
+
+<h4>pm/Page/Sample.pm</h4>
+
+<script src="https://gist.github.com/1038137.js?file=Sample.pm"></script>
+
+<h4>template/_system/sample/test.html</h4>
+
+<script src="https://gist.github.com/1038137.js?file=test.html"></script>
+
+<h3>次回はDB周りを触ってみる</h3>
+
+<p>commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。</p>
+
+		</div>
+		<div class="footer">
+			<time>2011-06-22</time>
+			<ul class="tag">
+				<li><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
+				<li><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2011/06/21/20110621/">MobaSiFを触ってみた</a></h2>
 		</div>
 		<div class="content">
@@ -543,32 +633,9 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2011/04/30/20110430/">Hadoopを触ってみた</a></h2>
-		</div>
-		<div class="content">
-			<p>具体的にはgistに書いた。</p>
-
-<p>完全分散モードが結構癖が強い感じなので気をつけたい。</p>
-
-<script src="https://gist.github.com/944255.js"> </script>
-
-<script src="https://gist.github.com/944342.js"> </script>
-
-		</div>
-		<div class="footer">
-			<time>2011-04-30</time>
-			<ul class="tag">
-				<li><a href="/tag/Hadoop">Hadoop(1)</a></li>
-				<li><a href="/tag/gist">gist(1)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/9" class="float-left">≪前のページ</a>
+		<a href="/page/11" class="float-right">次のページ≫</a>
 	</div>
 	<div class="clearer" />
 			</article>
@@ -594,19 +661,20 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/05/01/20150501/">そうだ docker触れる環境を作ろう</a></li>
 						<li><a href="/blog/2015/02/08/20150208/">plantumlのリアルタイムプレビュー</a></li>
 						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
-						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2015">2015年(2)</a>
+							<li><a href="/archives/2015">2015年(3)</a>
 								<ul>
+										<li><a href="/archives/2015/05">2015年05月(1)</a></li>
 										<li><a href="/archives/2015/02">2015年02月(1)</a></li>
 										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
 								</ul>
@@ -705,11 +773,13 @@ my ($rows, $pager) = $model-&gt;search_with_pager(
 						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
 						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
 						<li class="hide"><a href="/tag/dbic">dbic(1)</a></li>
+						<li class="hide"><a href="/tag/docker">docker(1)</a></li>
 						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
 						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
 						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
 						<li class="hide"><a href="/tag/java">java(1)</a></li>
 						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+						<li class="hide"><a href="/tag/mirage">mirage(1)</a></li>
 						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
 						<li class="hide"><a href="/tag/plantuml">plantuml(1)</a></li>

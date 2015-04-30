@@ -10,6 +10,187 @@
 <description>&#x30AE;&#x30FC;&#x30AF;&#x306B;&#x3082;&#x7D75;&#x63CF;&#x304D;&#x306B;&#x3082;&#x306A;&#x308C;&#x306A;&#x3044;&#x8005;&#x306E;&#x672B;&#x8DEF;</description>
 
 <item>
+<title>&#x305D;&#x3046;&#x3060; docker&#x89E6;&#x308C;&#x308B;&#x74B0;&#x5883;&#x3092;&#x4F5C;&#x308D;&#x3046;</title>
+<description>
+<![CDATA[
+<p>社内isuconで新卒にボッコボコにされたので、役立たずとして社内に居場所がなくなりそうです、mix3です。</p>
+
+<p><a href="https://twitter.com/acidlemon">@acidlemon</a> 作 <a href="https://github.com/acidlemon/mirage">mirage</a> を「使ってテスト環境を立てまくるぜー」みたいなことが割と当たり前になりつつあって今関わってるプロジェクトもいずれはそうしたいなぁということがありまして。(CentOS6だと不都合があるっぽくてCentOS7に移行するなりそこクリアしてからだけど)</p>
+
+<p>いざ「環境作れよ、あくしろよ」となっても困らないように練習しておこうと思い立って、持て余してるさくらvpsの一つをdocker専用にしてみた。ついでにCoreOSなんかも使ってみた。</p>
+
+<h3>ISOのアップロードしてリモートコンソールを開く</h3>
+
+<p>ところまでは <a href="http://qiita.com/yujiod/items/dc154120c4df2e938111">さくらのVPSにCoreOSをインストールしてDocker専用機にする - Qiita</a> を参考にした</p>
+
+<h3>sshで繋ぐ</h3>
+
+<p>ところは <a href="http://qiita.com/inTheRye/items/fea3c595cbc4f6f482b2">CoreOSをさくらVPSサーバに入れようとして嵌ったのでメモ - Qiita</a> を参考に /etc/systemd/network/static.network を作らずに以下を実行した</p>
+
+<pre><code>sudo ifconfig &lt;network port&gt; &lt;ip address&gt; netmask &lt;netmask&gt;  
+sudo route add default gw &lt;default gateway IP&gt;</code></pre>
+
+<pre><code>$ sudo vi /etc/resolv.conf
+nameserver &lt;DNS1&gt;</code></pre>
+
+<h3>cloud-config</h3>
+
+<p>も <a href="http://qiita.com/inTheRye/items/fea3c595cbc4f6f482b2">CoreOSをさくらVPSサーバに入れようとして嵌ったのでメモ - Qiita</a> を参考にした</p>
+
+<pre><code>#cloud-config
+
+coreos:  
+  units:
+    - name: static.network
+      content: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        Address=&lt;IPアドレス&gt;/&lt;サブネットマスク&gt;
+        Gateway=&lt;ゲートウェイ&gt;
+        DNS=&lt;DNS1&gt;
+        DNS=&lt;DNS2&gt;
+
+ssh_authorized_keys:
+  - ssh-rsa ABCDABCDABCDABCDABCDABCDABCDABCDABCD...</code></pre>
+
+<h3>CoreOS のインストールと reboot</h3>
+
+<p>インストールは <a href="http://qiita.com/yujiod/items/dc154120c4df2e938111">さくらのVPSにCoreOSをインストールしてDocker専用機にする - Qiita</a> を参考に以下のようにした。 記事では -C alpha だけど -C stable にしておいた。</p>
+
+<pre><code>$ sudo coreos-install -d /dev/vda -c cloud-config -C stable</code></pre>
+
+<p>reboot は VPS の管理画面から。 sudo reboot とかすると再度 LiveCD で boot されてしまう。</p>
+
+<h3>ログイン</h3>
+
+<p>cloud-configの設定によって公開鍵が設定されてるはずなので、それでログイン出来るようになってるハズ。</p>
+
+<h3>Docker 無しで mirage を動かしてみる</h3>
+
+<p>最新の mirage を落としてくる <a href="https://github.com/acidlemon/mirage/releases/download/v0.2.0/mirage-v0.2.0-linux-amd64.zip">https://github.com/acidlemon/mirage/releases/download/v0.2.0/mirage-v0.2.0-linux-amd64.zip</a></p>
+
+<p>解凍したら cp config_sample.yml config.yml して編集</p>
+
+<pre><code>host:
+  # web api host
+  # you can use API and Web interface through this host
+  # webapi: docker.dev.example.net
+  webapi: mirage.sakura
+
+  # host suffix
+  # if you access to foo.dev.example.net, mirage search "foo" subdomain container
+  reverse_proxy_suffix: .sakura
+
+listen:
+  # listen address
+  # default is only listen from localhost
+  foreign_address: 0.0.0.0
+
+  # listen port and reverse proxy port
+  http:
+    # listen 8080 and transport to container's 5000 port
+    - listen: 80
+      target: 5000
+
+  # not implemented
+  # we recommend to use frontend http(like nginx) to SSL termination
+  # HTTPS:
+  #   - 443
+
+docker:
+  # if you use docker through http, specify like "http://localhost:4243"
+  endpoint: unix:///var/run/docker.sock
+
+  # if you specify this, fill the form as default value on web interface.
+  # default_image: myapp:latest
+
+storage:
+  datadir: ./data
+  htmldir: ./html</code></pre>
+
+<p>で ./mirage として起動すると mirage.sakura でアクセスすると *.sakura で名前解決できるようになっていれば mirage の web interface が見える</p>
+
+<h3>dnsmasq</h3>
+
+<p>ドメイン持ってる場合は「*」でAレコード設定して mirage.sakura, .sakura をそれに合わせて設定すれば良いかと思う。持ってない場合は dnsmasq 使うと良い感じに名前解決が設定できるのでおすすめ。</p>
+
+<p>brew install dnsmasq して指示に従って起動する</p>
+
+<pre><code>$ brew install dnsmasq
+$ cp /usr/local/opt/dnsmasq/dnsmasq.conf.example /usr/local/etc/dnsmasq.conf
+$ sudo cp -fv /usr/local/opt/dnsmasq/*.plist /Library/LaunchDaemons
+$ sudo chown root /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+$ sudo launchctl load /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist</code></pre>
+
+<p>設定はさっきの *.sakura であればこんな感じで良いかと思う。</p>
+
+<pre><code>$ sudo vim /etc/resolver/sakura
+nameserver 127.0.0.1</code></pre>
+
+<pre><code>$ vim /usr/local/etc/dnsmasq.conf
+address=/sakura/&lt;IP&gt;</code></pre>
+
+<h3>Docker で mirage を起動する</h3>
+
+<p>mirage は Dockerfile が用意されていて Docker で起動することもできるので試してみる。</p>
+
+<p><a href="https://github.com/acidlemon/mirage/blob/master/docker/Dockerfile">Dockerfile</a> と <a href="https://github.com/acidlemon/mirage/blob/master/docker/config.yml">config.yml</a> を持ってきて config.yml を少し変更する</p>
+
+<pre><code>host:
+  # web api host
+  # you can use API and Web interface through this host
+  # webapi: docker.dev.example.net
+  webapi: mirage.sakura
+
+  # host suffix
+  # if you access to foo.dev.example.net, mirage search "foo" subdomain container
+  reverse_proxy_suffix: .sakura
+
+listen:
+  # listen address
+  # default is only listen from localhost
+  foreign_address: 0.0.0.0
+
+  # listen port and reverse proxy port
+  http:
+    # listen 8080 and transport to container's 5000 port
+    - listen: 8080
+      target: 5000
+
+  # not implemented
+  # we recommend to use frontend http(like nginx) to SSL termination
+  # HTTPS:
+  #   - 443
+
+docker:
+  # if you use docker through http, specify like "http://localhost:4243"
+  endpoint: unix:///var/run/docker.sock
+
+  # if you specify this, fill the form as default value on web interface.
+  # default_image: myapp:latest
+
+storage:
+  datadir: /mirage
+  htmldir: /opt/mirage/html</code></pre>
+
+<p>コンテナを起動するときのポートフォワードの設定に listen port を合わせておくのと storage をDocker 用のものに合わせておく。</p>
+
+<p>あとは docker build, docker run するだけ</p>
+
+<pre><code>$ docker build -t acidlemon/mirage:latest .
+$ docker run -d --name mirage -p 80:8080 acidlemon/mirage:latest</code></pre>
+
+<h3>あとは mirage を使うだけ</h3>
+
+<p>予習完璧やで（完璧とは言っていない）</p>
+]]>
+</description>
+<guid isPermaLink="true">http://mix3.github.io/blog/2015/05/01/20150501/</guid>
+<pubDate>Fri,  1 May 2015 00:00:00 -0000</pubDate>
+</item>
+<item>
 <title>plantuml&#x306E;&#x30EA;&#x30A2;&#x30EB;&#x30BF;&#x30A4;&#x30E0;&#x30D7;&#x30EC;&#x30D3;&#x30E5;&#x30FC;</title>
 <description>
 <![CDATA[
@@ -963,48 +1144,6 @@ gvm pkgset use hoge
 </description>
 <guid isPermaLink="true">http://mix3.github.io/blog/2014/06/15/20140615_01/</guid>
 <pubDate>Sun, 15 Jun 2014 00:00:00 -0000</pubDate>
-</item>
-<item>
-<title>p5-IkuSan&#x3092;&#x7169;&#x60A9;&#x306E;&#x307E;&#x307E;&#x306B;&#x516C;&#x958B;</title>
-<description>
-<![CDATA[
-<p>人生の迷子の行き着く先は富士の樹海ではないかと最近良く考えています。mix3です。</p>
-
-<h3><a href="http://search.cpan.org/~himachoco/IkuSan-0.01/lib/IkuSan.pm">p5-IkuSan</a></h3>
-
-<p>IRCボットいい加減今のプロジェクトに欲しくなったので、自分がIRCボット作ったらこうするなというのを<a href="/2013/10/05/20131005/">以前書いた</a>のだが、今回は実際にそれを作ったという話です。</p>
-
-<p>ただ単に作るだけだと別に<a href="http://search.cpan.org/~songmu/UnazuSan-0.02/lib/UnazuSan.pm">UnazuSan</a>で良いじゃないってなっちゃうので、以下の機能を盛り込みました</p>
-
-<h4>Getopt::Longの引数が取れる</h4>
-
-<p><a href="/2013/10/05/20131005/">以前の記事</a>参照</p>
-
-<h4>並列にタスク処理が出来る</h4>
-
-<p>最初Gearman使って頑張ってたのだけれど <a href="https://twitter.com/#!/karupanerura">@karupanerura</a> さん作、<a href="http://search.cpan.org/~karupa/AnyEvent-ForkManager-0.01/lib/AnyEvent/ForkManager.pm">AnyEvent::ForkManager</a>というのがあるのを見つたのでそれを使うように。worker数を指定出来る様にして並列に処理出来る様にしました</p>
-
-<p>あんまり気にしなくても良いとは思うけれども処理中だからってボットが無反応になるのはなんとなく嫌だったので</p>
-
-<h4>タスク処理中、dieしたら共通処理出来る様に</h4>
-
-<p><a href="http://search.cpan.org/~doy/Try-Tiny-0.20/lib/Try/Tiny.pm">Try::Tiny</a>を使って囲ってるだけなので別にいらないと言えばいらない（自前でtry catchするのでも良い）が、どうせボットが返すエラー文言なんて一律で同じように返したって全然良いと思うので、共通処理を設定出来る様にしておきました</p>
-
-<h3>ということで</h3>
-
-<p><a href="http://search.cpan.org/~himachoco/IkuSan-0.01/lib/IkuSan.pm">p5-IkuSan</a>が出来ました</p>
-
-<p>一応<a href="http://search.cpan.org/">CPAN</a>に上げるつもりだったので、今まで使ったことなかった<a href="http://search.cpan.org/~tokuhirom/Minilla/lib/Minilla.pm">Minilla</a>を使ってみたり、<a href="https://github.com/tokuhirom/plenv">plenv</a>と<a href="http://search.cpan.org/~miyagawa/Carton-v1.0.12/lib/Carton.pm">Carton</a>を経由して<a href="http://cr.yp.to/daemontools.html">daemontools</a>で起動出来るようにするというplackアプリの起動で良くある感じのアレをちゃんとやってみたり、その際にCarton経由しつつsystem perl使おうとするとCartonの方で環境変数PERL5OPTが設定されてしまうのでunsetするなりしないと読むモジュールが違って悲しい思いをするということを知ったり、perl5.19.10とか使うとNet::SSLeayあたりでpanicとかなんとか言われて動かなかったり（原因不明）forkしてる関係で子プロセスからsend_messageやらなんやらしようとして死にまくったりして、<a href="http://search.cpan.org/~yappo/App-Ikachan-v0.2.1/lib/App/Ikachan.pm">ikachan</a>リスペクトで頑張ってみたり、<a href="https://github.com/mix3/p5-IkuSan#readme">衣玖さんはやっぱり可愛い</a>んだなと再認識したりしました。CPANの方にもちゃんと画像出る様にしたい。</p>
-
-<p>あと以下の発言が実現出来てワタクシ非常に満足しております。煩悩はチカラなり。</p>
-
-<blockquote class="twitter-tweet" lang="ja"><p>（Ikusanっていう名前の入ったcpanモジュール作りたいだけです）</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/440167221289955328">March 2, 2014</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-]]>
-</description>
-<guid isPermaLink="true">http://mix3.github.io/blog/2014/04/12/20140412/</guid>
-<pubDate>Sat, 12 Apr 2014 00:00:00 -0000</pubDate>
 </item>
 </channel>
 </rss>

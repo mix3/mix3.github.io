@@ -42,6 +42,256 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2011/07/22/20110722/">blessとMouse</a></h2>
+		</div>
+		<div class="content">
+			<h3>健康診断</h3>
+
+<p>健康診断へ行って血を取ってきました。前回はチューブ通して採血の容器に取ってたのが今回は針から直結するようになって、それのおかげか何なのかは分りませんが採血スピードが向上して地味に嬉しかったです。痛いのは嫌いなのです…</p>
+
+<h3>blessとMouseの速度比較</h3>
+
+<p>すこし気になってblessとMouse、その他の速度比較。いろんなところでやられてるので今更自分でする事でもないでしょうが。なおblessで作るクラスは手を抜いて型制限などの実装はせずアクセサを用意して値を操作するだけにしました。適当適当。</p>
+
+<p><a href="http://blog.livedoor.jp/sasata299/archives/51281496.html">いまさら聞けない「Moose」超入門</a>を参考にblessとMouseのコードを書き足しました。以下の処理の速度を比較しています。</p>
+
+<ol>
+<li>hoge/fugaのアクセサを持ったクラスをnew
+<ul>
+<li>初期値はfugaに1</li>
+</ul></li>
+<li>hogeに'bbb'を代入</li>
+<li>fugaの値を取得</li>
+<li>hogeの値を取得</li>
+</ol>
+
+<h4>cost.pl</h4>
+
+<pre><code># おまじないしない場合
+package MooseTest;
+use Moose;
+
+has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
+has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
+
+no Moose;
+
+1;
+
+# おまじないする場合
+package MooseTest_mi;
+use Moose;
+
+has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
+has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
+
+__PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
+
+no Moose;
+
+1;
+
+# おまじないしない場合
+package MouseTest;
+use Mouse;
+
+has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
+has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
+
+no Mouse;
+
+1;
+
+# おまじないする場合
+package MouseTest_mi;
+use Mouse;
+
+has 'hoge' =&gt; ( is =&gt; 'rw', isa =&gt; 'Str' );
+has 'fuga' =&gt; ( is =&gt; 'rw', isa =&gt; 'Int' );
+
+__PACKAGE__-&gt;meta-&gt;make_immutable; # おまじない
+
+no Mouse;
+
+1;
+
+# Class::Accessor を使った場合
+package ClassAccessorTest;
+use strict;
+use warnings;
+use base 'Class::Accessor';
+
+__PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
+
+1;
+
+# Class::Accessor::Fast を使った場合
+package ClassAccessorFastTest;
+use strict;
+use warnings;
+use base 'Class::Accessor::Fast';
+
+__PACKAGE__-&gt;mk_accessors(qw/hoge fuga/);
+
+1;
+
+# perl5 OOP の場合
+package Bless;
+use strict;
+use warnings;
+
+sub new {
+    my $class = shift;
+    my $self  = shift || {};
+    return bless $self, $class;
+}
+
+sub hoge {
+    my $self = shift;
+    if (@_) {
+        $self-&gt;{hoge} = shift;
+    } else {
+        $self-&gt;{hoge};
+    }
+}
+
+sub fuga {
+    my $self = shift;
+    if (@_) {
+        $self-&gt;{fuga} = shift;
+    } else {
+        $self-&gt;{fuga};
+    }
+}
+
+1;
+
+package main;
+use strict;
+use warnings;
+use Benchmark qw(cmpthese timethese);
+
+cmpthese timethese(100000, {
+    moose =&gt; sub {
+        my $moose = MooseTest-&gt;new( fuga =&gt; 1 );
+        $moose-&gt;hoge('bbb');
+        $moose-&gt;fuga;
+        $moose-&gt;hoge;
+    },
+    moose_mi =&gt; sub {
+        my $moose = MooseTest_mi-&gt;new( fuga =&gt; 1 );
+        $moose-&gt;hoge('bbb');
+        $moose-&gt;fuga;
+        $moose-&gt;hoge;
+    },
+    mouse =&gt; sub {
+        my $mouse = MouseTest-&gt;new( fuga =&gt; 1 );
+        $mouse-&gt;hoge('bbb');
+        $mouse-&gt;fuga;
+        $mouse-&gt;hoge;
+    },
+    mouse_mi =&gt; sub {
+        my $mouse = MouseTest_mi-&gt;new( fuga =&gt; 1 );
+        $mouse-&gt;hoge('bbb');
+        $mouse-&gt;fuga;
+        $mouse-&gt;hoge;
+    },
+    accessor =&gt; sub {
+        my $class = ClassAccessorTest-&gt;new({ fuga =&gt; 1 });
+        $class-&gt;hoge('bbb');
+        $class-&gt;fuga;
+        $class-&gt;hoge;
+    },
+    accessor_fast =&gt; sub {
+        my $class = ClassAccessorFastTest-&gt;new({ fuga =&gt; 1 });
+        $class-&gt;hoge('bbb');
+        $class-&gt;fuga;
+        $class-&gt;hoge;
+    },
+    bless =&gt; sub {
+        my $class = Bless-&gt;new({ fuga =&gt; 1 });
+        $class-&gt;hoge('bbb');
+        $class-&gt;fuga;
+        $class-&gt;hoge;
+    },
+});
+</code></pre>
+
+<p>結果はこんな感じになりました。何回か実行するとばらつくので３つほど結果を書き出しています。</p>
+
+<pre><code>Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
+  accessor:  2 wallclock secs ( 1.19 usr +  0.00 sys =  1.19 CPU) @ 84033.61/s (n=100000)
+accessor_fast:  0 wallclock secs ( 0.58 usr +  0.00 sys =  0.58 CPU) @ 172413.79/s (n=100000)
+     bless:  1 wallclock secs ( 0.41 usr +  0.00 sys =  0.41 CPU) @ 243902.44/s (n=100000)
+     moose: 21 wallclock secs (21.26 usr +  0.02 sys = 21.28 CPU) @ 4699.25/s (n=100000)
+  moose_mi:  2 wallclock secs ( 1.67 usr +  0.00 sys =  1.67 CPU) @ 59880.24/s (n=100000)
+     mouse:  0 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
+  mouse_mi: -1 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 196078.43/s (n=100000)
+                  Rate moose moose_mi accessor accessor_fast mouse_mi mouse bless
+moose           4699/s    --     -92%     -94%          -97%     -98%  -98%  -98%
+moose_mi       59880/s 1174%       --     -29%          -65%     -69%  -69%  -75%
+accessor       84034/s 1688%      40%       --          -51%     -57%  -57%  -66%
+accessor_fast 172414/s 3569%     188%     105%            --     -12%  -12%  -29%
+mouse_mi      196078/s 4073%     227%     133%           14%       --    0%  -20%
+mouse         196078/s 4073%     227%     133%           14%       0%    --  -20%
+bless         243902/s 5090%     307%     190%           41%      24%   24%    --
+
+Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
+  accessor:  1 wallclock secs ( 0.87 usr +  0.00 sys =  0.87 CPU) @ 114942.53/s (n=100000)
+accessor_fast:  0 wallclock secs ( 0.56 usr +  0.00 sys =  0.56 CPU) @ 178571.43/s (n=100000)
+     bless:  1 wallclock secs ( 0.43 usr +  0.00 sys =  0.43 CPU) @ 232558.14/s (n=100000)
+     moose: 18 wallclock secs (18.30 usr +  0.00 sys = 18.30 CPU) @ 5464.48/s (n=100000)
+  moose_mi:  2 wallclock secs ( 1.57 usr +  0.00 sys =  1.57 CPU) @ 63694.27/s (n=100000)
+     mouse:  0 wallclock secs ( 0.55 usr +  0.00 sys =  0.55 CPU) @ 181818.18/s (n=100000)
+  mouse_mi:  1 wallclock secs ( 0.65 usr +  0.00 sys =  0.65 CPU) @ 153846.15/s (n=100000)
+                  Rate moose moose_mi accessor mouse_mi accessor_fast mouse bless
+moose           5464/s    --     -91%     -95%     -96%          -97%  -97%  -98%
+moose_mi       63694/s 1066%       --     -45%     -59%          -64%  -65%  -73%
+accessor      114943/s 2003%      80%       --     -25%          -36%  -37%  -51%
+mouse_mi      153846/s 2715%     142%      34%       --          -14%  -15%  -34%
+accessor_fast 178571/s 3168%     180%      55%      16%            --   -2%  -23%
+mouse         181818/s 3227%     185%      58%      18%            2%    --  -22%
+bless         232558/s 4156%     265%     102%      51%           30%   28%    --
+
+Benchmark: timing 100000 iterations of accessor, accessor_fast, bless, moose, moose_mi, mouse, mouse_mi...
+  accessor:  1 wallclock secs ( 0.90 usr +  0.00 sys =  0.90 CPU) @ 111111.11/s (n=100000)
+accessor_fast:  0 wallclock secs ( 0.75 usr +  0.00 sys =  0.75 CPU) @ 133333.33/s (n=100000)
+     bless:  1 wallclock secs ( 0.47 usr +  0.00 sys =  0.47 CPU) @ 212765.96/s (n=100000)
+     moose: 22 wallclock secs (21.62 usr +  0.01 sys = 21.63 CPU) @ 4623.21/s (n=100000)
+  moose_mi:  1 wallclock secs ( 1.61 usr +  0.00 sys =  1.61 CPU) @ 62111.80/s (n=100000)
+     mouse:  1 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
+  mouse_mi:  0 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 222222.22/s (n=100000)
+                  Rate moose moose_mi accessor accessor_fast bless mouse_mi mouse
+moose           4623/s    --     -93%     -96%          -97%  -98%     -98%  -98%
+moose_mi       62112/s 1243%       --     -44%          -53%  -71%     -72%  -72%
+accessor      111111/s 2303%      79%       --          -17%  -48%     -50%  -50%
+accessor_fast 133333/s 2784%     115%      20%            --  -37%     -40%  -40%
+bless         212766/s 4502%     243%      91%           60%    --      -4%   -4%
+mouse_mi      222222/s 4707%     258%     100%           67%    4%       --    0%
+mouse         222222/s 4707%     258%     100%           67%    4%       0%    --
+</code></pre>
+
+<p>Mouseが爆速でblessより速いこともあるようです。にわかに信じられないのですが。何か最適化されているものでもあるのでしょうか？ちゃんと中身を見ないといけませんね。</p>
+
+<h3>思う事</h3>
+
+<p>速度というのは最近気にしているテーマで、Webアプリの１リクエストのレスポンスタイムが10msと100msとあったとして、それの時間差が90msと何となく微々たる物のように思う物でも分間10リクエストとして合計100msと1000msになり差が900msとどんどん大きくなっていくのが恐ろしいなぁと思ったりしています。もしもこれが分間じゃなくて秒間だったら？10リクエストじゃなくて100リクエストだったら？1000リクエストだったら？…まだ実感の伴わない話なのでアレですが今後直面する問題だろうなと感じています。モダンだ流行だと色々なものに飛びつくのも勉強になって良いですが、ただ実際それが実用に堪えうるのかどうかちゃんと検証することも覚えないといけないなと。そんなことを考えています。</p>
+
+		</div>
+		<div class="footer">
+			<time>2011-07-22</time>
+			<ul class="tag">
+				<li><a href="/tag/perl">perl(10)</a></li>
+				<li><a href="/tag/bless">bless(1)</a></li>
+				<li><a href="/tag/Mouse">Mouse(1)</a></li>
+				<li><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2011/07/20/20110720/">MySQLのパーティショニングを触ってみる</a></h2>
 		</div>
 		<div class="content">
@@ -396,96 +646,6 @@ ChallengeResponseAuthentication no
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2011/06/22/20110622/">MobaSiFを弄ってみた</a></h2>
-		</div>
-		<div class="content">
-			<p>MobaSiFは機能がミニマムなので、コントローラに相当すると思われる部分にて以下の記述をします。</p>
-
-<ul>
-<li>アプリケーションロジックを記述</li>
-<li>レスポンスの値を生成＆セット</li>
-</ul>
-
-<p>具体的に書くと以下のような感じ。</p>
-
-<h4>conf/pages.conf</h4>
-
-<pre><code>our %PAGE = (
-    'test' =&gt; [0,0,0, 'Page::Sample', 'pageMain'],
-);
-</code></pre>
-
-<h4>pm/Page/Sample.pm</h4>
-
-<pre><code>package Page::Sample;
-sub pageMain {
-    my $func = shift;
-    # レスポンスの生成
-    my $html = HTMLTemplate::insert('sample/index', $rhData);
-    # レスポンスヘッダに値をセット
-    Response::output(¥$html);
-}
-</code></pre>
-
-<h4>template/_system/sample/index.html</h4>
-
-<pre><code>&lt;html&gt;
-&lt;head&gt;&lt;title&gt;$CON:title$&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;
-    test
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-<p>普段触るフレームワークだと「レスポンスの生成」も「レスポンスヘッダへの値のセット」も自分ですることはまず無くて。テンプレートに渡す値をハッシュで用意して、テンプレート自体はクエリパスなどから自動で判断するかもしくは明示的に指定するかする場合が多い。</p>
-
-<p>ということでこの辺り結構違和感が大きいのでちょっとそれっぽくなるように手を入れてみた。</p>
-
-<h4>pm/Context.pm</h4>
-
-<script src="https://gist.github.com/1038137.js?file=Context.pm"></script>
-
-<h4>pm/Page/Main.pm</h4>
-
-<script src="https://gist.github.com/1038137.js?file=Main.pm"></script>
-
-<h4>conf/pages.conf</h4>
-
-<pre><code>our %PAGE = (
-        .
-        .
-        .
-    'test'  =&gt; [0,0,0, 'Page::Sample', 'test'],
-    'test1' =&gt; [0,0,0, 'Page::Sample', 'test1'],
-    'test2' =&gt; [0,0,0, 'Page::Sample', 'test2'],
-);
-</code></pre>
-
-<h4>pm/Page/Sample.pm</h4>
-
-<script src="https://gist.github.com/1038137.js?file=Sample.pm"></script>
-
-<h4>template/_system/sample/test.html</h4>
-
-<script src="https://gist.github.com/1038137.js?file=test.html"></script>
-
-<h3>次回はDB周りを触ってみる</h3>
-
-<p>commit,transactionなどをラップしているものの、サンプルコードではSQL直叩きなのでこれもDBICなどでゴリゴリモデルに落とし込むなどして使った方が良いかもしれない。</p>
-
-		</div>
-		<div class="footer">
-			<time>2011-06-22</time>
-			<ul class="tag">
-				<li><a href="/tag/MobaSiF">MobaSiF(2)</a></li>
-				<li><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/8" class="float-left">≪前のページ</a>
 		<a href="/page/10" class="float-right">次のページ≫</a>
@@ -514,19 +674,20 @@ sub pageMain {
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/05/01/20150501/">そうだ docker触れる環境を作ろう</a></li>
 						<li><a href="/blog/2015/02/08/20150208/">plantumlのリアルタイムプレビュー</a></li>
 						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
-						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2015">2015年(2)</a>
+							<li><a href="/archives/2015">2015年(3)</a>
 								<ul>
+										<li><a href="/archives/2015/05">2015年05月(1)</a></li>
 										<li><a href="/archives/2015/02">2015年02月(1)</a></li>
 										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
 								</ul>
@@ -625,11 +786,13 @@ sub pageMain {
 						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
 						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
 						<li class="hide"><a href="/tag/dbic">dbic(1)</a></li>
+						<li class="hide"><a href="/tag/docker">docker(1)</a></li>
 						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
 						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
 						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
 						<li class="hide"><a href="/tag/java">java(1)</a></li>
 						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+						<li class="hide"><a href="/tag/mirage">mirage(1)</a></li>
 						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
 						<li class="hide"><a href="/tag/plantuml">plantuml(1)</a></li>

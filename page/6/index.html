@@ -42,6 +42,131 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2013/04/13/20130413/">phantomjsで遊ぶ</a></h2>
+		</div>
+		<div class="content">
+			<p>うわっ…私のチーム、レベル低すぎ…？ mix3です。リードエンジニアとしてどうにかしろって話ですが、コミュ
+障の自分には荷が重いです…</p>
+
+<h3><a href="http://d.hatena.ne.jp/karasuyamatengu/20110126/1296066287">PhantomJS: 最小限なheadlessのWebKitベースのJavaScriptツール</a></h3>
+
+<p>だそうです。正直良くわかりませんが、nodeのようにサーバーサイドで書けるイメージ。</p>
+
+<p>$ cat hello.js</p>
+
+<pre><code>console.log('Hello, world!');
+phantom.exit();
+</code></pre>
+
+<p>$ phantomjs hello.js</p>
+
+<pre><code>Hello, world!
+</code></pre>
+
+<p>とか</p>
+
+<p>$ cat google_capture.js</p>
+
+<pre><code>var page = require('webpage').create();
+page.open('http://www.google.com', function (status) {
+    page.render('google_capture.png');
+    phantom.exit();
+});
+</code></pre>
+
+<p><a href="/images/20130413/google_capture.png"><img src="/images/20130413/google_capture.png" width="200" /></a><br /></p>
+
+<p>とか</p>
+
+<p>$ cat hello_server.js</p>
+
+<pre><code>var system = require('system');
+
+if (system.args.length !== 2) {
+    console.log('Usage: hello_server.js &lt;portnumber&gt;');
+    phantom.exit(1);
+} else {
+    port = system.args[1];
+    server = require('webserver').create();
+
+    service = server.listen(port, function (request, response) {
+        response.statusCode = 200;
+        response.write('&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;');
+        response.close();
+    });
+
+    if (!service) {
+        console.log('Error: Could not create web server listening on port ' + port);
+        phantom.exit();
+    }
+}
+</code></pre>
+
+<p>$ phantomjs hello_server.js</p>
+
+<p>$ curl http://localhost:2525</p>
+
+<pre><code>&lt;html&gt;&lt;body&gt;Hello, World!&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+
+<p>などなど。単純なCLIプログラムや、Webページにアクセスしてキャプチャ取ったり、サーバプログラムも書けたりします。</p>
+
+<p>ローカルファイルも扱えるので、例えばあるディレクトリ以下の画像を並べて表示するサーバを立てつつ、それを</p>
+
+<pre><code>page.open('http://localhost:[port]', function () {
+    page.render(...);
+});
+</code></pre>
+
+<p>とかするとあら不思議。コマンド一発で複数画像を１枚画像に出来たりします。</p>
+
+<h3>なんでこんなもん触ってるかというと</h3>
+
+<p>ソーシャルゲームに携わっていて思う事なのですが、イベント中だと特にそうですが時間で文言が変わるということは良くあることです。そしてこういうものは当然リリース前にスケジュールはきっちり決まっていて（もちろん差し込みで仕込み直すこともありますが）がっつりテストすることになります。が、開発段階でも当然自分で目視チェックすることになるのですがこれが非常に面倒くさい。なぜ面倒くさいかというとモジュールの単体テストとは違いローカルプロキシ越しにブラウザで確認したり実機で確認したりすることになり、自動テストになかなか上手く落とし込めないからです。（見た目の部分は特に変更が出易いのでそういう意味でもテストに落としづらいというのはあると思います）他のプロジェクトだと一部定型的な部分はモデルに落とし込んでテスト出来るようにしていたりするようですが、当然限界もあり。</p>
+
+<p>ということで、今のところ画像、文言など見た目の部分をテストに落とし込むのは無理だろうなぁと思っておりますが、そうは言ってもチェックが面倒なことは面倒なのでチェックすること自体はいくらか楽にはしたい。特に時間で文言が切り替わるのを見比べられる状態にしたい。</p>
+
+<p>ということでphantomjsでしこしこ以下のようなスクリプト書いてました</p>
+
+<ul>
+<li>指定ページを時間別にキャプチャしてpngで吐き出すスクリプト</li>
+<li>フォルダ以下の*.png画像を横に並べて表示するサーバを立ててそれをキャプチャするスクリプト</li>
+</ul>
+
+<p>参考: <a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">PhantomJS でログインが必要なページでも自由自在にスクレイピング - 凹みTips</a></p>
+
+<p>ほぼほぼキャプチャの部分は<a href="http://d.hatena.ne.jp/hecomi/20121229/1356785834">参考</a>をそのまま使わせてもらっているのですが、参考のままだと画像などがキャプチャされないことがあったので、setTimeoutを使ってキャプチャのタイミングを遅らせるなどの簡単な工夫をしています。</p>
+
+<p>後、サーバがバイナリを出力するときは、ローカルからファイルを読み込む時に 'b' を指定するのとresponse.writeするまえにresponse.setEncoding('binary')しないといけないようなので注意が必要です。</p>
+
+<pre><code>var image = fs.read(file_path, 'b');
+response.headers = {
+    'Accept-Ranges': 'bytes',
+    'Content-Type': 'image/png',
+    'Content-Length': image.length
+};
+response.setEncoding('binary');
+response.write(image);
+</code></pre>
+
+<p>こうすることで横並び画像にして文言チェック出来るようになり捗りそうな気配がしています。（まだ作ったばかりで実際に活用するのはこれから）</p>
+
+<p>ちなみに一枚画像にしてしまうのは社内gyazoにあげてディレクターなど他の方にも見てもらえるようにしたかったからですが、今にして思えば別に一枚画像にする必要はなく、画像一括アップロード出来るフォームと横並びにして表示出来る簡単なサーバアプリを書くだけで良いことに気づいたので、ここは今後やりやすい方にシフトする感じで行きたい。</p>
+
+<p>ということでphantomjs便利なんじゃないかなというお話でした。</p>
+
+		</div>
+		<div class="footer">
+			<time>2013-04-13</time>
+			<ul class="tag">
+				<li><a href="/tag/phantomjs">phantomjs(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2013/03/16/20130316/">おれおれWebフレームワーク - Chaco</a></h2>
 		</div>
 		<div class="content">
@@ -192,29 +317,6 @@ run;
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2013/01/06/20130106/">あけおめ</a></h2>
-		</div>
-		<div class="content">
-			<p>ことよろ。なんか本当に久しぶりに落書きしたmix3です。</p>
-
-<script src="http://source.pixiv.net/source/embed.js" data-id="32685756_6064c2b2416178ec058c322de47db89e" data-size="medium" data-border="on" charset="utf-8"></script>
-
-<noscript><p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=32685756" target="_blank">あけおめ</a> by <a href="http://www.pixiv.net/member.php?id=88339" target="_blank">mix3</a> on <a href="http://www.pixiv.net/" target="_blank">pixiv</a></p></noscript>
-
-<p>年に1回の年賀絵ぐらい継続して描きたいものですね…</p>
-
-		</div>
-		<div class="footer">
-			<time>2013-01-06</time>
-			<ul class="tag">
-				<li><a href="/tag/落書き">落書き(2)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/5" class="float-left">≪前のページ</a>
 		<a href="/page/7" class="float-right">次のページ≫</a>
@@ -243,19 +345,20 @@ run;
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/05/01/20150501/">そうだ docker触れる環境を作ろう</a></li>
 						<li><a href="/blog/2015/02/08/20150208/">plantumlのリアルタイムプレビュー</a></li>
 						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
 						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
-						<li><a href="/blog/2014/09/03/20140903_01/">YAPC::Asia 2014 感想 #yapcasia</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2015">2015年(2)</a>
+							<li><a href="/archives/2015">2015年(3)</a>
 								<ul>
+										<li><a href="/archives/2015/05">2015年05月(1)</a></li>
 										<li><a href="/archives/2015/02">2015年02月(1)</a></li>
 										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
 								</ul>
@@ -354,11 +457,13 @@ run;
 						<li class="hide"><a href="/tag/cpan">cpan(1)</a></li>
 						<li class="hide"><a href="/tag/cpan author">cpan author(1)</a></li>
 						<li class="hide"><a href="/tag/dbic">dbic(1)</a></li>
+						<li class="hide"><a href="/tag/docker">docker(1)</a></li>
 						<li class="hide"><a href="/tag/gist">gist(1)</a></li>
 						<li class="hide"><a href="/tag/heroku">heroku(1)</a></li>
 						<li class="hide"><a href="/tag/isucon">isucon(1)</a></li>
 						<li class="hide"><a href="/tag/java">java(1)</a></li>
 						<li class="hide"><a href="/tag/jquery-presentation">jquery-presentation(1)</a></li>
+						<li class="hide"><a href="/tag/mirage">mirage(1)</a></li>
 						<li class="hide"><a href="/tag/packer">packer(1)</a></li>
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
 						<li class="hide"><a href="/tag/plantuml">plantuml(1)</a></li>
