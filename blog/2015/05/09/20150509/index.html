@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title>go版ikachanのgithub.com/mix3/go-ikusanを作った話 - 萌えキャラとは何だったのか</title>
+		<title>CentOS6/7 で VPN 構築 - 萌えキャラとは何だったのか</title>
 		<meta charset="utf-8" />
 		<link rel="alternate" type="application/rss+xml" title="RSS" href="/index.rdf" />
 		<link rel="stylesheet" type="text/css" href="/css/simplegrid.css" />
@@ -42,21 +42,21 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
-			<h2><a href="/blog/2014/06/15/20140615_03/">go版ikachanのgithub.com/mix3/go-ikusanを作った話</a></h2>
+			<h2><a href="/blog/2015/05/09/20150509/">CentOS6/7 で VPN 構築</a></h2>
 		</div>
 		<div class="social_button">
 				<!-- はてブ -->
 				<div class="hatena">
-					<a href="http://b.hatena.ne.jp/entry/http://mix3.github.io/blog/2014/06/15/20140615_03/" class="hatena-bookmark-button" data-hatena-bookmark-title="go版ikachanのgithub.com/mix3/go-ikusanを作った話 - 萌えキャラとは何だったのか" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+					<a href="http://b.hatena.ne.jp/entry/http://mix3.github.io/blog/2015/05/09/20150509/" class="hatena-bookmark-button" data-hatena-bookmark-title="CentOS6/7 で VPN 構築 - 萌えキャラとは何だったのか" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
 				</div>
 				<!-- Twitter -->
 				<div class="twitter">
-					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mix3.github.io/blog/2014/06/15/20140615_03/" data-text="go版ikachanのgithub.com/mix3/go-ikusanを作った話 - 萌えキャラとは何だったのか" data-via="mix3" data-lang="ja">ツイート</a>
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mix3.github.io/blog/2015/05/09/20150509/" data-text="CentOS6/7 で VPN 構築 - 萌えキャラとは何だったのか" data-via="mix3" data-lang="ja">ツイート</a>
 					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 				</div>
 				<!-- Google+ -->
 				<div class="googleplus">
-					<div class="g-plusone" data-size="medium" data-href="http://mix3.github.io/blog/2014/06/15/20140615_03/"></div>
+					<div class="g-plusone" data-size="medium" data-href="http://mix3.github.io/blog/2015/05/09/20150509/"></div>
 					<script type="text/javascript">
 						window.___gcfg = {lang: 'ja'};
 						(function() {
@@ -68,95 +68,219 @@
 				</div>
 				<!-- facebook -->
 				<div class="facebook">
-					<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmix3.github.io%2Fblog%2F2014%2F06%2F15%2F20140615_03%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=false&amp;height=21&amp;appId=662642987135668" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+					<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmix3.github.io%2Fblog%2F2015%2F05%2F09%2F20150509%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=false&amp;height=21&amp;appId=662642987135668" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
 				</div>
 		</div>
 		<div class="clearer"></div>
 		<div class="content">
-			<blockquote class="twitter-tweet" lang="ja"><p>衣玖さん芸人に!!!俺はなるっ!!!（海賊王的なノリで</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/475532375305109504">2014, 6月 8</a></blockquote>
+			<p>今期のバントホームラン枠 <a href="http://showbyrock-anime.com/">SHOW BY ROCK!!</a> が毎週楽しみな mix3 です。</p>
 
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<h3>CentOS6/7 で VPN 構築</h3>
 
-<p>最近p5-Ikusanを作ったり、それで衣玖さんのIRCボット作ったりして衣玖さんへのロマンティックが止まらないmix3です</p>
+<p>今までにも何回か VPN 構築に挑戦してその度に「上手くいかない」となって諦めるということを繰り返してたのですが、今回はどうにか成功したので忘れないうちにメモ。</p>
 
-<h3><a href="https://github.com/mix3/go-ikusan">github.com/mix3/go-ikusan</a>と<a href="https://github.com/mix3/go-irc">github.com/mix3/go-irc</a></h3>
+<p>openswan (for CentOS6) / libreswan (for CentOS7) (IPsec), xl2tpd(L2TP) でさくら VPS で VPN を構築した。</p>
 
-<p>最近golangを触ってる事が多いのですが（絶賛開発中の社内アプリがgolangだけどそっちにはあんまり関わってなかったりする）</p>
-
-<p>適当になんか作りたいなぁと思っていたところに最近衣玖さんへの愛が溢れ出してきてたので、そりゃ「go版ikachan作ろう」となるのは自然な事ですよね</p>
-
-<p>でgoでircってどう触るんだろうとgithubを漁ったところ</p>
+<p>参考にしたサイト</p>
 
 <ul>
-<li><a href="https://github.com/thoj/go-ircevent">github.com/thoj/go-ircevent</a></li>
-<li><a href="https://github.com/fluffle/goirc/tree/master">github.com/fluffle/goirc</a></li>
+<li><a href="https://gist.github.com/CLCL/5742738">CLCL / CentOS6-L2TP-IPsec.md - Gist</a></li>
+<li><a href="http://blog.sotm.jp/2014/01/06/L2TPIPSec-VPN-Setup-for-CentOS65/">スクリプトで一発簡単！iPhone/Android/Mac/Windowsから接続可能なL2TP/IPSecなVPN環境を構築する&nbsp;-&nbsp;blog@sotm.jp</a></li>
+<li><a href="http://orange.servecounterstrike.com/html/tomokaku_archives/2015/01/L2TP-IPSec-setup.html">CentOS7 PPTPを辞めてL2TP/IPSecに変更する - ともかくメモ</a></li>
+<li><a href="http://qiita.com/mell3210/items/2fa2c9b616e4a2c685af">ipsec - linuxでVPNサーバ - Qiita</a></li>
+<li><a href="http://techblog.clara.jp/2014/11/centos7_linux-router-by-firewalled/">CentOS7 第4回 はじめての firewalld で作る Linuxルータ &#8211; CLARA ONLINE techblog</a></li>
+<li>etc...</li>
 </ul>
 
-<p>辺りがirc触るためのライブラリとして有名どころなのかなぁということが分かって、その辺り使って作ろうとしたのですが、</p>
+<p>設定は <a href="http://blog.sotm.jp/2014/01/06/L2TPIPSec-VPN-Setup-for-CentOS65/">スクリプトで一発簡単！iPhone/Android/Mac/Windowsから接続可能なL2TP/IPSecなVPN環境を構築する&nbsp;-&nbsp;blog@sotm.jp</a> のスクリプトをほぼほぼそのまま使わせてもらっている。</p>
 
-<blockquote class="twitter-tweet" lang="ja"><p>go-ikusanのためにgo-irceventの中追いかけてるがエラー検知からのリコネクト処理がダメだこりゃ close(end)して各イベントチャンネルをwaitgroupで待ってるけど、socketのreadで待ってるからtimeoutするまで待ち続けてる</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476224165708451840">2014, 6月 10</a></blockquote>
+<p>以下ハマッたポイント</p>
 
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<h3>VPNパススルー、またはIPsecパススルー</h3>
 
-<blockquote class="twitter-tweet" lang="ja"><p>preadってチャンネル用意してるのにどこにも使ってなくて多分これはsocketから1行読んで解釈するのと、それをcallbackに投げるのを分離するためものだと思うけど、まだ未実装ってことなのかな</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476225950380597248">2014, 6月 10</a></blockquote>
+<p>今までずっと玉砕してた理由が多分これで、ブロードバンドルータのほうで NAT を突破出来るように設定しなければならず、大抵「VPN パススルー」または「IPsec パススルー」という名前で設定が用意されているので設定を有効にしないといけなかった。</p>
 
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<p>NAT超えが出来ないとサーバに接続が到達しないのでログすら出力されず途方にくれるしかったので、今回どうにかルータで止まってるということに気付けて良かった。</p>
 
-<blockquote class="twitter-tweet" lang="ja"><p>go-ircevent、groupwaitしてるのsocketを安全に閉じるのを保証するためだと思うけど、socketのreadで待ち続けるのもなんとも言えないなぁ</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476226654398709761">2014, 6月 10</a></blockquote>
+<h3>CentOS6 の openswan は yum で入れるとバージョンが低い</h3>
 
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<blockquote class="twitter-tweet" lang="ja"><p>Errorチャンネルをselectで待ってて、検知したらdisconnectするけどそのdisconnectの中でさらにErrorを投げてるの結構ワンダーな感じする</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476227286870392832">2014, 6月 10</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p>とか</p>
-
-<blockquote class="twitter-tweet" lang="ja"><p><a href="http://t.co/jXGwN4arHz">http://t.co/jXGwN4arHz</a> がエラーハンドリングちゃんとしてそうだけど、flag要求されて非常に使いづらい</p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/476228862263570434">2014, 6月 10</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p>とかでなんか微妙に使いづらいなぁとなってしまい、じゃあいっそそっから作るかということで両方の間の子みたなの作ったりしました。<a href="https://github.com/mix3/go-irc">github.com/mix3/go-irc</a></p>
-
-<p>出来るだけ薄くしておきたかったのと、IRCについて知識はまるでないので難しいことはしないようにしたかったので</p>
+<p>openswan のバージョンによっては MacOSX でうまく接続出来ない問題があるっぽい</p>
 
 <ul>
-<li>ircサーバへのリクエストが出来る</li>
-<li>ircサーバからのレスポンスを受け取れる</li>
-<li>ircサーバからのレスポンスを元にコールバックを呼ぶがディスパッチャみたいなことはしない</li>
-<li>ircサーバからのレスポンスのtimeoutを待たずに落ちる事が出来る</li>
-<li>落ちたタイミングで何かしたいこともあるだろうから、別途落ちたタイミングでコールバックを呼ぶようにする</li>
-<li>flagは使わない</li>
-<li>loggerはデフォルトで<a href="https://github.com/umisama/golog">github.com/umisama/golog</a>を使うけどinterfaceが定義されてるので差し替え出来るハズ</li>
+<li><a href="http://www.neobit.jp/archives/394">Openswan(IPSec VPN)がiPhoneから繋がらなくなった！ | 技術屋のあれやこれや</a></li>
 </ul>
 
-<p>ぐらいを満たすような感じで<a href="https://github.com/thoj/go-ircevent">github.com/thoj/go-ircevent</a>と<a href="https://github.com/fluffle/goirc/tree/master">github.com/fluffle/goirc</a>からコピペしたりしなかったりしました</p>
+<p>なので、こんな感じで openswan を最新に更新してあげる必要があった。</p>
 
-<p>たまに落ちるときにWaitしたまま帰ってこないみたいなことがある感じなので、明らかにここマズいとかあったらプルリクあると嬉しいです</p>
+<p><code>$ wget https://download.openswan.org/openswan/openswan-latest.tar.gz -O /tmp/openswan-latest.tar.gz
+$ mkdir /tmp/openswan-latest
+$ tar xzf /tmp/openswan-latest.tar.gz -C /tmp/openswan-latest --strip=1
+$ cd /tmp/openswan-latest
+$ make programs
+$ make install
+</code></p>
 
-<p>で、これを元にgo版<a href="https://github.com/yappo/p5-App-Ikachan">ikachan</a>こと<a href="https://github.com/mix3/go-ikusan">go-ikusann</a>を作りましたとさ</p>
+<p>CentOS7 の libreswan ではそういう問題はないっぽい。</p>
 
-<p>とってもキュートな衣玖さんがお出迎えしてくれるwebインタフェースも作ってやはり衣玖さんは最高だなって思いました</p>
+<h3>conf の name は揃える必要がある</h3>
 
-<blockquote class="twitter-tweet" lang="ja"><p>go-ikusanのwebインタフェース作った　衣玖さんマジかわ <a href="http://t.co/sAcXgUZJP1">pic.twitter.com/sAcXgUZJP1</a></p>&mdash; mix3 (@mix3) <a href="https://twitter.com/mix3/statuses/477786314641657857">2014, 6月 14</a></blockquote>
+<p>/etc/ppp/options.xl2tpd
+<code>name xl2tpd
+</code></p>
 
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<p>/etc/xl2tpd/xl2tpd.conf
+<code>name = LinuxVPNserver
+</code></p>
 
-<p>なおAAの画像は「衣玖 AA」で検索して見繕ったAAなので著作権的に問題あったら非常に心苦しいですが消します</p>
+<p>/etc/ipsec.d/default.secrets</p>
+
+<p><code>"hoge001" "xl2tpd" "hoge##123" *
+"hoge002" "xl2tpd" "hoge##456" *
+</code></p>
+
+<p>これらの設定で <strong>LinuxVPNserver</strong> となってるところを <strong>xl2tpd</strong> にして名前を揃えないと接続がうまくいかなかった。（もしかしたら気のせいかもしれない）</p>
+
+<h3>CentoOS7 のカーネル設定</h3>
+
+<p>CentOS7 のカーネル設定は <strong>/etc/sysctl.d/*.conf</strong> にファイルを置いて設定するっぽいので <a href="http://orange.servecounterstrike.com/html/tomokaku_archives/2015/01/L2TP-IPSec-setup.html">CentOS7 PPTPを辞めてL2TP/IPSecに変更する - ともかくメモ</a> に従って</p>
+
+<p>/etc/sysctl.d/10-sysctl_ipsec.conf
+<code>net.ipv4.ip_forward = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.eth0.accept_redirects = 0
+net.ipv4.conf.eth0.send_redirects = 0
+net.ipv4.conf.lo.accept_redirects = 0
+net.ipv4.conf.lo.send_redirects = 0
+</code></p>
+
+<p>として設定反映したあと <strong>ipsec verify</strong> するとおそらくこんな感じのが出てくる</p>
+
+<p><code>Checking rp_filter                                   [ENABLED]
+ /proc/sys/net/ipv4/conf/default/rp_filter          [ENABLED]
+  rp_filter is not fully aware of IPsec and should be disabled
+</code></p>
+
+<p><strong>rp_filter</strong> もちゃんと無効にしろ ということなので、</p>
+
+<p>/etc/sysctl.d/10-sysctl_ipsec.conf
+<code>net.ipv4.ip_forward = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.all.rp_filter = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.default.rp_filter = 0
+net.ipv4.conf.eth0.accept_redirects = 0
+net.ipv4.conf.eth0.send_redirects = 0
+net.ipv4.conf.eth0.rp_filter = 0
+net.ipv4.conf.lo.accept_redirects = 0
+net.ipv4.conf.lo.send_redirects = 0
+net.ipv4.conf.lo.rp_filter = 0
+</code></p>
+
+<p>として設定反映したあと <strong>ipsec verify</strong> するとなぜか変わらず ENABLED がでてくる。設定を確認するとなぜか反映されていない。</p>
+
+<p><code>$ sysctl -a | grep -e net.ipv4.conf.*send_redirects -e net.ipv4.conf.*accept_redirects -e net.ipv4.conf.*rp_filter | grep -v arp
+</code>
+<code>net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.rp_filter = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.default.rp_filter = 1 &lt;= ここだけおかしい
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.eth0.accept_redirects = 0
+net.ipv4.conf.eth0.rp_filter = 0
+net.ipv4.conf.eth0.send_redirects = 0
+net.ipv4.conf.lo.accept_redirects = 0
+net.ipv4.conf.lo.rp_filter = 0
+net.ipv4.conf.lo.send_redirects = 0
+</code></p>
+
+<p>上書きされてるっぽい雰囲気は感じるので、どこで何が設定されるか調べられないかとググったところ <strong>sysctl --system</strong> で見れるっぽいことが分かったので、試したところこんな感じになっており <strong>/usr/lib/sysctl.d/50-default.conf</strong> で上書きされてることが判明。</p>
+
+<p><code>* Applying /usr/lib/sysctl.d/00-system.conf ...
+net.bridge.bridge-nf-call-ip6tables = 0
+net.bridge.bridge-nf-call-iptables = 0
+net.bridge.bridge-nf-call-arptables = 0
+kernel.shmmax = 4294967295
+kernel.shmall = 268435456
+* Applying /etc/sysctl.d/10-sysctl_ipsec.conf
+net.ipv4.ip_forward = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.lo.accept_redirects = 0
+net.ipv4.conf.lo.send_redirects = 0
+net.ipv4.conf.eth0.accept_redirects = 0
+net.ipv4.conf.eth0.send_redirects = 0
+* Applying /usr/lib/sysctl.d/50-default.conf ...
+kernel.sysrq = 16
+kernel.core_uses_pid = 1
+net.ipv4.conf.default.rp_filter = 1 &lt;= ここで上書きされてる
+net.ipv4.conf.default.accept_source_route = 0
+fs.protected_hardlinks = 1
+fs.protected_symlinks = 1
+* Applying /etc/sysctl.d/99-sysctl.conf ...
+* Applying /etc/sysctl.conf ...
+</code></p>
+
+<p>仕方ないので <strong>mv /etc/sysctl.d/10-sysctl_ipsec.conf /etc/sysctl.d/60-sysctl_ipsec.conf</strong> として上書きされるのを回避することでようやく ENABLED を除去出来た。</p>
+
+<h3>CentOS7 では iptables ではなく firewalld</h3>
+
+<p>CentOS7 では iptables ではなく firewalld でファイアーウォールを設定する。IPsec/L2TP で必要な設定は以下で良いかと思われる。</p>
+
+<p><code>firewall-cmd --permanent --add-service=ipsec
+firewall-cmd --permanent --add-port=1701/udp
+firewall-cmd --permanent --add-port=4500/udp
+firewall-cmd --permanent --add-masquerade
+firewall-cmd --reload
+</code></p>
+
+<h3>CentOS7 では chkconfig, /etc/init.d/NAME COMMAND ではなく systemctl COMMAND NAME</h3>
+
+<p>CentOS7 ではサービスの管理方法が変更されているので自動起動やサービスのスタートが以下のようになっている。</p>
+
+<p><code>systemctl enable ipsec
+systemctl enable xl2tpd
+systemctl restart ipsec
+systemctl restart xl2tpd
+</code></p>
+
+<h3>完成品がこちら</h3>
+
+<p>CentOS7 の一発VPN構築スクリプト <a href="https://gist.github.com/mix3/efbaf5cb47946bff6f56">L2TP_IPSec_vpn_setup_for_centos7.sh</a></p>
+
+<p><code>$ curl -L https://gist.githubusercontent.com/mix3/efbaf5cb47946bff6f56/raw/L2TP_IPSec_vpn_setup_for_centos7.sh | bash
+</code>
+or
+<code>$ wget https://gist.githubusercontent.com/mix3/efbaf5cb47946bff6f56/raw/L2TP_IPSec_vpn_setup_for_centos7.sh
+$ vim L2TP_IPSec_vpn_setup_for_centos7.sh
+$ bash L2TP_IPSec_vpn_setup_for_centos7.sh
+</code></p>
+
+<p>とでもすると一発で構築VPNが構築出来ると思う。</p>
+
+<h3>共有鍵ではなく公開鍵</h3>
+
+<p>に出来たらいいなぁとか思ってるがそこまでは行けていない。</p>
 
 		</div>
 		<div class="footer">
-			<time>2014-06-15</time>
+			<time>2015-05-09</time>
 			<ul class="tag">
-				<li><a href="/tag/golang">golang(6)</a></li>
+				<li><a href="/tag/vpn">vpn(1)</a></li>
 			</ul>
 			<div class="clearer"></div>
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
-	<a href="/blog/2014/06/15/20140615_02/" class="float-left">≪ブログデザインを変えてみる</a>
-	<a href="/blog/2014/06/15/20140717_01/" class="float-right">rocket≫</a>
+	<a href="/blog/2015/05/01/20150501/" class="float-left">≪そうだ docker触れる環境を作ろう</a>
 	</div>
 	<div class="clearer"></div>
 			</article>

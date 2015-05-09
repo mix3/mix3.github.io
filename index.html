@@ -42,6 +42,217 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2015/05/09/20150509/">CentOS6/7 で VPN 構築</a></h2>
+		</div>
+		<div class="content">
+			<p>今期のバントホームラン枠 <a href="http://showbyrock-anime.com/">SHOW BY ROCK!!</a> が毎週楽しみな mix3 です。</p>
+
+<h3>CentOS6/7 で VPN 構築</h3>
+
+<p>今までにも何回か VPN 構築に挑戦してその度に「上手くいかない」となって諦めるということを繰り返してたのですが、今回はどうにか成功したので忘れないうちにメモ。</p>
+
+<p>openswan (for CentOS6) / libreswan (for CentOS7) (IPsec), xl2tpd(L2TP) でさくら VPS で VPN を構築した。</p>
+
+<p>参考にしたサイト</p>
+
+<ul>
+<li><a href="https://gist.github.com/CLCL/5742738">CLCL / CentOS6-L2TP-IPsec.md - Gist</a></li>
+<li><a href="http://blog.sotm.jp/2014/01/06/L2TPIPSec-VPN-Setup-for-CentOS65/">スクリプトで一発簡単！iPhone/Android/Mac/Windowsから接続可能なL2TP/IPSecなVPN環境を構築する&nbsp;-&nbsp;blog@sotm.jp</a></li>
+<li><a href="http://orange.servecounterstrike.com/html/tomokaku_archives/2015/01/L2TP-IPSec-setup.html">CentOS7 PPTPを辞めてL2TP/IPSecに変更する - ともかくメモ</a></li>
+<li><a href="http://qiita.com/mell3210/items/2fa2c9b616e4a2c685af">ipsec - linuxでVPNサーバ - Qiita</a></li>
+<li><a href="http://techblog.clara.jp/2014/11/centos7_linux-router-by-firewalled/">CentOS7 第4回 はじめての firewalld で作る Linuxルータ &#8211; CLARA ONLINE techblog</a></li>
+<li>etc...</li>
+</ul>
+
+<p>設定は <a href="http://blog.sotm.jp/2014/01/06/L2TPIPSec-VPN-Setup-for-CentOS65/">スクリプトで一発簡単！iPhone/Android/Mac/Windowsから接続可能なL2TP/IPSecなVPN環境を構築する&nbsp;-&nbsp;blog@sotm.jp</a> のスクリプトをほぼほぼそのまま使わせてもらっている。</p>
+
+<p>以下ハマッたポイント</p>
+
+<h3>VPNパススルー、またはIPsecパススルー</h3>
+
+<p>今までずっと玉砕してた理由が多分これで、ブロードバンドルータのほうで NAT を突破出来るように設定しなければならず、大抵「VPN パススルー」または「IPsec パススルー」という名前で設定が用意されているので設定を有効にしないといけなかった。</p>
+
+<p>NAT超えが出来ないとサーバに接続が到達しないのでログすら出力されず途方にくれるしかったので、今回どうにかルータで止まってるということに気付けて良かった。</p>
+
+<h3>CentOS6 の openswan は yum で入れるとバージョンが低い</h3>
+
+<p>openswan のバージョンによっては MacOSX でうまく接続出来ない問題があるっぽい</p>
+
+<ul>
+<li><a href="http://www.neobit.jp/archives/394">Openswan(IPSec VPN)がiPhoneから繋がらなくなった！ | 技術屋のあれやこれや</a></li>
+</ul>
+
+<p>なので、こんな感じで openswan を最新に更新してあげる必要があった。</p>
+
+<p><code>$ wget https://download.openswan.org/openswan/openswan-latest.tar.gz -O /tmp/openswan-latest.tar.gz
+$ mkdir /tmp/openswan-latest
+$ tar xzf /tmp/openswan-latest.tar.gz -C /tmp/openswan-latest --strip=1
+$ cd /tmp/openswan-latest
+$ make programs
+$ make install
+</code></p>
+
+<p>CentOS7 の libreswan ではそういう問題はないっぽい。</p>
+
+<h3>conf の name は揃える必要がある</h3>
+
+<p>/etc/ppp/options.xl2tpd
+<code>name xl2tpd
+</code></p>
+
+<p>/etc/xl2tpd/xl2tpd.conf
+<code>name = LinuxVPNserver
+</code></p>
+
+<p>/etc/ipsec.d/default.secrets</p>
+
+<p><code>"hoge001" "xl2tpd" "hoge##123" *
+"hoge002" "xl2tpd" "hoge##456" *
+</code></p>
+
+<p>これらの設定で <strong>LinuxVPNserver</strong> となってるところを <strong>xl2tpd</strong> にして名前を揃えないと接続がうまくいかなかった。（もしかしたら気のせいかもしれない）</p>
+
+<h3>CentoOS7 のカーネル設定</h3>
+
+<p>CentOS7 のカーネル設定は <strong>/etc/sysctl.d/*.conf</strong> にファイルを置いて設定するっぽいので <a href="http://orange.servecounterstrike.com/html/tomokaku_archives/2015/01/L2TP-IPSec-setup.html">CentOS7 PPTPを辞めてL2TP/IPSecに変更する - ともかくメモ</a> に従って</p>
+
+<p>/etc/sysctl.d/10-sysctl_ipsec.conf
+<code>net.ipv4.ip_forward = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.eth0.accept_redirects = 0
+net.ipv4.conf.eth0.send_redirects = 0
+net.ipv4.conf.lo.accept_redirects = 0
+net.ipv4.conf.lo.send_redirects = 0
+</code></p>
+
+<p>として設定反映したあと <strong>ipsec verify</strong> するとおそらくこんな感じのが出てくる</p>
+
+<p><code>Checking rp_filter                                   [ENABLED]
+ /proc/sys/net/ipv4/conf/default/rp_filter          [ENABLED]
+  rp_filter is not fully aware of IPsec and should be disabled
+</code></p>
+
+<p><strong>rp_filter</strong> もちゃんと無効にしろ ということなので、</p>
+
+<p>/etc/sysctl.d/10-sysctl_ipsec.conf
+<code>net.ipv4.ip_forward = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.all.rp_filter = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.default.rp_filter = 0
+net.ipv4.conf.eth0.accept_redirects = 0
+net.ipv4.conf.eth0.send_redirects = 0
+net.ipv4.conf.eth0.rp_filter = 0
+net.ipv4.conf.lo.accept_redirects = 0
+net.ipv4.conf.lo.send_redirects = 0
+net.ipv4.conf.lo.rp_filter = 0
+</code></p>
+
+<p>として設定反映したあと <strong>ipsec verify</strong> するとなぜか変わらず ENABLED がでてくる。設定を確認するとなぜか反映されていない。</p>
+
+<p><code>$ sysctl -a | grep -e net.ipv4.conf.*send_redirects -e net.ipv4.conf.*accept_redirects -e net.ipv4.conf.*rp_filter | grep -v arp
+</code>
+<code>net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.rp_filter = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.default.rp_filter = 1 &lt;= ここだけおかしい
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.eth0.accept_redirects = 0
+net.ipv4.conf.eth0.rp_filter = 0
+net.ipv4.conf.eth0.send_redirects = 0
+net.ipv4.conf.lo.accept_redirects = 0
+net.ipv4.conf.lo.rp_filter = 0
+net.ipv4.conf.lo.send_redirects = 0
+</code></p>
+
+<p>上書きされてるっぽい雰囲気は感じるので、どこで何が設定されるか調べられないかとググったところ <strong>sysctl --system</strong> で見れるっぽいことが分かったので、試したところこんな感じになっており <strong>/usr/lib/sysctl.d/50-default.conf</strong> で上書きされてることが判明。</p>
+
+<p><code>* Applying /usr/lib/sysctl.d/00-system.conf ...
+net.bridge.bridge-nf-call-ip6tables = 0
+net.bridge.bridge-nf-call-iptables = 0
+net.bridge.bridge-nf-call-arptables = 0
+kernel.shmmax = 4294967295
+kernel.shmall = 268435456
+* Applying /etc/sysctl.d/10-sysctl_ipsec.conf
+net.ipv4.ip_forward = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.lo.accept_redirects = 0
+net.ipv4.conf.lo.send_redirects = 0
+net.ipv4.conf.eth0.accept_redirects = 0
+net.ipv4.conf.eth0.send_redirects = 0
+* Applying /usr/lib/sysctl.d/50-default.conf ...
+kernel.sysrq = 16
+kernel.core_uses_pid = 1
+net.ipv4.conf.default.rp_filter = 1 &lt;= ここで上書きされてる
+net.ipv4.conf.default.accept_source_route = 0
+fs.protected_hardlinks = 1
+fs.protected_symlinks = 1
+* Applying /etc/sysctl.d/99-sysctl.conf ...
+* Applying /etc/sysctl.conf ...
+</code></p>
+
+<p>仕方ないので <strong>mv /etc/sysctl.d/10-sysctl_ipsec.conf /etc/sysctl.d/60-sysctl_ipsec.conf</strong> として上書きされるのを回避することでようやく ENABLED を除去出来た。</p>
+
+<h3>CentOS7 では iptables ではなく firewalld</h3>
+
+<p>CentOS7 では iptables ではなく firewalld でファイアーウォールを設定する。IPsec/L2TP で必要な設定は以下で良いかと思われる。</p>
+
+<p><code>firewall-cmd --permanent --add-service=ipsec
+firewall-cmd --permanent --add-port=1701/udp
+firewall-cmd --permanent --add-port=4500/udp
+firewall-cmd --permanent --add-masquerade
+firewall-cmd --reload
+</code></p>
+
+<h3>CentOS7 では chkconfig, /etc/init.d/NAME COMMAND ではなく systemctl COMMAND NAME</h3>
+
+<p>CentOS7 ではサービスの管理方法が変更されているので自動起動やサービスのスタートが以下のようになっている。</p>
+
+<p><code>systemctl enable ipsec
+systemctl enable xl2tpd
+systemctl restart ipsec
+systemctl restart xl2tpd
+</code></p>
+
+<h3>完成品がこちら</h3>
+
+<p>CentOS7 の一発VPN構築スクリプト <a href="https://gist.github.com/mix3/efbaf5cb47946bff6f56">L2TP_IPSec_vpn_setup_for_centos7.sh</a></p>
+
+<p><code>$ curl -L https://gist.githubusercontent.com/mix3/efbaf5cb47946bff6f56/raw/L2TP_IPSec_vpn_setup_for_centos7.sh | bash
+</code>
+or
+<code>$ wget https://gist.githubusercontent.com/mix3/efbaf5cb47946bff6f56/raw/L2TP_IPSec_vpn_setup_for_centos7.sh
+$ vim L2TP_IPSec_vpn_setup_for_centos7.sh
+$ bash L2TP_IPSec_vpn_setup_for_centos7.sh
+</code></p>
+
+<p>とでもすると一発で構築VPNが構築出来ると思う。</p>
+
+<h3>共有鍵ではなく公開鍵</h3>
+
+<p>に出来たらいいなぁとか思ってるがそこまでは行けていない。</p>
+
+		</div>
+		<div class="footer">
+			<time>2015-05-09</time>
+			<ul class="tag">
+				<li><a href="/tag/vpn">vpn(1)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2015/05/01/20150501/">そうだ docker触れる環境を作ろう</a></h2>
 		</div>
 		<div class="content">
@@ -733,51 +944,6 @@ ORDER BY is_equiped, id ASC LIMIT 2 FOR UPDATE;
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></h2>
-		</div>
-		<div class="content">
-			<p>してしまったmix3だよ!</p>
-
-<blockquote class="twitter-tweet" lang="ja"><p>あー今日祝日やん！</p>&mdash; 衣玖さんは天子の嫁 (@mix3) <a href="https://twitter.com/mix3/status/529066233010745344">2014, 11月 3</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p>そして意識高いのか社畜なのか良くわからないこと呟いたけど</p>
-
-<blockquote class="twitter-tweet" lang="ja"><p>まあいいや オフィス開いてたらすこし仕事してこ</p>&mdash; 衣玖さんは天子の嫁 (@mix3) <a href="https://twitter.com/mix3/status/529066997594611712">2014, 11月 3</a></blockquote>
-
-<p><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<p>当然オフィスに誰も居なかったので一人で仕事とか寂しくて死ぬので速攻で帰ったよ!とんでもないクズ野郎だね!</p>
-
-<h3>こんな悲しみ繰り返さないために</h3>
-
-<p>切実に祝日リマインダーが必要だと感じたので以前作った<a href="http://mix3.github.io/blog/2014/06/15/20140717_01/">リマインダアプリ</a>(<a href="https://github.com/mix3/go-rocket-sample-app">github</a>)に祝日も自動で通知するみたいなの追加したいなぁとか思った</p>
-
-<p>で、golangで祝日を取得する方法無いかなぁと適当にググったら見つからない(本当に適当にググっただけなのでちゃんと探したらあるかもしれない)ので<a href="http://d.hatena.ne.jp/fbis/20070616/1181993102">国民の祝日の名称を取得するモジュール</a>(<a href="http://coderepos.org/share/browser/lang/perl/DateTime-Holiday-Japanese">coderepos</a>)をgolangに移植したんだけど、それだけで一日潰してしまって祝日リマインダー出来ませんでした!</p>
-
-<p>また祝日に出勤してしまうかもしれない! やばい!!!</p>
-
-<h3>追記</h3>
-
-<p>githubへのリンク貼ってなかったよ!おっちょこちょいだね!</p>
-
-<p><a href="https://github.com/mix3/go-holiday">go-holiday</a></p>
-
-<p>無駄にDriverの仕組みを入れてるので日本の祝日以外の実装も追加しやすいよ!多分ね!</p>
-
-		</div>
-		<div class="footer">
-			<time>2014-11-03</time>
-			<ul class="tag">
-				<li><a href="/tag/golang">golang(6)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/2" class="float-right">次のページ≫</a>
 	</div>
@@ -805,20 +971,20 @@ ORDER BY is_equiped, id ASC LIMIT 2 FOR UPDATE;
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/05/09/20150509/">CentOS6/7 で VPN 構築</a></li>
 						<li><a href="/blog/2015/05/01/20150501/">そうだ docker触れる環境を作ろう</a></li>
 						<li><a href="/blog/2015/02/08/20150208/">plantumlのリアルタイムプレビュー</a></li>
 						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
-						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2015">2015年(3)</a>
+							<li><a href="/archives/2015">2015年(4)</a>
 								<ul>
-										<li><a href="/archives/2015/05">2015年05月(1)</a></li>
+										<li><a href="/archives/2015/05">2015年05月(2)</a></li>
 										<li><a href="/archives/2015/02">2015年02月(1)</a></li>
 										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
 								</ul>
@@ -928,6 +1094,7 @@ ORDER BY is_equiped, id ASC LIMIT 2 FOR UPDATE;
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
 						<li class="hide"><a href="/tag/plantuml">plantuml(1)</a></li>
 						<li class="hide"><a href="/tag/responsive design">responsive design(1)</a></li>
+						<li class="hide"><a href="/tag/vpn">vpn(1)</a></li>
 						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
 						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
 						<li class="hide"><a href="/tag/サーバ管理">サーバ管理(1)</a></li>

@@ -42,6 +42,71 @@
 			<article class="col-8-12">
 	<div class="col-1-1">
 		<div class="header">
+			<h2><a href="/blog/2012/08/12/20120812/">そろそろ自分は本当に死んだ方が良い気がする件について</a></h2>
+		</div>
+		<div class="content">
+			<p>「バカジャネーノ」と言われてぐぅの根も出ないmix3です。</p>
+
+<h3>死んだ方が良い事の概要その１</h3>
+
+<p>今やってるサービスに諸事情により一つ機能を追加しなければならない必要に迫られ、その対応を自分がすることになったのですが、結果は盛大に燃やし散々な糞クオリティで納期に間に合わないという目も当てられない自体になってしまいました。
+設計段階で詰んでいて（DB設計の時点で要件を満たせない）どう尻拭いしても物理的に納期に間に合わないということで、結局お尻を先延ばしにしてもらって先輩にヘルプ入ってもらい設計からやり直しとなりました。</p>
+
+<h3>死んだ方が良い事の概要その２</h3>
+
+<p>スケジュール再編からは先輩の手によって設計が組み直され、画面仕様から必要な機能を洗い出してコントローラとモデルのインタフェースを決めて行く（勝手にIDD[インタフェースドリブンデベロップメント]などと呼んでいる）やりかたで、仕様認識の齟齬を減らしつつ必要充分な機能を決めて行きました。このやり方は関わるプログラマ全員の時間を使ってしまうのでなかなか面倒ですが、仕様認識齟齬が減るのと機能の洗い出しで全員がチェックするので抜けが減るので危険な香りがする時は積極的にするようにしています。またインタフェースを決めてしまうので、分業しやすいというのも利点です。Javaのインタフェースベースの作り方を思い出してとても気分良く作れます。</p>
+
+<p>ここまでは良いのですが、分業で自分がモデルを作って最後にコントローラと結合すると自分の糞クオリティを発揮して色々問題を起こしていました</p>
+
+<ul>
+<li>バリデート関数はエラーを返すだけというルールで決めたはずなのになぜかExceptionを投げてる</li>
+<li>関数の返り値の形を変えてしまった</li>
+<li>明らかにコピペしてる</li>
+<li>関数名、変数名の意味が分からない</li>
+<li>テスト書けていない（間に合ってない）</li>
+</ul>
+
+<p>時間も無いのに色々やらかして最終的に「バカジャネーノ」と言われて何も言えないmix3の姿がそこにはありました。</p>
+
+<h3>こういう怒られ方はずっと前から続いている 今回は集中しただけで</h3>
+
+<p>要するにプログラマとしては致命的なほど人から見て意味の通じるコードが書けないのだと思います。視野狭窄で自分しか見えてなくて、平気で他人から見て意味の分からないコードを書いてしまう。他人のコードを見て何がどう優れているか、このコードの何がだめか。変数、関数の意味は。怒られるたびに考えるようにしても、結局怒られる。良し悪しの判断がいつまでたっても改善されない。</p>
+
+<p>自分は成長していないといつも感じているしいつも言っているけど、こういったことの成長が無いことも多く含んでいる。</p>
+
+<h3>結局どうすれば良いのかは分からない</h3>
+
+<p>これだけ怒られて改善しないといけないと思っていて、でもどうすれば良いのかは良くわからない。</p>
+
+<p>ただ「他人が理解出来るコードを書けば良い」だけではあるけれども、それだけの事が出来ないということは、自分にはそれをするための何かが欠けてるということで、でもその何かを「何か」としか書けないということは全くその「何か」を理解していない。つまりどうしたら良いのか分からない。</p>
+
+<p>いっぱいコード書いて怒られて判断出来るようになる以外にもう方法が思いつかないが、でもそのやり方をするには既に時間を使いすぎてる感があるし、そのせいで関わるいろんなひとに迷惑をかけていて、今回は特に他のスケージュルに大きく影響を与え、お金を消費している。大きさ的に自分が取れる責任を大きく上回っている。</p>
+
+<p>だから最近はタイトルのようなことを良く考えている。自分が何かやらかすことで与える色々なな迷惑が大きすぎて、本音の本音では今すぐ逃げ出したい（逃げて人が減る事の方がとんでもない迷惑なのでしないけど）</p>
+
+<h3>ということで</h3>
+
+<ul>
+<li>mix3は今すぐ死ぬべきである。</li>
+<li>死なないのであれば迷惑を掛けないように生きるべきである</li>
+</ul>
+
+<p>どっちかを満たすためにmix3は頑張らなければならない。</p>
+
+<p>そしてそんな事とは関係なく<a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a>を更新してますYO。大本の<a href="http://d.hatena.ne.jp/yoya/20120808/swfed">swfed</a>のバージョンアップに追従しています。<a href="https://github.com/mix3/p5-SWFEditor">p5-SWFEditor</a>は可愛いね。イイコイイコ。</p>
+
+		</div>
+		<div class="footer">
+			<time>2012-08-12</time>
+			<ul class="tag">
+				<li><a href="/tag/p5-SWFEditor">p5-SWFEditor(3)</a></li>
+			</ul>
+			<div class="clearer"></div>
+		</div>
+	</div>
+	<div class="clearer spacer30"></div>
+	<div class="col-1-1">
+		<div class="header">
 			<h2><a href="/blog/2012/04/22/20120422/">修論で作ったなつかしのもの</a></h2>
 		</div>
 		<div class="content">
@@ -213,411 +278,6 @@
 		</div>
 	</div>
 	<div class="clearer spacer30"></div>
-	<div class="col-1-1">
-		<div class="header">
-			<h2><a href="/blog/2011/07/24/20110724/">Play framework + Scala に入門してみる</a></h2>
-		</div>
-		<div class="content">
-			<h3>Scalaクラスタの怒りが聞こえる…</h3>
-
-<p>Scalaクラスタの怒りに満ちたTLが見えて当該セッションのUstを見れなかったのが悔しいです。何があったかはTogetterからある程度察する事が出来ます。</p>
-
-<p>参考：<a href="http://togetter.com/li/164689">2011/07/22_Advanced_Tech_Night No.2 「ジャバラーが知っておくべき最近の開発言語のこと」(#atn2011 )</a> </p>
-
-<h3>Play framework + Scala に入門してみる</h3>
-
-<p>そんな流れがあったのでScalaを触りたい気持ちが強くなりPlay frameworkの勉強と一緒にScalaをやってみようかと思い立ちました。Play frameworkというのははJava版Ruby on Railsといった感じでJavaだけれど非常に効率に良い開発が出来るフレームワークです（らしいです）Wicketとはまた違う爽快感のあるフレームワークのようです。</p>
-
-<h3>インストール</h3>
-
-<p>インストールは非常に簡単です。zipを落として適当に配置してPATHを通すだけ。ただしplayのコマンドはpythonで書かれているのでpythonが必要になるかもしれません。[play]とだけ打つとセットアップが出来ていれば以下のように結果が返ってくるでしょう。</p>
-
-<h4>$ play</h4>
-
-<pre><code>~        _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ Usage: play cmd [app_path] [--options]
-~ 
-~ with,  new      Create a new application
-~        run      Run the application in the current shell
-~        help     Show play help
-~
-</code></pre>
-
-<p>セットアップの確認が出来ればさっそく動作確認してみましょう。</p>
-
-<h3>プロジェクトの作成、アプリケーションの実行</h3>
-
-<p>以下のように打つとプロジェクトが作成出来ます。作成途中アプリケーションの名前を聞かれます。基本デフォルトのままで良いでしょう。スケルトンが作成されます。</p>
-
-<h4>$ play new [project_name] --with scala</h4>
-
-<pre><code>~        _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ The new application will be created in /path/to/[project_name]
-~ What is the application name? [project_name] 
-~
-~ OK, the application is created.
-~ Start it with : play run project_name
-~ Have fun!
-~
-</code></pre>
-
-<p>以下のようにして作成されたアプリケーションを起動する事が出来ます。9000番ポートで待っているようなので<a href="http://localhost:9000/">http://localhost:9000/</a>にアクセスしましょう。いかにもな導入ページが返って来たらOKです。</p>
-
-<h4>$ play run [project_name]</h4>
-
-<pre><code>~        _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ Ctrl+C to stop
-~ 
-Listening for transport dt_socket at address: 8000
-01:35:10,384 INFO  ~ Starting /path/to/[project_name]
-01:35:11,399 WARN  ~ You're running Play! in DEV mode
-01:35:11,609 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-01:43:01,925 INFO  ~ Application '[project_name]' is now started !
-</code></pre>
-
-<h3>Scalaで動作するプロジェクトを作成してみる。</h3>
-
-<p>今度はScalaのプロジェクトを作成してみます。ちなみに以下のように conf/dependencies.yml にScalaに依存することを追記して $ play dependencies [project_name] とすることでScala対応のプロジェクトにすることも出来ますが、スケルトンコードがJavaのままなので作り直したいと思います。</p>
-
-<h4>$ diff -u [project_name]/conf/dependencies.yml.orig [project_name]/conf/dependencies.yml</h4>
-
-<pre><code>--- project_name/conf/dependencies.yml.orig 2011-07-24 02:04:56.000000000 +0900
-+++ project_name/conf/dependencies.yml  2011-07-24 02:04:46.000000000 +0900
-@@ -2,3 +2,4 @@
-
- require:
-     - play
-+    - play -&gt; scala 0.9.1
-</code></pre>
-
-<h4>$ play dependencies [project_name]</h4>
-
-<pre><code>~            _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
-~
-~   play-&gt;scala 0.9.1 (from playLocalModules)
-~
-~ Installing resolved dependencies,
-~
-~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
-~
-~ Done!
-~
-</code></pre>
-
-<h3>Scala対応のプロジェクトを作成して動作確認する</h3>
-
-<p>Scala対応のプロジェクトを作成するにはまず以下のようにしてScalaモジュールをインストールする必要があります。</p>
-
-<h4>$ play install scala</h4>
-
-<pre><code>~        _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ Will install scala-0.9.1
-~ This module is compatible with: 1.2.2
-~ Do you want to install this version (y/n)? y
-~ Installing module scala-0.9.1...
-~
-~ Fetching http://www.playframework.org/modules/scala-0.9.1.zip
-~ [--------------------------100%-------------------------] 60034.6 KiB/s    
-~ Unzipping...
-~
-~ Module scala-0.9.1 is installed!
-~ You can now use it by adding it to the dependencies.yml file:
-~
-~ require:
-~     play -&gt; scala 0.9.1
-~
-</code></pre>
-
-<p>インストールが済んだら実際にScala対応のプロジェクトを作成してみましょう。</p>
-
-<h4>$ play new [project_name] --with scala</h4>
-
-<pre><code>~        _            _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ The new application will be created in /path/to/[project_name]
-~ What is the application name? [project_name] 
-~
-~ Resolving dependencies using /path/to/[project_name]/conf/dependencies.yml,
-~
-~   play-&gt;scala 0.9.1 (from playLocalModules)
-~
-~ Installing resolved dependencies,
-~
-~   modules/scala-0.9.1 -&gt; /path/to/[play]/modules/scala-0.9.1
-~
-~ Done!
-~
-~ OK, the application is created.
-~ Start it with : play run project_name
-~ Have fun!
-~
-</code></pre>
-
-<p>動作確認はJavaの時と同様に $ play run [project_name] で出来ます。</p>
-
-<h4>$ play run project_name/</h4>
-
-<pre><code>~        _                _ 
-~  _ __ | | __ _ _  _| |
-~ | '_ \| |/ _' | || |_|
-~ |  __/|_|\____|\__ (_)
-~ |_|            |__/   
-~
-~ play! 1.2.2, http://www.playframework.org
-~
-~ Ctrl+C to stop
-~ 
-Listening for transport dt_socket at address: 8000
-02:15:51,036 INFO  ~ Starting /path/to/[project_name]
-02:15:51,067 INFO  ~ Module scala is available (/path/to/[play]/modules/scala-0.9.1)
-02:15:54,598 INFO  ~ Scala support is active
-02:15:54,598 WARN  ~ You're running Play! in DEV mode
-02:15:54,734 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-Compiling:
-    /path/to/[project_name]/app/controllers.scala
-    /path/to/[play]/modules/docviewer/app/controllers/PlayDocumentation.java
-    /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
-    /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
-    /path/to/[play]/modules/docviewer/app/DocViewerPlugin.java
-    /path/to/[project_name]/tmp/generated/views.html.main.scala
-    /path/to/[play]/modules/docviewer/app/helpers/CheatSheetHelper.java
-Traversing /path/to/[project_name]/app/controllers.scala
-Traversing /path/to/[project_name]/tmp/generated/views.Application.html.index.scala
-Traversing /path/to/[project_name]/tmp/generated/views.defaults.html.welcome.scala
-Traversing /path/to/[project_name]/tmp/generated/views.html.main.scala
-API phase took : 0.503 s
-02:16:21,114 INFO  ~ Application '[project_name]' is now started !
-</code></pre>
-
-<h3>プロジェクト構成</h3>
-
-<p>Playのプロジェクトは以下のような構成となっています。アプリケーションを構築して行く際は主にapp以下を弄って行く事になるでしょう。</p>
-
-<ul>
-<li>app
-<ul>
-<li>コントローラ、モデル、ビューなど。</li>
-</ul></li>
-<li>conf
-<ul>
-<li>アプリケーションの設定。ルーティングの設定もここ。</li>
-</ul></li>
-<li>lib
-<ul>
-<li>jarファイルなどのlib関係。</li>
-</ul></li>
-<li>modules
-<ul>
-<li>プロジェクトが依存しているものがこの下に書き出されるのかな？</li>
-</ul></li>
-<li>public
-<ul>
-<li>静的ファイルなど。</li>
-</ul></li>
-<li>test
-<ul>
-<li>テスト関係など。</li>
-</ul></li>
-<li>tmp
-<ul>
-<li>生成されたclassファイルの配置やキャッシュなど。</li>
-</ul></li>
-</ul>
-
-<h3>とりあえず中身を眺めてみる</h3>
-
-<p>生成されるスケルトンは以下のようになっています。ルーティングとコントローラ/アクションの対応は直感的で分かりやすいですね。Controllerを継承したApplicationがコントローラ、その中で定義したメソッドがアクションのようです。</p>
-
-<p>ただアクションで何を返すかが非常に分りづらいですね（もちろん基本はテンプレートですが）テンプレートそのものも@が出て来て関数定義っぽいし非常に分りづらいです。Webデザイナー殺しですね<s>死ねば良いと思います＾＾</s></p>
-
-<h4>$ cat [project_name]/conf/routes</h4>
-
-<pre><code># Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
-
-# Home page
-GET     /                                       Application.index
-
-# Ignore favicon requests
-GET     /favicon.ico                            404
-
-# Map static resources from the /app/public folder to the /public path
-GET     /public/                                staticDir:public
-
-# Catch all
-*       /{controller}/{action}                  {controller}.{action}
-</code></pre>
-
-<h4>$ cat [project_name]/app/controllers.scala</h4>
-
-<pre><code>package controllers
-
-import play._
-import play.mvc._
-
-object Application extends Controller {
-
-    import views.Application._
-
-    def index = {
-        html.index("Your Scala application is ready!")
-    }
-
-}
-</code></pre>
-
-<h4>$ cat [project_name]/app/views/Application/index.scala.html</h4>
-
-<pre><code>@(title:String)
-
-@main(title) {
-
-    @views.defaults.html.welcome(title)
-
-}
-</code></pre>
-
-<h4>$ cat [project_name]/app/views/main.scala.html</h4>
-
-<pre><code>@(title:String = "")(body: =&gt; Html)
-
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-    &lt;head&gt;
-        &lt;title&gt;@title&lt;/title&gt;
-        &lt;link rel="stylesheet" media="screen" href="@asset("public/stylesheets/main.css")"&gt;
-        &lt;link rel="shortcut icon" type="image/png" href="@asset("public/images/favicon.png")"&gt;
-        &lt;script src="@asset("public/javascripts/jquery-1.5.2.min.js")" type="text/javascript"&gt;&lt;/script&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-        @body
-    &lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-<h3>アクションとビュー</h3>
-
-<p>とりあえずスケルトンでは以下のような感じで動いているようです。</p>
-
-<ul>
-<li>views/[レイアウト].scala.html
-<ul>
-<li>レイアウトを定義</li>
-</ul></li>
-<li>views/[コントローラ]/[アクション].scala.html
-<ul>
-<li>@レイアウト(引数) { HTML }</li>
-<li>レイアウトとHTMLをガッチャンコして返す</li>
-</ul></li>
-</ul>
-
-<p>HTMLの部分が@views.defaults.html.welcome(title)となってこれが何を差しているのかが分りづらくしています。ここを&lt;h1&gt;@title&lt;/h1&gt;とでもすればもう少し見通しが良くなるのではないかと思います。具体的には以下のような感じ。</p>
-
-<h4>$ diff -u [project_name]/app/views/Application/index.scala.html.orig [project_name]/app/views/Application/index.scala.html</h4>
-
-<pre><code>--- project_name/app/views/Application/index.scala.html.orig    2011-07-24 03:45:31.000000000 +0900
-+++ project_name/app/views/Application/index.scala.html 2011-07-24 03:47:38.000000000 +0900
-@@ -2,6 +2,6 @@
-
- @main(title) {
-
--    @views.defaults.html.welcome(title)
-+    &lt;h1&gt;@title&lt;/h1&gt;
-
--}
-\ No newline at end of file
-+}
-</code></pre>
-
-<h4>$ diff -u project_name/app/controllers.scala.orig project_name/app/controllers.scala</h4>
-
-<pre><code>--- project_name/app/controllers.scala.orig 2011-07-24 03:49:42.000000000 +0900
-+++ project_name/app/controllers.scala  2011-07-24 03:48:58.000000000 +0900
-@@ -8,7 +8,11 @@
-     import views.Application._
-
-     def index = {
--        html.index("Your Scala application is ready!")
-+        html.index("index")
-     }
-
-+    def sample = {
-+        html.index("sample")
-+    }
-+
- }
-</code></pre>
-
-<p>アクションも増やしてみました。これでルーティング設定も確認出来ます。$ play run [project_name] として以下へアクセスするとそれぞれindex、sampleが&lt;h1&gt;で表示されることが確認出来ると思います。</p>
-
-<ul>
-<li><a href="http://localhost:9000/">http://localhost:9000/</a></li>
-<li><a href="http://localhost:9000/Application/sample">http://localhost:9000/Application/sample</a></li>
-</ul>
-
-<p>なんとなくではありますがアクションからテンプレートが呼ばれ、引数を使ってレイアウトを解決して表示していることが見えてきた感じがします。</p>
-
-<h3>まとめ</h3>
-
-<p>とりあえず一旦ここまで。何をしているか理解出来たらまたコントローラ／アクション／テンプレートの関係を文字に起こしてみたいと思います。</p>
-
-<p>Play frameworkですが面白そうではあるもののやはりテンプレート周りが気に入らないですね。テンプレートの中にコードを埋め込んだり、独自の構文でロジックを埋め込んだりというのはどうしても慣れないです。どんなに簡単な構文でそれが可能だとしてもデザイナーとの連携の時にはやはり困ると思うのです。「ここは動的な情報が入るのでこういう書き方をして下さい」なんて絶対混乱します。テンプレートをHTMLで書くならそのテンプレートはプレーンなHTMLであるべきだと自分は思います。</p>
-
-		</div>
-		<div class="footer">
-			<time>2011-07-24</time>
-			<ul class="tag">
-				<li><a href="/tag/Scala">Scala(1)</a></li>
-				<li><a href="/tag/Play">Play(1)</a></li>
-				<li><a href="/tag/フレームワーク">フレームワーク(3)</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-	</div>
-	<div class="clearer spacer30"></div>
 	<div class="col-1-1 pager">
 		<a href="/page/7" class="float-left">≪前のページ</a>
 		<a href="/page/9" class="float-right">次のページ≫</a>
@@ -646,20 +306,20 @@ object Application extends Controller {
 				<div class="col-1-1">
 					<h3>Recent Posts</h3>
 					<ul class="sidemenu">
+						<li><a href="/blog/2015/05/09/20150509/">CentOS6/7 で VPN 構築</a></li>
 						<li><a href="/blog/2015/05/01/20150501/">そうだ docker触れる環境を作ろう</a></li>
 						<li><a href="/blog/2015/02/08/20150208/">plantumlのリアルタイムプレビュー</a></li>
 						<li><a href="/blog/2015/01/24/20150124/">ORDER BY や LIMIT を含む場合の select for update</a></li>
 						<li><a href="/blog/2014/12/21/20141221/">DBICのprefetch</a></li>
-						<li><a href="/blog/2014/11/03/20141103/">祝日であることを完全に忘れて出社</a></li>
 					</ul>
 				</div>
 				<div class="clearer"></div>
 				<div class="col-1-1">
 					<h3>Archives</h3>
 						<ul class="sidemenu toggle_tree">
-							<li><a href="/archives/2015">2015年(3)</a>
+							<li><a href="/archives/2015">2015年(4)</a>
 								<ul>
-										<li><a href="/archives/2015/05">2015年05月(1)</a></li>
+										<li><a href="/archives/2015/05">2015年05月(2)</a></li>
 										<li><a href="/archives/2015/02">2015年02月(1)</a></li>
 										<li><a href="/archives/2015/01">2015年01月(1)</a></li>
 								</ul>
@@ -769,6 +429,7 @@ object Application extends Controller {
 						<li class="hide"><a href="/tag/phantomjs">phantomjs(1)</a></li>
 						<li class="hide"><a href="/tag/plantuml">plantuml(1)</a></li>
 						<li class="hide"><a href="/tag/responsive design">responsive design(1)</a></li>
+						<li class="hide"><a href="/tag/vpn">vpn(1)</a></li>
 						<li class="hide"><a href="/tag/wicket">wicket(1)</a></li>
 						<li class="hide"><a href="/tag/オブジェクト指向">オブジェクト指向(1)</a></li>
 						<li class="hide"><a href="/tag/サーバ管理">サーバ管理(1)</a></li>
